@@ -1,30 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
            xsi:type="TaskPaneApp">
-  <Id>12345678-90ab-cdef-1234-567890abcdef</Id>
+  <Id>3e49f6c6-16c1-4b1a-949d-185b52c2a934</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>Avi Benita</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Normal Distribution Calculator"/>
-  <Description DefaultValue="A visual calculator embedded in Excel sheet"/>
-  <IconUrl DefaultValue="https://avibenita.github.io/StaticticalCalculator/icon.png"/>
-  <SupportUrl DefaultValue="https://avibenita.github.io/StaticticalCalculator/"/>
+  <Description DefaultValue="Advanced normal distribution tool with real-time visualization."/>
+  <IconUrl DefaultValue="https://avibenita.github.io/StaticticalCalculator/assets/icon-32.png"/>
+  <SupportUrl DefaultValue="https://github.com/avibenita/StaticticalCalculator"/>
 
   <Hosts>
-    <Host Name="Workbook" />
+    <Host Name="Workbook"/>
   </Hosts>
 
   <DefaultSettings>
-   
-    <SourceLocation DefaultValue="https://avibenita.github.io/StatisticalCalculator/taskpane.html"/>        
+    <SourceLocation DefaultValue="https://avibenita.github.io/StaticticalCalculator/taskpane.html"/>
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
 
-  <Requirements>
-    <Sets DefaultMinVersion="1.1">
-      <Set Name="ExcelApi" />
-    </Sets>
-  </Requirements>
+  <VersionOverrides Version="1.0">
+    <Hosts>
+      <Host xsi:type="Workbook">
+        <Runtimes>
+          <Runtime resid="taskpaneUrl" lifetime="long" />
+        </Runtimes>
+        <ExtensionPoint xsi:type="TaskPane">
+          <SourceLocation resid="taskpaneUrl"/>
+          <Title resid="paneTitle"/>
+          <RequestedHeight>600</RequestedHeight>
+        </ExtensionPoint>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Urls>
+        <bt:Url id="taskpaneUrl">https://avibenita.github.io/StaticticalCalculator/taskpane.html</bt:Url>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="paneTitle">Normal Distribution Calculator</bt:String>
+      </bt:ShortStrings>
+    </Resources>
+  </VersionOverrides>
 </OfficeApp>
