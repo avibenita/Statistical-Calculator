@@ -10,7 +10,7 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Normal Distribution Calculator"/>
   <Description DefaultValue="Advanced normal distribution tool with real-time visualization."/>
-  <IconUrl DefaultValue="https://avibenita.github.io/StaticticalCalculator/assets/icon-32.png"/>
+ <!--  <IconUrl DefaultValue="https://avibenita.github.io/StaticticalCalculator/assets/icon-32.png"/> -->
   <SupportUrl DefaultValue="https://github.com/avibenita/StaticticalCalculator"/>
 
   <Hosts>
