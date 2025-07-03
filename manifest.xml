@@ -16,7 +16,8 @@
   </Hosts>
 
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://avibenita.github.io/StaticticalCalculator/Normal.html"/>
+   
+    <SourceLocation DefaultValue="https://avibenita.github.io/StatisticalCalculator/taskpane.html"/>        
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
