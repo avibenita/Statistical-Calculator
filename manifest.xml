@@ -10,15 +10,15 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Normal Distribution Calculator"/>
   <Description DefaultValue="Advanced normal distribution tool with real-time visualization."/>
- <!--  <IconUrl DefaultValue="https://avibenita.github.io/StaticticalCalculator/assets/icon-32.png"/> -->
-  <SupportUrl DefaultValue="https://github.com/avibenita/StaticticalCalculator"/>
+ <!--  <IconUrl DefaultValue="https://avibenita.github.io/Statistical-Calculator/assets/icon-32.png"/> -->
+  <SupportUrl DefaultValue="https://github.com/avibenita/Statistical-Calculator"/>
 
   <Hosts>
     <Host Name="Workbook"/>
   </Hosts>
 
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://avibenita.github.io/StaticticalCalculator/taskpane.html"/>
+    <SourceLocation DefaultValue="https://avibenita.github.io/Statistical-Calculator/taskpane.html"/>
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
@@ -38,7 +38,7 @@
     </Hosts>
     <Resources>
       <bt:Urls>
-        <bt:Url id="taskpaneUrl">https://avibenita.github.io/StaticticalCalculator/taskpane.html</bt:Url>
+        <bt:Url id="taskpaneUrl">https://avibenita.github.io/Statistical-Calculator/taskpane.html</bt:Url>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="paneTitle">Normal Distribution Calculator</bt:String>
