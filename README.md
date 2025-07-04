@@ -1,2 +1,2 @@
-# StaticticalCalculator
+# Statistical-Calculator
 Statictical Calculator
