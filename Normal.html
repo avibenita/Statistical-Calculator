@@ -1,33 +1,28 @@
 <!DOCTYPE html>
-
 <html lang="en">
-<head>
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  font-family: sans-serif;
-}
-#main-wrapper {
-  width: 75vw;
-  max-width: 1000px;
-  max-height: 560px;
-  margin: auto;
-  overflow: hidden;
-  box-sizing: border-box;
-  padding: 1rem;
-}
-.chart-area, svg, canvas {
-  max-height: 600px !important;
-  height: auto !important;
-}
-</style>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<style>
-    html, body {
+ <head>
+  <style>
+   html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    #main-wrapper {
+      width: 75vw;
+      max-width: 1000px;
+      margin: 0 auto;
+      height: 95vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      padding: 1rem;
+    }
+  </style>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <style>
+   html, body {
       margin: 0;
       padding: 0;
       width: 100%;
@@ -44,14 +39,18 @@ html, body {
       box-sizing: border-box;
     }
   </style>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Advanced Statistics Calculator</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
-<style>
-        :root {
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Advanced Statistics Calculator
+  </title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+  <style>
+   :root {
             --panel-bg: #484b57;
             --panel-radius: 10px;
             --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
@@ -696,163 +695,238 @@ html, body {
                 font-size: 0.55rem;
             }
         }
-    </style>
-</head>
-<body>
-<div id="main-wrapper"><div class='\"main-container\"'>
-<div class="container">
-<div class="header">
-<h1><i class="fas fa-chart-line"></i> Advanced Statistics Calculator</h1>
-<p>Interactive Normal Distribution Analysis with Real-time Visualization</p>
-<div style="margin-top: 15px;">
-<button class="btn btn-success" onclick="reloadCalculator()">
-<i class="fas fa-redo"></i>
-                    Reset Calculator
-                </button>
-</div>
-</div>
-<div class="main-content">
-<div class="control-panel">
-<h3 class="panel-title">
-<i class="fas fa-sliders-h"></i>
-                    Distribution Parameters
-                </h3>
-<div class="input-group">
-<label>Mean (μ)</label>
-<div class="input-row">
-<input class="input-field" id="mean" step="0.1" type="number" value="0"/>
-</div>
-</div>
-<div class="input-group">
-<label>Standard Deviation (σ)</label>
-<div class="input-row">
-<input class="input-field" id="stddev" min="0.01" step="0.1" type="number" value="1"/>
-</div>
-</div>
-<div class="calculation-type">
-<h4 style="margin-bottom: 15px; color: var(--header-color);">Calculation Type</h4>
-<div class="radio-group">
-<label class="radio-option">
-<input checked="" name="calcType" type="radio" value="probability"/>
-                            Find Probability P(X ≤ x)
-                        </label>
-<label class="radio-option">
-<input name="calcType" type="radio" value="between"/>
-                            Find P(a ≤ X ≤ b)
-                        </label>
-<label class="radio-option">
-<input name="calcType" type="radio" value="quantile"/>
-                            Find Value for Given Probability
-                        </label>
-</div>
-</div>
-<div id="inputSection">
-<div class="input-group">
-<label>X Value</label>
-<input class="input-field" id="xValue" step="0.1" type="number" value="0"/>
-</div>
-</div>
-<button class="btn btn-primary" onclick="calculate()">
-<i class="fas fa-calculator"></i>
-                    Calculate
-                </button>
-<div class="advanced-options">
-<div class="advanced-toggle" onclick="toggleAdvanced()">
-<i class="fas fa-cogs"></i>
-                        Advanced Options
-                        <i class="fas fa-chevron-down" id="advancedIcon"></i>
-</div>
-<div class="advanced-content" id="advancedContent">
-<div class="input-group">
-<label>Decimal Precision</label>
-<select class="input-field" id="precision">
-<option value="2">2 decimals</option>
-<option value="3">3 decimals</option>
-<option selected="" value="4">4 decimals</option>
-<option value="5">5 decimals</option>
-<option value="6">6 decimals</option>
-</select>
-</div>
-<div class="input-group">
-<label>Chart Range (σ units)</label>
-<input class="input-field" id="chartRange" max="6" min="2" step="0.5" type="number" value="4"/>
-</div>
-</div>
-</div>
-</div>
-<div class="visualization-panel">
-<div class="tabs">
-<div class="tab active" onclick="switchTab('pdf')">PDF View</div>
-<div class="tab" onclick="switchTab('cdf')">CDF View</div>
-<div class="tab" onclick="switchTab('both')">Combined View</div>
-</div>
-<div class="tab-content active" id="pdfTab">
-<div class="chart-container">
-<canvas id="pdfChart"></canvas>
-</div>
-</div>
-<div class="tab-content" id="cdfTab">
-<div class="chart-container">
-<canvas id="cdfChart"></canvas>
-</div>
-</div>
-<div class="tab-content" id="bothTab">
-<div class="chart-container">
-<canvas id="combinedChart"></canvas>
-</div>
-</div>
-<div class="probability-visualization">
-<h4 style="color: var(--header-color); margin-bottom: 10px;">
-<i class="fas fa-area-chart"></i>
-                        Shaded Area Representation
-                    </h4>
-<div class="shaded-area-info">
-<span id="areaDescription">Select calculation type to see shaded area</span>
-<span id="areaValue" style="font-weight: bold; color: var(--header-color);">--</span>
-</div>
-</div>
-<!-- Embedded Results & Statistics Panel -->
-<div class="embedded-results-panel">
-<h4 class="embedded-panel-title">
-<i class="fas fa-chart-bar"></i>
-                        Results &amp; Statistics
-                    </h4>
-<div class="embedded-stats-grid">
-<div class="embedded-stat-item primary-result">
-<div class="embedded-stat-value" id="mainResult">--</div>
-<div class="embedded-stat-label">Result</div>
-</div>
-<div class="embedded-stat-item">
-<div class="embedded-stat-value" id="meanStat">0</div>
-<div class="embedded-stat-label">Mean (μ)</div>
-</div>
-<div class="embedded-stat-item">
-<div class="embedded-stat-value" id="stddevStat">1</div>
-<div class="embedded-stat-label">Std Dev (σ)</div>
-</div>
-<div class="embedded-stat-item">
-<div class="embedded-stat-value" id="varianceStat">1</div>
-<div class="embedded-stat-label">Variance (σ²)</div>
-</div>
-<div class="embedded-stat-item">
-<div class="embedded-stat-value" id="medianStat">0</div>
-<div class="embedded-stat-label">Median</div>
-</div>
-<div class="embedded-stat-item">
-<div class="embedded-stat-value" id="modeStat">0</div>
-<div class="embedded-stat-label">Mode</div>
-</div>
-<div class="embedded-stat-item">
-<div class="embedded-stat-value" id="skewnessStat">0</div>
-<div class="embedded-stat-label">Skewness</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<script>
-        let pdfChart, cdfChart, combinedChart;
+  </style>
+ </head>
+ <body style="margin: 0; overflow: hidden;">
+  <div style="width: 100vw; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+   <div id="mainContentWrapper" style="width: 90%; max-width: 1200px; height: auto;">
+    <div class="container">
+     <div class="header">
+      <h1>
+       <i class="fas fa-chart-line">
+       </i>
+       Advanced Statistics Calculator
+      </h1>
+      
+      
+       <button class="btn btn-success" onclick="reloadCalculator()">
+        <i class="fas fa-redo">
+        </i>
+        Reset Calculator
+       </button>
+    
+     </div>
+     <div class="main-content">
+      <div class="control-panel">
+       <h3 class="panel-title">
+        <i class="fas fa-sliders-h">
+        </i>
+        Distribution Parameters
+       </h3>
+       <div class="input-group">
+        <label>
+         Mean (μ)
+        </label>
+        <div class="input-row">
+         <input class="input-field" id="mean" step="0.1" type="number" value="0"/>
+        </div>
+       </div>
+       <div class="input-group">
+        <label>
+         Standard Deviation (σ)
+        </label>
+        <div class="input-row">
+         <input class="input-field" id="stddev" min="0.01" step="0.1" type="number" value="1"/>
+        </div>
+       </div>
+       <div class="calculation-type">
+        <h4 style="margin-bottom: 15px; color: var(--header-color);">
+         Calculation Type
+        </h4>
+        <div class="radio-group">
+         <label class="radio-option">
+          <input checked="" name="calcType" type="radio" value="probability"/>
+          Find Probability P(X ≤ x)
+         </label>
+         <label class="radio-option">
+          <input name="calcType" type="radio" value="between"/>
+          Find P(a ≤ X ≤ b)
+         </label>
+         <label class="radio-option">
+          <input name="calcType" type="radio" value="quantile"/>
+          Find Value for Given Probability
+         </label>
+        </div>
+       </div>
+       <div id="inputSection">
+        <div class="input-group">
+         <label>
+          X Value
+         </label>
+         <input class="input-field" id="xValue" step="0.1" type="number" value="0"/>
+        </div>
+       </div>
+       <button class="btn btn-primary" onclick="calculate()">
+        <i class="fas fa-calculator">
+        </i>
+        Calculate
+       </button>
+       <div class="advanced-options">
+        <div class="advanced-toggle" onclick="toggleAdvanced()">
+         <i class="fas fa-cogs">
+         </i>
+         Advanced Options
+         <i class="fas fa-chevron-down" id="advancedIcon">
+         </i>
+        </div>
+        <div class="advanced-content" id="advancedContent">
+         <div class="input-group">
+          <label>
+           Decimal Precision
+          </label>
+          <select class="input-field" id="precision">
+           <option value="2">
+            2 decimals
+           </option>
+           <option value="3">
+            3 decimals
+           </option>
+           <option selected="" value="4">
+            4 decimals
+           </option>
+           <option value="5">
+            5 decimals
+           </option>
+           <option value="6">
+            6 decimals
+           </option>
+          </select>
+         </div>
+         <div class="input-group">
+          <label>
+           Chart Range (σ units)
+          </label>
+          <input class="input-field" id="chartRange" max="6" min="2" step="0.5" type="number" value="4"/>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="visualization-panel">
+       <div class="tabs">
+        <div class="tab active" onclick="switchTab('pdf')">
+         PDF View
+        </div>
+        <div class="tab" onclick="switchTab('cdf')">
+         CDF View
+        </div>
+        <div class="tab" onclick="switchTab('both')">
+         Combined View
+        </div>
+       </div>
+       <div class="tab-content active" id="pdfTab">
+        <div class="chart-container">
+         <canvas id="pdfChart">
+         </canvas>
+        </div>
+       </div>
+       <div class="tab-content" id="cdfTab">
+        <div class="chart-container">
+         <canvas id="cdfChart">
+         </canvas>
+        </div>
+       </div>
+       <div class="tab-content" id="bothTab">
+        <div class="chart-container">
+         <canvas id="combinedChart">
+         </canvas>
+        </div>
+       </div>
+       <div class="probability-visualization">
+        <h4 style="color: var(--header-color); margin-bottom: 10px;">
+         <i class="fas fa-area-chart">
+         </i>
+         Shaded Area Representation
+        </h4>
+        <div class="shaded-area-info">
+         <span id="areaDescription">
+          Select calculation type to see shaded area
+         </span>
+         <span id="areaValue" style="font-weight: bold; color: var(--header-color);">
+          --
+         </span>
+        </div>
+       </div>
+       <!-- Embedded Results & Statistics Panel -->
+       <div class="embedded-results-panel">
+        <h4 class="embedded-panel-title">
+         <i class="fas fa-chart-bar">
+         </i>
+         Results &amp; Statistics
+        </h4>
+        <div class="embedded-stats-grid">
+         <div class="embedded-stat-item primary-result">
+          <div class="embedded-stat-value" id="mainResult">
+           --
+          </div>
+          <div class="embedded-stat-label">
+           Result
+          </div>
+         </div>
+         <div class="embedded-stat-item">
+          <div class="embedded-stat-value" id="meanStat">
+           0
+          </div>
+          <div class="embedded-stat-label">
+           Mean (μ)
+          </div>
+         </div>
+         <div class="embedded-stat-item">
+          <div class="embedded-stat-value" id="stddevStat">
+           1
+          </div>
+          <div class="embedded-stat-label">
+           Std Dev (σ)
+          </div>
+         </div>
+         <div class="embedded-stat-item">
+          <div class="embedded-stat-value" id="varianceStat">
+           1
+          </div>
+          <div class="embedded-stat-label">
+           Variance (σ²)
+          </div>
+         </div>
+         <div class="embedded-stat-item">
+          <div class="embedded-stat-value" id="medianStat">
+           0
+          </div>
+          <div class="embedded-stat-label">
+           Median
+          </div>
+         </div>
+         <div class="embedded-stat-item">
+          <div class="embedded-stat-value" id="modeStat">
+           0
+          </div>
+          <div class="embedded-stat-label">
+           Mode
+          </div>
+         </div>
+         <div class="embedded-stat-item">
+          <div class="embedded-stat-value" id="skewnessStat">
+           0
+          </div>
+          <div class="embedded-stat-label">
+           Skewness
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <script>
+     let pdfChart, cdfChart, combinedChart;
         let currentCalcType = 'probability';
 
         // Initialize the application
@@ -1860,6 +1934,7 @@ html, body {
             }
         }
     </script>
-</div></div>
-</body>
+   </div>
+  </div>
+ </body>
 </html>
