@@ -29,11 +29,12 @@
 <button onclick="openDistribution('T')">t Distribution</button>
 <button onclick="openDistribution('ChiSquare')">Chi-square</button>
 <button onclick="openDistribution('F')">F Distribution</button>
+
+
 <script>
-    
-    function openDistribution(type) {
-        alert (111);
-      const baseURL = "\\DESKTOP-KETN051\OfficeAddins";
+Office.onReady((info) => {
+  if (info.host === Office.HostType.Excel) {
+    document.addEventListener("DOMContentLoaded", function () {
       const pageMap = {
         Normal: "Normal.html",
         T: "T.html",
@@ -41,30 +42,32 @@
         F: "F.html"
       };
 
-      const page = pageMap[type];
-      if (!page) {  
-        alert("Unknown distribution");
-        return;
+      function openDistribution(type) {
+        const baseURL = "https://avibenita.github.io/Statistical-Calculator/";
+        const page = pageMap[type];
+        if (!page) {
+          console.error("Unknown distribution");
+          return;
+        }
+
+        Office.context.ui.displayDialogAsync(
+          baseURL + page,
+          { height: 65, width: 75, displayInIframe: true },
+          function (result) {
+            if (result.status !== Office.AsyncResultStatus.Succeeded) {
+              console.error("Failed to open dialog");
+            }
+          }
+        );
       }
 
-      Office.onReady((info) => {
-  if (info.host === Office.HostType.Excel) {
-    // ✅ Your dialog logic goes here
-    document.getElementById("normalBtn").onclick = function () {
-      Office.context.ui.displayDialogAsync(
-        "https://avibenita.github.io/Statistical-Calculator/Normal.html",
-        { height: 65, width: 75, displayInIframe: true },
-        function (result) {
-          if (result.status !== Office.AsyncResultStatus.Succeeded) {
-            console.error("Failed to open dialog");
-          }
-        }
-      );
-    };
+      document.getElementById("normalBtn").onclick = () => openDistribution("Normal");
+      document.getElementById("tBtn").onclick = () => openDistribution("T");
+      document.getElementById("chiBtn").onclick = () => openDistribution("ChiSquare");
+      document.getElementById("fBtn").onclick = () => openDistribution("F");
+    });
   }
 });
-
-    }
-  </script>
+</script>
 </body>
 </html>
