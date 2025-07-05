@@ -1,48 +1,101 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
-           xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
-           xsi:type="TaskPaneApp">
-  <Id>3e49f6c6-16c1-4b1a-949d-185b52c2a934</Id>
-  <Version>1.0.0.0</Version>
-  <ProviderName>Avi Benita</ProviderName>
-  <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Normal Distribution Calculator"/>
-  <Description DefaultValue="Advanced normal distribution tool with real-time visualization."/>
- <!--  <IconUrl DefaultValue="https://avibenita.github.io/Statistical-Calculator/assets/icon-32.png"/> -->
-  <SupportUrl DefaultValue="https://github.com/avibenita/Statistical-Calculator"/>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 10px; width: 100%; box-sizing: border-box; }
+    h3 { margin-top: 0; }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #005a9e;
+    }
+    .log {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <h3>📊 Distribution Calculators</h3>
 
-  <Hosts>
-    <Host Name="Workbook"/>
-  </Hosts>
+  <button id="btnNormal">Normal-Distribution</button>
+  <button id="btnT">t Distribution</button>
+  <button id="btnChiSquare">Chi-square</button>
+  <button id="btnF">F Distribution</button>
 
-  <DefaultSettings>
-    <SourceLocation DefaultValue="https://avibenita.github.io/Statistical-Calculator/taskpane.html"/>
-  </DefaultSettings>
+  <div id="logPanel" class="log"></div>
 
-  <Permissions>ReadWriteDocument</Permissions>
+  <script>
+    function log(msg) {
+      const div = document.getElementById("logPanel");
+      const p = document.createElement("p");
+      p.textContent = msg;
+      div.appendChild(p);
+    }
 
-  <VersionOverrides Version="1.0">
-    <Hosts>
-      <Host xsi:type="Workbook">
-        <Runtimes>
-          <Runtime resid="taskpaneUrl" lifetime="long" />
-        </Runtimes>
-        <ExtensionPoint xsi:type="TaskPane">
-          <SourceLocation resid="taskpaneUrl"/>
-          <Title resid="paneTitle"/>
-          <RequestedHeight>600</RequestedHeight>
-        </ExtensionPoint>
-      </Host>
-    </Hosts>
-    <Resources>
-      <bt:Urls>
-        <bt:Url id="taskpaneUrl">https://avibenita.github.io/Statistical-Calculator/taskpane.html</bt:Url>
-      </bt:Urls>
-      <bt:ShortStrings>
-        <bt:String id="paneTitle">Normal Distribution Calculator</bt:String>
-      </bt:ShortStrings>
-    </Resources>
-  </VersionOverrides>
-</OfficeApp>
+    if (typeof Office !== "undefined" && Office.onReady) {
+      Office.onReady((info) => {
+        log("✅ Office.js is ready");
+
+        if (info.host === Office.HostType.Excel) {
+          log("✅ Running inside Excel");
+
+          const pageMap = {
+            Normal: "Normal.html",
+            T: "T.html",
+            ChiSquare: "ChiSquare.html",
+            F: "F.html"
+          };
+
+          function openDistribution(type) {
+            const baseURL = "https://avibenita.github.io/Statistical-Calculator/";
+            const page = pageMap[type];
+
+            if (!page) {
+              log("❌ Unknown distribution type: " + type);
+              return;
+            }
+
+            const fullPath = baseURL + page;
+            log("🔗 Attempting to open: " + fullPath);
+
+            Office.context.ui.displayDialogAsync(
+              fullPath,
+              { height: 60, width: 80, displayInIframe: true },
+              function (result) {
+                if (result.status !== Office.AsyncResultStatus.Succeeded) {
+                  log("❌ Failed to open dialog");
+                } else {
+                  log("✅ Dialog opened successfully");
+                }
+              }
+            );
+          }
+
+          document.getElementById("btnNormal").onclick = () => openDistribution("Normal");
+          document.getElementById("btnT").onclick = () => openDistribution("T");
+          document.getElementById("btnChiSquare").onclick = () => openDistribution("ChiSquare");
+          document.getElementById("btnF").onclick = () => openDistribution("F");
+
+        } else {
+          log("⚠️ Office initialized, but not in Excel. Host: " + info.host);
+        }
+      });
+    } else {
+      log("❌ Office.js not loaded properly.");
+    }
+  </script>
+</body>
+</html>
