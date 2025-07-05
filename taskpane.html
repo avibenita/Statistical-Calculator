@@ -46,9 +46,12 @@
         return;
       }
 
+      Office.onReady((info) => {
+  if (info.host === Office.HostType.Excel) {
+    // ✅ Your dialog logic goes here
+    document.getElementById("normalBtn").onclick = function () {
       Office.context.ui.displayDialogAsync(
-
-        baseURL + page,
+        "https://avibenita.github.io/Statistical-Calculator/Normal.html",
         { height: 65, width: 75, displayInIframe: true },
         function (result) {
           if (result.status !== Office.AsyncResultStatus.Succeeded) {
@@ -56,6 +59,10 @@
           }
         }
       );
+    };
+  }
+});
+
     }
   </script>
 </body>
