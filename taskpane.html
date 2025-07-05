@@ -31,43 +31,42 @@
 <button onclick="openDistribution('F')">F Distribution</button>
 
 
+
 <script>
+let openDistribution;
+
 Office.onReady((info) => {
   if (info.host === Office.HostType.Excel) {
-    document.addEventListener("DOMContentLoaded", function () {
-      const pageMap = {
-        Normal: "Normal.html",
-        T: "T.html",
-        ChiSquare: "ChiSquare.html",
-        F: "F.html"
-      };
+    const pageMap = {
+      Normal: "Normal.html",
+      T: "T.html",
+      ChiSquare: "ChiSquare.html",
+      F: "F.html"
+    };
 
-      function openDistribution(type) {
-        const baseURL = "https://avibenita.github.io/Statistical-Calculator/";
-        const page = pageMap[type];
-        if (!page) {
-          console.error("Unknown distribution");
-          return;
-        }
-
-        Office.context.ui.displayDialogAsync(
-          baseURL + page,
-          { height: 65, width: 75, displayInIframe: true },
-          function (result) {
-            if (result.status !== Office.AsyncResultStatus.Succeeded) {
-              console.error("Failed to open dialog");
-            }
-          }
-        );
+    // Define the function in global scope
+    openDistribution = function (type) {
+      const baseURL = "https://avibenita.github.io/Statistical-Calculator/";
+      const page = pageMap[type];
+      if (!page) {
+        console.error("Unknown distribution");
+        return;
       }
 
-      document.getElementById("normalBtn").onclick = () => openDistribution("Normal");
-      document.getElementById("tBtn").onclick = () => openDistribution("T");
-      document.getElementById("chiBtn").onclick = () => openDistribution("ChiSquare");
-      document.getElementById("fBtn").onclick = () => openDistribution("F");
-    });
+      Office.context.ui.displayDialogAsync(
+        baseURL + page,
+        { height: 65, width: 75, displayInIframe: true },
+        function (result) {
+          if (result.status !== Office.AsyncResultStatus.Succeeded) {
+            console.error("Failed to open dialog");
+          }
+        }
+      );
+    };
   }
 });
+</script>
+
 </script>
 </body>
 </html>
