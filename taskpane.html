@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-  <meta charset="utf-8" />
-  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<style>
     body { font-family: sans-serif; padding: 10px; width: 100%; box-sizing: border-box; }
     h3 { margin-top: 0; }
     button {
@@ -23,14 +24,12 @@
   </style>
 </head>
 <body>
-  <h3>📊 Distribution Calculators</h3>
-
-  <button onclick="openDistribution('Normal')">Normal-Distribution</button>
-  <button onclick="openDistribution('T')">t Distribution</button>
-  <button onclick="openDistribution('ChiSquare')">Chi-square</button>
-  <button onclick="openDistribution('F')">F Distribution</button>
-
-  <script>
+<h3>📊 Distribution Calculators</h3>
+<button onclick="openDistribution('Normal')">Normal-Distribution</button>
+<button onclick="openDistribution('T')">t Distribution</button>
+<button onclick="openDistribution('ChiSquare')">Chi-square</button>
+<button onclick="openDistribution('F')">F Distribution</button>
+<script>
     
     function openDistribution(type) {
       const baseURL = "\\DESKTOP-KETN051\OfficeAddins";
@@ -42,7 +41,7 @@
       };
 
       const page = pageMap[type];
-      if (!page) {
+      if (!page) {  
         alert("Unknown distribution");
         return;
       }
