@@ -1,9 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        #main-wrapper {
+            width: 75vw;
+            max-width: 1000px;
+            margin: 0 auto;
+            height: 95vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding: 1rem;
+        }
+    </style>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .main-container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+    </style>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Chi-squared Distribution Calculator</title>
+    <title>
+        Chi-Square Distribution Calculator
+    </title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/annotations.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -15,9 +55,9 @@
             --panel-radius: 10px;
             --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
             --header-bg: #000;
-            --header-color: rgb(255,192,192);
-            --highlight-bg: rgba(255, 192, 192, 0.2);
-            --highlight-text: rgb(255, 192, 192);
+            --header-color: rgb(255,165,120);
+            --highlight-bg: rgba(255, 165, 120, 0.2);
+            --highlight-text: rgb(255, 165, 120);
             --primary-blue: #3498db;
             --primary-blue-hover: #2980b9;
             --success-green: #27ae60;
@@ -61,6 +101,12 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
+        .header p {
+            color: #bbb;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
         .main-content {
             display: grid;
             grid-template-columns: 1fr 2fr;
@@ -68,21 +114,12 @@
             margin-bottom: 30px;
         }
 
-        .control-panel-wrapper,
-        .visualization-panel-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
         .control-panel {
             background: var(--panel-bg);
             border-radius: var(--panel-radius);
             box-shadow: var(--panel-shadow);
             padding: 25px;
-            min-height: 750px;
-            display: flex;
-            flex-direction: column;
+            height: fit-content;
         }
 
         .visualization-panel {
@@ -90,26 +127,20 @@
             border-radius: var(--panel-radius);
             box-shadow: var(--panel-shadow);
             padding: 25px;
-            min-height: 750px;
-            display: flex;
-            flex-direction: column;
+            min-height: 500px;
         }
 
         .panel-title {
             font-size: 1.4rem;
             color: var(--header-color);
-            margin-bottom: 0;
+            margin-bottom: 2px;
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(0,0,0,0.3);
-            padding: 15px 20px;
-            border-radius: var(--panel-radius);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 2px;
         }
 
         .input-group label {
@@ -119,8 +150,14 @@
             color: #e8e8e8;
         }
 
+        .input-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
         .input-field {
-            width: 100%;
+            flex: 1;
             padding: 12px;
             border: 2px solid #555;
             border-radius: 8px;
@@ -154,7 +191,19 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
             justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #2c3e50 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-blue-hover) 0%, #34495e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
 
         .btn-success {
@@ -196,6 +245,8 @@
         .radio-option input[type="radio"] {
             margin-right: 10px;
             accent-color: var(--primary-blue);
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .radio-option.selected {
@@ -203,58 +254,44 @@
             background: var(--highlight-bg);
         }
 
+        .results-panel {
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--header-color);
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--header-color);
+            margin-bottom: 5px;
+        }
+
+        .result-label {
+            color: #bbb;
+            font-size: 0.95rem;
+        }
+
         .chart-container {
             position: relative;
             height: 400px;
             margin-top: 20px;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .chart-container.animating {
-            transform: scale(1.01);
-            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.25);
-            border-radius: 12px;
-        }
-
-        .chart-container.drawing-curves {
-            animation: curvePulse 2.5s ease-in-out;
-        }
-
-        @keyframes curvePulse {
-            0% { 
-                box-shadow: 0 4px 20px rgba(52, 152, 219, 0.2);
-            }
-            25% { 
-                box-shadow: 0 8px 40px rgba(52, 152, 219, 0.4);
-                transform: scale(1.02);
-            }
-            50% { 
-                box-shadow: 0 12px 60px rgba(52, 152, 219, 0.6);
-                transform: scale(1.015);
-            }
-            75% { 
-                box-shadow: 0 8px 40px rgba(52, 152, 219, 0.4);
-                transform: scale(1.01);
-            }
-            100% { 
-                box-shadow: 0 4px 20px rgba(52, 152, 219, 0.2);
-                transform: scale(1);
-            }
-        }
-
-        .tabs-and-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 20px;
-            gap: 20px;
         }
 
         .tabs {
             display: flex;
+            margin-bottom: 20px;
             border-bottom: 2px solid #555;
-            flex: 1;
         }
 
         .tab {
@@ -263,17 +300,22 @@
             border-bottom: 3px solid transparent;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             color: #bbb;
+            position: relative;
+            overflow: hidden;
         }
 
         .tab:hover {
             color: white;
             background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
         }
 
         .tab.active {
             color: var(--header-color);
             border-bottom-color: var(--header-color);
-            background: rgba(255,192,192,0.1);
+            background: rgba(255,165,120,0.1);
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(255,165,120,0.3);
         }
 
         .tab.switching {
@@ -283,45 +325,50 @@
         @keyframes tabSwitchPulse {
             0% {
                 transform: translateY(0);
-                box-shadow: 0 4px 12px rgba(255,192,192,0.3);
+                box-shadow: 0 4px 12px rgba(255,165,120,0.3);
             }
             50% {
                 transform: translateY(-4px);
-                box-shadow: 0 8px 24px rgba(255,192,192,0.5);
+                box-shadow: 0 8px 24px rgba(255,165,120,0.5);
             }
             100% {
                 transform: translateY(0);
-                box-shadow: 0 4px 12px rgba(255,192,192,0.3);
+                box-shadow: 0 4px 12px rgba(255,165,120,0.3);
             }
         }
 
         .tab-content {
             display: none;
-            opacity: 0;
-            transform: translateX(20px);
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .tab-content.active {
             display: block;
-            opacity: 1;
-            transform: translateX(0);
-            animation: tabSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes tabSlideIn {
-            0% {
-                opacity: 0;
-                transform: translateX(30px) scale(0.95);
-            }
-            50% {
-                opacity: 0.7;
-                transform: translateX(10px) scale(0.98);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--header-color);
+        }
+
+        .stat-label {
+            color: #bbb;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
 
         .probability-visualization {
@@ -337,7 +384,7 @@
             align-items: center;
             margin-top: 10px;
             padding: 10px;
-            background: rgba(255,192,192,0.1);
+            background: rgba(255,165,120,0.1);
             border-radius: 6px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -349,6 +396,111 @@
             box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
         }
 
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+        }
+
+        .advanced-options {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .advanced-toggle {
+            cursor: pointer;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .advanced-content {
+            display: none;
+        }
+
+        .advanced-content.show {
+            display: block;
+        }
+
+        .formula-display {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            color: #e8e8e8;
+            font-size: 0.95rem;
+        }
+
+        .chart-indicator {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .x-marker {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .x-marker::before {
+            content: '';
+            width: 3px;
+            height: 20px;
+            border-radius: 1px;
+            opacity: 0.8;
+        }
+
+        .probability-result {
+            background: linear-gradient(135deg, rgba(255,165,120,0.2) 0%, rgba(255,140,100,0.2) 100%);
+            border: 2px solid rgba(255,165,120,0.6);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: rgb(255,165,120);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        /* Embedded Results Panel Styles - Small Horizontal Boxes */
         .embedded-results-panel {
             background: rgba(0,0,0,0.2);
             border-radius: 6px;
@@ -379,7 +531,9 @@
             border-radius: 4px;
             text-align: center;
             min-width: 70px;
+            flex: 0 0 auto;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
         }
 
         .embedded-stat-item.updating {
@@ -388,9 +542,20 @@
             box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
         }
 
+        .embedded-stat-item:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
         .embedded-stat-item.primary-result {
-            background: rgba(255,192,192,0.15);
-            border: 1px solid rgba(255,192,192,0.3);
+            background: rgba(255,165,120,0.15);
+            border: 1px solid rgba(255,165,120,0.3);
+        }
+
+        .embedded-stat-item.primary-result:hover {
+            background: rgba(255,165,120,0.25);
+            box-shadow: 0 4px 16px rgba(255,165,120,0.3);
         }
 
         .embedded-stat-value {
@@ -401,8 +566,14 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .embedded-stat-value.animating {
+            color: #3498db;
+            transform: scale(1.1);
+            text-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+        }
+
         .embedded-stat-item.primary-result .embedded-stat-value {
-            color: rgb(255,192,192);
+            color: rgb(255,165,120);
         }
 
         .embedded-stat-label {
@@ -410,107 +581,29 @@
             font-size: 0.6rem;
             margin-top: 2px;
             line-height: 1;
+            transition: color 0.3s ease;
         }
 
-        .control-sliders {
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            padding: 12px 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            align-items: center;
-            flex-shrink: 0;
-            min-width: 400px;
+        /* Chart animation enhancements */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
+        .chart-container > div {
+            transition: opacity 0.3s ease;
         }
 
-        .slider-label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: 600;
-            color: #e8e8e8;
-            font-size: 0.8rem;
-            min-width: 90px;
-            flex-shrink: 0;
+        .chart-container.animating {
+            transform: scale(1.02);
+            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.3);
+            border-radius: 12px;
         }
 
-        .slider-value {
-            background: rgba(52, 152, 219, 0.2);
-            color: var(--primary-blue);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            min-width: 30px;
-            text-align: center;
-            border: 1px solid rgba(52, 152, 219, 0.3);
-        }
-
-        .slider-input {
-            width: 80px;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255,255,255,0.1);
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .slider-input::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #2980b9 100%);
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .slider-input::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.6);
-        }
-
-        .slider-input::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #2980b9 100%);
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .slider-input::-moz-range-track {
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-        }
-
-        .slider-input:focus {
-            background: rgba(52, 152, 219, 0.1);
-        }
-
-        .slider-input:focus::-webkit-slider-thumb {
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-        }
-
-        /* Highcharts styling */
+        /* Highcharts specific styling for dark theme */
         .highcharts-container {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
         }
@@ -521,6 +614,10 @@
         
         .highcharts-title {
             fill: white !important;
+        }
+        
+        .highcharts-subtitle {
+            fill: #bbb !important;
         }
         
         .highcharts-axis-labels text {
@@ -534,8 +631,12 @@
         .highcharts-legend-item text {
             fill: white !important;
         }
+        
+        .highcharts-plot-line-label {
+            color: white !important;
+        }
 
-        /* Chart indicators */
+        /* Animated chart indicators */
         .chart-indicator {
             animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -583,34 +684,108 @@
             }
         }
 
-        .probability-result {
-            background: linear-gradient(135deg, rgba(255,192,192,0.2) 0%, rgba(255,160,160,0.2) 100%);
-            border: 2px solid rgba(255,192,192,0.6);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: rgb(255,192,192);
-            text-align: center;
-            min-width: 120px;
+        /* Tab switching animations */
+        .tab-content {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
         }
 
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
+        .tab-content.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+            animation: tabSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes tabSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(30px) scale(0.95);
             }
-            
-            .control-panel-wrapper,
-            .visualization-panel-wrapper {
-                gap: 10px;
+            50% {
+                opacity: 0.7;
+                transform: translateX(10px) scale(0.98);
             }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .tab {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab:hover {
+            transform: translateY(-1px);
+        }
+
+        .tab.active {
+            transform: translateY(0);
+        }
+
+        /* Reset animation effects */
+        .resetting {
+            animation: resetPulse 0.8s ease-in-out;
+        }
+
+        @keyframes resetPulse {
+            0% { 
+                transform: scale(1);
+                background: rgba(255,255,255,0.08);
+            }
+            25% { 
+                transform: scale(1.05);
+                background: rgba(39, 174, 96, 0.2);
+            }
+            50% { 
+                transform: scale(1.02);
+                background: rgba(39, 174, 96, 0.15);
+            }
+            75% { 
+                transform: scale(1.01);
+                background: rgba(39, 174, 96, 0.1);
+            }
+            100% { 
+                transform: scale(1);
+                background: rgba(255,255,255,0.08);
+            }
+        }
+
+        .btn-success {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-success::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-success:hover::before {
+            left: 100%;
+        }
+
+        /* Loading pulse effect for calculations */
+        .calculating {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
             .embedded-stats-grid {
                 gap: 6px;
             }
@@ -620,220 +795,1159 @@
                 padding: 5px 8px;
             }
             
-            .tabs-and-controls {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-            
-            .control-sliders {
-                flex-direction: column;
-                gap: 12px;
-                padding: 10px;
-                min-width: auto;
-            }
-            
-            .slider-group {
-                flex-direction: column;
-                gap: 6px;
-                align-items: stretch;
-            }
-            
-            .slider-label {
-                min-width: auto;
+            .embedded-stat-value {
                 font-size: 0.75rem;
             }
             
-            .slider-input {
-                width: 100%;
+            .embedded-stat-label {
+                font-size: 0.55rem;
             }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>
-                <i class="fas fa-chart-line"></i>
-               Chi-squared Distribution Calculator
-            </h1>
-            <button class="btn btn-success" onclick="reloadCalculator()">
-                <i class="fas fa-redo"></i>
-                Reset Calculator
-            </button>
-        </div>
-
-        <div class="main-content">
-            <div class="control-panel-wrapper">
-                <h3 class="panel-title">
-                    <i class="fas fa-edit"></i>
-                    Input Panel 
-                </h3>
-                <div class="control-panel">
-                    <div class="input-group">
-                        <label>
-                            Degrees of Freedom (k)
-                            <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Degrees of freedom parameter (positive integer)</small>
-                        </label>
-                        <input class="input-field" id="dof" min="1" step="1" type="number" value="5" placeholder="e.g., 1, 3, 5, 10"/>
-                    </div>
-
-                    <div class="calculation-type">
-                        <h4 style="margin-bottom: 15px; color: var(--header-color);">
-                            Calculation Type
-                        </h4>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input checked="" name="calcType" type="radio" value="probability"/>
-                                <div>
-                                    <strong>Find Probability P(χ² ≤ x)</strong>
-                                    <small style="color: #bbb; display: block; margin-top: 2px;">What's the chance of getting a χ² value ≤ x?</small>
-                                </div>
-                            </label>
-                            <label class="radio-option">
-                                <input name="calcType" type="radio" value="between"/>
-                                <div>
-                                    <strong>Find P(a ≤ χ² ≤ b)</strong>
-                                    <small style="color: #bbb; display: block; margin-top: 2px;">What's the chance of getting a χ² value between a and b?</small>
-                                </div>
-                            </label>
-                            <label class="radio-option">
-                                <input name="calcType" type="radio" value="quantile"/>
-                                <div>
-                                    <strong>Find χ² Value for Given Probability</strong>
-                                    <small style="color: #bbb; display: block; margin-top: 2px;">What χ² value has this probability below it?</small>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="inputSection">
-                        <div class="input-group">
-                                                            <label>χ² Value</label>
-                            <input class="input-field" id="xValue" step="0.1" type="number" value="3" min="0"/>
-                        </div>
-                    </div>
-
-                    <div style="text-align: center; padding: 10px; background: rgba(52, 152, 219, 0.1); border-radius: 6px; border: 1px solid rgba(52, 152, 219, 0.3); margin-top: 10px;">
-                        <i class="fas fa-bolt" style="color: #3498db; margin-right: 8px;"></i>
-                        <span style="color: #3498db; font-weight: 600; font-size: 0.9rem;">Results update instantly as you type!</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="visualization-panel-wrapper">
-                <h3 class="panel-title">
-                    <i class="fas fa-chart-area"></i>
-                    Results Panel - Visualizations & Statistics
-                </h3>
-                <div class="visualization-panel">
-                    <div class="tabs-and-controls">
-                        <div class="tabs">
-                            <div class="tab active" onclick="switchTab('pdf', this)">PDF View</div>
-                            <div class="tab" onclick="switchTab('cdf', this)">CDF View</div>
-                            <div class="tab" onclick="switchTab('both', this)">Combined View</div>
-                        </div>
-
-                        <div class="control-sliders">
-                            <div class="slider-group">
-                                <label class="slider-label">
-                                    Precision
-                                    <span class="slider-value" id="precisionValue">4</span>
-                                </label>
-                                <input type="range" class="slider-input" id="precision" min="2" max="6" step="1" value="4"/>
-                            </div>
-                            <div class="slider-group">
-                                <label class="slider-label">
-                                    Range (σ)
-                                    <span class="slider-value" id="chartRangeValue">4.0</span>
-                                </label>
-                                <input type="range" class="slider-input" id="chartRange" min="2" max="6" step="0.5" value="4"/>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-content active" id="pdfTab">
-                        <div class="chart-container">
-                            <div id="pdfChart"></div>
-                        </div>
-                    </div>
-
-                    <div class="tab-content" id="cdfTab">
-                        <div class="chart-container">
-                            <div id="cdfChart"></div>
-                        </div>
-                    </div>
-
-                    <div class="tab-content" id="bothTab">
-                        <div class="chart-container">
-                            <div id="combinedChart"></div>
-                        </div>
-                    </div>
-
-                    <div class="probability-visualization">
-                        <h4 style="color: var(--header-color); margin-bottom: 10px;">
-                            <i class="fas fa-area-chart"></i>
-                            Shaded Area Representation
-                        </h4>
-                        <div class="shaded-area-info">
-                            <span id="areaDescription">Select calculation type to see shaded area</span>
-                            <span id="areaValue" style="font-weight: bold; color: var(--header-color);">--</span>
-                        </div>
-                    </div>
-
-                    <div class="embedded-results-panel">
-                        <h4 class="embedded-panel-title">
-                            <i class="fas fa-chart-bar"></i>
-                            Results &amp; Statistics
-                        </h4>
-                        <div class="embedded-stats-grid">
-                            <div class="embedded-stat-item primary-result">
-                                <div class="embedded-stat-value" id="mainResult">--</div>
-                                <div class="embedded-stat-label">Result</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="dofStat">5</div>
-                                <div class="embedded-stat-label">DOF (k)</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="meanStat">5</div>
-                                <div class="embedded-stat-label">Mean (μ)</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="stddevStat">3.16</div>
-                                <div class="embedded-stat-label">Std Dev (σ)</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="varianceStat">10</div>
-                                <div class="embedded-stat-label">Variance (σ²)</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="medianStat">4.35</div>
-                                <div class="embedded-stat-label">Median</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="modeStat">3</div>
-                                <div class="embedded-stat-label">Mode</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="skewnessStat">1.26</div>
-                                <div class="embedded-stat-label">Skewness</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+<body style="margin: 0; overflow: hidden;">
+    <div style="width: 100vw; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+        <div id="mainContentWrapper" style="width: 90%; max-width: 1200px; height: auto;">
+            <div class="container">
+                <div class="header">
+                    <h1>
+                        <i class="fas fa-chi"></i>
+                        Chi-Square Distribution Calculator
+                    </h1>
+                    
+                    
+                    <button class="btn btn-success" onclick="reloadCalculator()">
+                        <i class="fas fa-redo">
+                        </i>
+                        Reset Calculator
+                    </button>
                 
-
-             
-
-            
+                </div>
+                <div class="main-content">
+                    <div class="control-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-edit">
+                            </i>
+                            Input Panel - Distribution Parameters
+                        </h3>
+                        <div class="input-group">
+                            <label>
+                                Degrees of Freedom (ν)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Must be a positive integer</small>
+                            </label>
+                            <div class="input-row">
+                                <input class="input-field" id="degreesOfFreedom" min="1" step="1" type="number" value="5" placeholder="e.g., 1, 5, 10"/>
+                            </div>
+                        </div>
+                        <div class="calculation-type">
+                            <h4 style="margin-bottom: 15px; color: var(--header-color);">
+                                Calculation Type
+                            </h4>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input checked="" name="calcType" type="radio" value="probability"/>
+                                    <div>
+                                        <strong>Find Probability P(X ≤ x)</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">What's the chance of getting a value ≤ x?</small>
+                                    </div>
+                                </label>
+                                <label class="radio-option">
+                                    <input name="calcType" type="radio" value="between"/>
+                                    <div>
+                                        <strong>Find P(a ≤ X ≤ b)</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">What's the chance of getting a value between a and b?</small>
+                                    </div>
+                                </label>
+                                <label class="radio-option">
+                                    <input name="calcType" type="radio" value="quantile"/>
+                                    <div>
+                                        <strong>Find Value for Given Probability</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">What value has this probability below it?</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="inputSection">
+                            <div class="input-group">
+                                <label>
+                                    X Value
+                                </label>
+                                <input class="input-field" id="xValue" min="0" step="0.1" type="number" value="5"/>
+                            </div>
+                        </div>
+                        <div style="text-align: center; padding: 10px; background: rgba(52, 152, 219, 0.1); border-radius: 6px; border: 1px solid rgba(52, 152, 219, 0.3); margin-top: 10px;">
+                            <i class="fas fa-bolt" style="color: #3498db; margin-right: 8px;"></i>
+                            <span style="color: #3498db; font-weight: 600; font-size: 0.9rem;">Results update instantly as you type!</span>
+                        </div>
+                        <div class="advanced-options">
+                            <div class="advanced-toggle" onclick="toggleAdvanced()">
+                                <i class="fas fa-cogs">
+                                </i>
+                                Advanced Options
+                                <i class="fas fa-chevron-down" id="advancedIcon">
+                                </i>
+                            </div>
+                            <div class="advanced-content" id="advancedContent">
+                                <div class="input-group">
+                                    <label>
+                                        Decimal Precision
+                                        <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Number of decimal places in results</small>
+                                    </label>
+                                    <select class="input-field" id="precision">
+                                        <option value="2">
+                                            2 decimals
+                                        </option>
+                                        <option value="3">
+                                            3 decimals
+                                        </option>
+                                        <option selected="" value="4">
+                                            4 decimals
+                                        </option>
+                                        <option value="5">
+                                            5 decimals
+                                        </option>
+                                        <option value="6">
+                                            6 decimals
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>
+                                        Chart Range Multiplier
+                                        <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">How much of the distribution to show</small>
+                                    </label>
+                                    <input class="input-field" id="chartRange" max="5" min="1" step="0.5" type="number" value="3" placeholder="1 to 5"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="visualization-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-chart-area">
+                            </i>
+                            Results Panel - Visualizations & Statistics
+                        </h3>
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTab('pdf', this)">
+                                PDF View
+                            </div>
+                            <div class="tab" onclick="switchTab('cdf', this)">
+                                CDF View
+                            </div>
+                            <div class="tab" onclick="switchTab('both', this)">
+                                Combined View
+                            </div>
+                        </div>
+                        <div class="tab-content active" id="pdfTab">
+                            <div class="chart-container">
+                                <div id="pdfChart"></div>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="cdfTab">
+                            <div class="chart-container">
+                                <div id="cdfChart"></div>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="bothTab">
+                            <div class="chart-container">
+                                <div id="combinedChart"></div>
+                            </div>
+                        </div>
+                        <div class="probability-visualization">
+                            <h4 style="color: var(--header-color); margin-bottom: 10px;">
+                                <i class="fas fa-area-chart">
+                                </i>
+                                Shaded Area Representation
+                            </h4>
+                            <div class="shaded-area-info">
+                                <span id="areaDescription">
+                                    Select calculation type to see shaded area
+                                </span>
+                                <span id="areaValue" style="font-weight: bold; color: var(--header-color);">
+                                    --
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Embedded Results & Statistics Panel -->
+                        <div class="embedded-results-panel">
+                            <h4 class="embedded-panel-title">
+                                <i class="fas fa-chart-bar">
+                                </i>
+                                Results &amp; Statistics
+                            </h4>
+                            <div class="embedded-stats-grid">
+                                <div class="embedded-stat-item primary-result">
+                                    <div class="embedded-stat-value" id="mainResult">
+                                        --
+                                    </div>
+                                    <div class="embedded-stat-label">
+                                        Result
+                                    </div>
+                                </div>
+                                <div class="embedded-stat-item">
+                                    <div class="embedded-stat-value" id="dfStat">
+                                        5
+                                    </div>
+                                    <div class="embedded-stat-label">
+                                        DoF (ν)
+                                    </div>
+                                </div>
+                                <div class="embedded-stat-item">
+                                    <div class="embedded-stat-value" id="meanStat">
+                                        5
+                                    </div>
+                                    <div class="embedded-stat-label">
+                                        Mean
+                                    </div>
+                                </div>
+                                <div class="embedded-stat-item">
+                                    <div class="embedded-stat-value" id="varianceStat">
+                                        10
+                                    </div>
+                                    <div class="embedded-stat-label">
+                                        Variance
+                                    </div>
+                                </div>
+                                <div class="embedded-stat-item">
+                                    <div class="embedded-stat-value" id="stddevStat">
+                                        3.16
+                                    </div>
+                                    <div class="embedded-stat-label">
+                                        Std Dev
+                                    </div>
+                                </div>
+                                <div class="embedded-stat-item">
+                                    <div class="embedded-stat-value" id="modeStat">
+                                        3
+                                    </div>
+                                    <div class="embedded-stat-label">
+                                        Mode
+                                    </div>
+                                </div>
+                                <div class="embedded-stat-item">
+                                    <div class="embedded-stat-value" id="skewnessStat">
+                                        1.26
+                                    </div>
+                                    <div class="embedded-stat-label">
+                                        Skewness
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-   
-
+    </div>
     <script>
+        let pdfChart, cdfChart, combinedChart;
+        let currentCalcType = 'probability';
+        
+        // Store chart data for animations
+        let chartDataStore = {
+            pdfData: [],
+            cdfData: [],
+            shadedPdfData: []
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for Highcharts to load
+            if (typeof Highcharts === 'undefined') {
+                setTimeout(() => {
+                    initializeApp();
+                }, 100);
+            } else {
+                initializeApp();
+            }
+        });
+
+        function initializeApp() {
+            try {
+                initializeCharts();
+                updateInputSection();
+                updateRadioSelection();
+                updateStatistics();
+                calculate();
+                
+                // Trigger initial animation only for PDF view (which is active by default)
+                setTimeout(() => {
+                    if (pdfChart) {
+                        triggerChartAnimations('pdf');
+                    }
+                }, 500);
+                
+                // Add event listeners with visual feedback
+                document.getElementById('degreesOfFreedom').addEventListener('input', debounce(calculateWithFeedback, 250));
+                document.getElementById('chartRange').addEventListener('input', debounce(calculateWithFeedback, 250));
+                
+                // Add event listener to initial X value input
+                const initialXValue = document.getElementById('xValue');
+                if (initialXValue) {
+                    initialXValue.addEventListener('input', debounce(calculateWithFeedback, 250));
+                }
+                
+                document.querySelectorAll('input[name="calcType"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        currentCalcType = this.value;
+                        updateInputSection();
+                        updateRadioSelection();
+                        calculateWithFeedback();
+                    });
+                });
+                
+                // Add keyboard shortcuts
+                document.addEventListener('keydown', function(e) {
+                    // Ctrl+R or Cmd+R for reload (prevent default browser reload)
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                        e.preventDefault();
+                        reloadCalculator();
+                    }
+                    // F5 for reload
+                    if (e.key === 'F5') {
+                        e.preventDefault();
+                        reloadCalculator();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                // Fallback: show error message
+                const mainResultEl = document.getElementById('mainResult');
+                if (mainResultEl) mainResultEl.textContent = 'Loading...';
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function updateRadioSelection() {
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`input[value="${currentCalcType}"]`).closest('.radio-option').classList.add('selected');
+        }
+
+        function updateInputSection() {
+            const inputSection = document.getElementById('inputSection');
+            const calcType = document.querySelector('input[name="calcType"]:checked').value;
+            
+            let html = '';
+            
+            switch(calcType) {
+                case 'probability':
+                    html = `
+                        <div class="input-group">
+                            <label>X Value
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Find probability up to this value (must be ≥ 0)</small>
+                            </label>
+                            <input type="number" id="xValue" class="input-field" value="5" step="0.1" min="0" placeholder="e.g., 1.5, 5, 10">
+                        </div>
+                    `;
+                    break;
+                case 'between':
+                    html = `
+                        <div class="input-group">
+                            <label>Lower Bound (a)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Start of the range (must be ≥ 0)</small>
+                            </label>
+                            <input type="number" id="lowerBound" class="input-field" value="2" step="0.1" min="0" placeholder="e.g., 0, 2, 5">
+                        </div>
+                        <div class="input-group">
+                            <label>Upper Bound (b)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">End of the range</small>
+                            </label>
+                            <input type="number" id="upperBound" class="input-field" value="8" step="0.1" min="0" placeholder="e.g., 5, 10, 20">
+                        </div>
+                    `;
+                    break;
+                case 'quantile':
+                    html = `
+                        <div class="input-group">
+                            <label>Probability (0 to 1)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Decimal between 0 and 1 (e.g., 0.5 = 50%)</small>
+                            </label>
+                            <input type="number" id="probability" class="input-field" value="0.5" step="0.01" min="0" max="1" placeholder="e.g., 0.5, 0.95, 0.05">
+                        </div>
+                    `;
+                    break;
+            }
+            
+            inputSection.innerHTML = html;
+            
+            // Add event listeners to new inputs
+            inputSection.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', debounce(calculateWithFeedback, 250));
+            });
+        }
+
+        function initializeCharts() {
+            try {
+                if (typeof Highcharts === 'undefined') {
+                    console.error('Highcharts not loaded');
+                    return;
+                }
+
+                // Set dark theme for all charts
+                Highcharts.setOptions({
+                    chart: {
+                        backgroundColor: 'transparent',
+                        style: {
+                            fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+                        }
+                    },
+                    colors: ['#e67e22', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
+                    title: {
+                        style: {
+                            color: 'white'
+                        }
+                    },
+                    xAxis: {
+                        gridLineColor: 'rgba(255,255,255,0.1)',
+                        lineColor: 'rgba(255,255,255,0.3)',
+                        tickColor: 'rgba(255,255,255,0.3)',
+                        labels: {
+                            style: {
+                                color: 'white'
+                            }
+                        },
+                        title: {
+                            style: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    yAxis: {
+                        gridLineColor: 'rgba(255,255,255,0.1)',
+                        lineColor: 'rgba(255,255,255,0.3)',
+                        tickColor: 'rgba(255,255,255,0.3)',
+                        labels: {
+                            style: {
+                                color: 'white'
+                            }
+                        },
+                        title: {
+                            style: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    legend: {
+                        itemStyle: {
+                            color: 'white'
+                        }
+                    },
+                    plotOptions: {
+                        line: {
+                            marker: {
+                                enabled: false
+                            }
+                        },
+                        area: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    }
+                });
+
+                // PDF Chart
+                pdfChart = Highcharts.chart('pdfChart', {
+                    chart: {
+                        type: 'line',
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    },
+                    title: {
+                        text: null
+                    },
+                    xAxis: {
+                        title: {
+                            text: 'X'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Density'
+                        },
+                        min: 0
+                    },
+                    series: [{
+                        name: 'Probability Density',
+                        data: [],
+                        color: '#e67e22',
+                        lineWidth: 3,
+                        shadow: true
+                    }, {
+                        name: 'Shaded Area',
+                        data: [],
+                        type: 'area',
+                        color: 'rgba(255, 165, 120, 0.4)',
+                        lineWidth: 2,
+                        fillOpacity: 0.3
+                    }],
+                    tooltip: {
+                        shared: true,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        style: {
+                            color: 'white'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    exporting: {
+                        enabled: false
+                    }
+                });
+
+                // CDF Chart
+                cdfChart = Highcharts.chart('cdfChart', {
+                    chart: {
+                        type: 'line',
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    },
+                    title: {
+                        text: null
+                    },
+                    xAxis: {
+                        title: {
+                            text: 'X'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'P(X ≤ x)'
+                        },
+                        min: 0,
+                        max: 1
+                    },
+                    series: [{
+                        name: 'Cumulative Probability',
+                        data: [],
+                        color: '#27ae60',
+                        lineWidth: 3,
+                        shadow: true
+                    }],
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        style: {
+                            color: 'white'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    exporting: {
+                        enabled: false
+                    }
+                });
+
+                // Combined Chart
+                combinedChart = Highcharts.chart('combinedChart', {
+                    chart: {
+                        type: 'line',
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    },
+                    title: {
+                        text: null
+                    },
+                    xAxis: {
+                        title: {
+                            text: 'X'
+                        }
+                    },
+                    yAxis: [{
+                        title: {
+                            text: 'PDF',
+                            style: {
+                                color: '#e67e22'
+                            }
+                        },
+                        min: 0,
+                        labels: {
+                            style: {
+                                color: '#e67e22'
+                            }
+                        }
+                    }, {
+                        title: {
+                            text: 'CDF',
+                            style: {
+                                color: '#27ae60'
+                            }
+                        },
+                        min: 0,
+                        max: 1,
+                        opposite: true,
+                        labels: {
+                            style: {
+                                color: '#27ae60'
+                            }
+                        }
+                    }],
+                    series: [{
+                        name: 'PDF',
+                        data: [],
+                        color: '#e67e22',
+                        lineWidth: 3,
+                        shadow: true,
+                        yAxis: 0
+                    }, {
+                        name: 'CDF',
+                        data: [],
+                        color: '#27ae60',
+                        lineWidth: 3,
+                        shadow: true,
+                        yAxis: 1
+                    }],
+                    tooltip: {
+                        shared: true,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        style: {
+                            color: 'white'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    exporting: {
+                        enabled: false
+                    }
+                });
+
+            } catch (error) {
+                console.error('Chart initialization error:', error);
+            }
+        }
+
+        // Chi-square distribution mathematical functions
+        function gammaFunction(z) {
+            // Approximation of gamma function using Stirling's approximation
+            if (z < 0.5) {
+                return Math.PI / (Math.sin(Math.PI * z) * gammaFunction(1 - z));
+            }
+            z--;
+            var x = 0.99999999999980993;
+            var coefficients = [
+                676.5203681218851, -1259.1392167224028,
+                771.32342877765313, -176.61502916214059,
+                12.507343278686905, -0.13857109526572012,
+                9.9843695780195716e-6, 1.5056327351493116e-7
+            ];
+            for (var i = 0; i < coefficients.length; i++) {
+                x += coefficients[i] / (z + i + 1);
+            }
+            var t = z + coefficients.length - 0.5;
+            return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+        }
+
+        function chiSquarePDF(x, df) {
+            if (x <= 0) return 0;
+            return (Math.pow(x, df/2 - 1) * Math.exp(-x/2)) / (Math.pow(2, df/2) * gammaFunction(df/2));
+        }
+
+        function chiSquareCDF(x, df) {
+            if (x <= 0) return 0;
+            return incompleteGamma(df/2, x/2) / gammaFunction(df/2);
+        }
+
+        function incompleteGamma(s, x) {
+            // Approximation of incomplete gamma function
+            if (x === 0) return 0;
+            if (s === 0) return 0;
+            
+            var result = 0;
+            var term = 1;
+            var n = 0;
+            
+            while (Math.abs(term) > 1e-15 && n < 200) {
+                if (n > 0) {
+                    term *= x / (s + n - 1);
+                }
+                result += term;
+                n++;
+            }
+            
+            return Math.pow(x, s) * Math.exp(-x) * result;
+        }
+
+        function chiSquareQuantile(p, df) {
+            // Approximation of chi-square quantile using Newton-Raphson method
+            if (p <= 0) return 0;
+            if (p >= 1) return Infinity;
+            
+            // Initial guess
+            let x = df;
+            
+            // Newton-Raphson iterations
+            for (let i = 0; i < 100; i++) {
+                const cdf = chiSquareCDF(x, df);
+                const pdf = chiSquarePDF(x, df);
+                
+                if (Math.abs(pdf) < 1e-15) break;
+                
+                const newX = x - (cdf - p) / pdf;
+                
+                if (Math.abs(newX - x) < 1e-10) break;
+                
+                x = Math.max(0.001, newX); // Ensure x stays positive
+            }
+            
+            return x;
+        }
+
+        function calculateWithFeedback() {
+            // Add visual feedback to input fields (only visible ones)
+            const inputFields = document.querySelectorAll('.input-field:not([style*="display: none"])');
+            inputFields.forEach(field => {
+                field.classList.add('updating');
+                setTimeout(() => field.classList.remove('updating'), 600);
+            });
+            
+            // Call main calculate function
+            calculate();
+        }
+
+        function calculate() {
+            try {
+                const df = parseInt(document.getElementById('degreesOfFreedom').value) || 5;
+                const precision = parseInt(document.getElementById('precision')?.value) || 4;
+                const calcType = document.querySelector('input[name="calcType"]:checked').value;
+                
+                if (df <= 0) {
+                    const mainResultEl = document.getElementById('mainResult');
+                    if (mainResultEl) mainResultEl.textContent = 'Error: Degrees of freedom must be positive';
+                    return;
+                }
+                
+                let result, areaDescription;
+                
+                switch(calcType) {
+                    case 'probability':
+                        const xValue = parseFloat(document.getElementById('xValue')?.value) || 5;
+                        if (xValue < 0) {
+                            const mainResultEl = document.getElementById('mainResult');
+                            if (mainResultEl) mainResultEl.textContent = 'Error: X value must be non-negative';
+                            return;
+                        }
+                        result = chiSquareCDF(xValue, df);
+                        areaDescription = `P(X ≤ ${xValue})`;
+                        updateFormulaDisplay('cdf');
+                        break;
+                        
+                    case 'between':
+                        const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || 2;
+                        const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 8;
+                        if (lowerBound < 0 || upperBound < 0) {
+                            const mainResultEl = document.getElementById('mainResult');
+                            if (mainResultEl) mainResultEl.textContent = 'Error: Bounds must be non-negative';
+                            return;
+                        }
+                        if (lowerBound >= upperBound) {
+                            const mainResultEl = document.getElementById('mainResult');
+                            if (mainResultEl) mainResultEl.textContent = 'Error: Lower bound must be less than upper bound';
+                            return;
+                        }
+                        const lowerProb = chiSquareCDF(lowerBound, df);
+                        const upperProb = chiSquareCDF(upperBound, df);
+                        result = upperProb - lowerProb;
+                        areaDescription = `P(${lowerBound} ≤ X ≤ ${upperBound})`;
+                        updateFormulaDisplay('between');
+                        break;
+                        
+                    case 'quantile':
+                        const probability = parseFloat(document.getElementById('probability')?.value) || 0.5;
+                        if (probability < 0 || probability > 1) {
+                            const mainResultEl = document.getElementById('mainResult');
+                            if (mainResultEl) mainResultEl.textContent = 'Error: Probability must be between 0 and 1';
+                            return;
+                        }
+                        result = chiSquareQuantile(probability, df);
+                        areaDescription = `X such that P(X ≤ x) = ${probability}`;
+                        updateFormulaDisplay('quantile');
+                        break;
+                }
+                
+                // Add updating visual feedback to area info
+                const areaInfoEl = document.querySelector('.shaded-area-info');
+                if (areaInfoEl) {
+                    areaInfoEl.classList.add('updating');
+                    setTimeout(() => areaInfoEl.classList.remove('updating'), 1000);
+                }
+                
+                // Update elements with animated transitions and staggered timing
+                const mainResultEl = document.getElementById('mainResult');
+                if (mainResultEl) {
+                    animateNumber(mainResultEl, mainResultEl.textContent, result, 800);
+                }
+                
+                const areaDescEl = document.getElementById('areaDescription');
+                if (areaDescEl) {
+                    // Fade out, change text, fade in
+                    areaDescEl.style.opacity = '0.5';
+                    areaDescEl.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => {
+                        areaDescEl.textContent = areaDescription;
+                        areaDescEl.style.opacity = '1';
+                    }, 150);
+                }
+                
+                const areaValueEl = document.getElementById('areaValue');
+                if (areaValueEl) {
+                    const displayValue = calcType === 'quantile' ? result : (result * 100);
+                    const suffix = calcType === 'quantile' ? '' : '%';
+                    
+                    // Animate the percentage/value with enhanced feedback
+                    animateNumber(areaValueEl, parseFloat(areaValueEl.textContent) || 0, displayValue, 700, false);
+                    
+                    // Add suffix after animation
+                    setTimeout(() => {
+                        if (areaValueEl.textContent && !areaValueEl.textContent.includes('%') && suffix) {
+                            areaValueEl.textContent += suffix;
+                        }
+                    }, 750);
+                }
+                
+                updateStatistics();
+                updateCharts();
+                
+            } catch (error) {
+                console.error('Calculation error:', error);
+                const mainResultEl = document.getElementById('mainResult');
+                if (mainResultEl) mainResultEl.textContent = 'Calculation Error';
+            }
+        }
+
+        // Enhanced animated number counter function with visual feedback
+        function animateNumber(element, startValue, endValue, duration = 800, showVisualFeedback = true) {
+            if (!element) return;
+            
+            const start = performance.now();
+            const startNum = parseFloat(startValue) || 0;
+            const endNum = parseFloat(endValue) || 0;
+            const precision = parseInt(document.getElementById('precision')?.value) || 4;
+            
+            // Add visual feedback classes
+            if (showVisualFeedback) {
+                element.classList.add('animating');
+                const parentItem = element.closest('.embedded-stat-item');
+                if (parentItem) {
+                    parentItem.classList.add('updating');
+                }
+            }
+            
+            function updateValue(currentTime) {
+                const elapsed = currentTime - start;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Use smoother easing function (ease-out-quart)
+                const easedProgress = 1 - Math.pow(1 - progress, 4);
+                
+                const currentValue = startNum + (endNum - startNum) * easedProgress;
+                element.textContent = currentValue.toFixed(precision);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateValue);
+                } else {
+                    element.textContent = endNum.toFixed(precision);
+                    
+                    // Remove visual feedback classes
+                    if (showVisualFeedback) {
+                        setTimeout(() => {
+                            element.classList.remove('animating');
+                            const parentItem = element.closest('.embedded-stat-item');
+                            if (parentItem) {
+                                parentItem.classList.remove('updating');
+                            }
+                        }, 200);
+                    }
+                }
+            }
+            
+            requestAnimationFrame(updateValue);
+        }
+
+        function updateStatistics() {
+            const df = parseInt(document.getElementById('degreesOfFreedom')?.value) || 5;
+            const precision = parseInt(document.getElementById('precision')?.value) || 4;
+            
+            // Chi-square distribution statistics
+            const mean = df;
+            const variance = 2 * df;
+            const stddev = Math.sqrt(variance);
+            const mode = Math.max(0, df - 2);
+            const skewness = Math.sqrt(8 / df);
+            
+            // Get current values for animation start points
+            const statsElements = [
+                { el: document.getElementById('dfStat'), value: df, delay: 0 },
+                { el: document.getElementById('meanStat'), value: mean, delay: 100 },
+                { el: document.getElementById('varianceStat'), value: variance, delay: 200 },
+                { el: document.getElementById('stddevStat'), value: stddev, delay: 300 },
+                { el: document.getElementById('modeStat'), value: mode, delay: 400 },
+                { el: document.getElementById('skewnessStat'), value: skewness, delay: 500 }
+            ];
+            
+            // Animate the value changes with staggered timing
+            statsElements.forEach(({ el, value, delay }) => {
+                if (el) {
+                    setTimeout(() => {
+                        animateNumber(el, el.textContent, value, 600);
+                    }, delay);
+                }
+            });
+        }
+
+        function updateCharts() {
+            const df = parseInt(document.getElementById('degreesOfFreedom').value) || 5;
+            const range = parseFloat(document.getElementById('chartRange').value) || 3;
+            const calcType = document.querySelector('input[name="calcType"]:checked').value;
+            
+            // Generate much more data points for ultra-smooth curves
+            const points = 1000; // Increased to 1000 for ultra-smooth curves
+            const maxX = df + range * Math.sqrt(2 * df); // Mean + range * stddev
+            const minX = 0; // Chi-square is always non-negative
+            const step = (maxX - minX) / points;
+            
+            const pdfData = [];
+            const cdfData = [];
+            const shadedPdfData = [];
+            
+            // Get X values for marking
+            let xMarkers = [];
+            switch(calcType) {
+                case 'probability':
+                    const xValue = parseFloat(document.getElementById('xValue')?.value) || 5;
+                    xMarkers = [{ value: xValue, label: `X = ${xValue}`, color: '#ff6b6b' }];
+                    break;
+                case 'between':
+                    const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || 2;
+                    const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 8;
+                    xMarkers = [
+                        { value: lowerBound, label: `a = ${lowerBound}`, color: '#4ecdc4' },
+                        { value: upperBound, label: `b = ${upperBound}`, color: '#45b7d1' }
+                    ];
+                    break;
+                case 'quantile':
+                    const probability = parseFloat(document.getElementById('probability')?.value) || 0.5;
+                    const quantileValue = chiSquareQuantile(probability, df);
+                    xMarkers = [{ value: quantileValue, label: `X = ${quantileValue.toFixed(3)}`, color: '#96ceb4' }];
+                    break;
+            }
+            
+            // Generate ultra-smooth curve data
+            for (let i = 0; i <= points; i++) {
+                const x = minX + i * step;
+                const pdfValue = chiSquarePDF(x, df);
+                const cdfValue = chiSquareCDF(x, df);
+                
+                pdfData.push([x, pdfValue]);
+                cdfData.push([x, cdfValue]);
+                
+                // Determine if this point should be in the shaded area
+                let inShadedArea = false;
+                
+                switch(calcType) {
+                    case 'probability':
+                        const xValue = parseFloat(document.getElementById('xValue')?.value) || 5;
+                        inShadedArea = x <= xValue;
+                        break;
+                    case 'between':
+                        const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || 2;
+                        const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 8;
+                        inShadedArea = x >= lowerBound && x <= upperBound;
+                        break;
+                    case 'quantile':
+                        // No shading for quantile calculations
+                        inShadedArea = false;
+                        break;
+                }
+                
+                if (inShadedArea) {
+                    shadedPdfData.push([x, pdfValue]);
+                }
+            }
+            
+            // Store data globally for animations
+            chartDataStore.pdfData = [...pdfData];
+            chartDataStore.cdfData = [...cdfData];
+            chartDataStore.shadedPdfData = [...shadedPdfData];
+            
+            // Update PDF chart
+            if (pdfChart && pdfChart.series && pdfChart.series[0]) {
+                try {
+                    pdfChart.series[0].setData(pdfData, false);
+                    if (pdfChart.series[1]) {
+                        pdfChart.series[1].setData(shadedPdfData, false);
+                    }
+                    
+                    // Update X axis range
+                    if (pdfChart.xAxis && pdfChart.xAxis[0]) {
+                        pdfChart.xAxis[0].setExtremes(minX, maxX, false);
+                    }
+                } catch (error) {
+                    console.warn('Error updating PDF chart data:', error);
+                }
+                
+                // Add plot lines for markers
+                // Remove existing plot lines first (with error checking)
+                try {
+                    if (pdfChart && pdfChart.xAxis && pdfChart.xAxis[0]) {
+                        for (let i = 0; i < 5; i++) {
+                            pdfChart.xAxis[0].removePlotLine(`marker-${i}`);
+                        }
+                        xMarkers.forEach((marker, index) => {
+                            pdfChart.xAxis[0].addPlotLine({
+                                id: `marker-${index}`,
+                                value: marker.value,
+                                color: marker.color,
+                                width: 3,
+                                dashStyle: 'Dash',
+                                label: {
+                                    text: marker.label,
+                                    style: {
+                                        color: 'white',
+                                        fontWeight: 'bold'
+                                    },
+                                    align: 'center'
+                                }
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.warn('Error updating PDF chart plot lines:', error);
+                }
+                
+                try {
+                    pdfChart.redraw();
+                } catch (error) {
+                    console.warn('Error redrawing PDF chart:', error);
+                }
+            }
+            
+            // Update CDF chart (always update even if not visible)
+            if (cdfChart && cdfChart.series && cdfChart.series[0]) {
+                try {
+                    cdfChart.series[0].setData(cdfData, false);
+                    
+                    // Update X axis range
+                    if (cdfChart.xAxis && cdfChart.xAxis[0]) {
+                        cdfChart.xAxis[0].setExtremes(minX, maxX, false);
+                    }
+                } catch (error) {
+                    console.warn('Error updating CDF chart data:', error);
+                }
+                
+                // Add plot lines for markers
+                // Remove existing plot lines first (with error checking)
+                try {
+                    if (cdfChart && cdfChart.xAxis && cdfChart.xAxis[0]) {
+                        for (let i = 0; i < 5; i++) {
+                            cdfChart.xAxis[0].removePlotLine(`marker-${i}`);
+                        }
+                        xMarkers.forEach((marker, index) => {
+                            cdfChart.xAxis[0].addPlotLine({
+                                id: `marker-${index}`,
+                                value: marker.value,
+                                color: marker.color,
+                                width: 3,
+                                dashStyle: 'Dash',
+                                label: {
+                                    text: marker.label,
+                                    style: {
+                                        color: 'white',
+                                        fontWeight: 'bold'
+                                    },
+                                    align: 'center'
+                                }
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.warn('Error updating CDF chart plot lines:', error);
+                }
+                
+                try {
+                    cdfChart.redraw();
+                } catch (error) {
+                    console.warn('Error redrawing CDF chart:', error);
+                }
+            }
+            
+            // Update combined chart (always update even if not visible)
+            if (combinedChart && combinedChart.series && combinedChart.series[0]) {
+                try {
+                    combinedChart.series[0].setData(pdfData, false);
+                    if (combinedChart.series[1]) {
+                        combinedChart.series[1].setData(cdfData, false);
+                    }
+                    
+                    // Update X axis range
+                    if (combinedChart.xAxis && combinedChart.xAxis[0]) {
+                        combinedChart.xAxis[0].setExtremes(minX, maxX, false);
+                    }
+                } catch (error) {
+                    console.warn('Error updating Combined chart data:', error);
+                }
+                
+                // Add plot lines for markers
+                // Remove existing plot lines first (with error checking)
+                try {
+                    if (combinedChart && combinedChart.xAxis && combinedChart.xAxis[0]) {
+                        for (let i = 0; i < 5; i++) {
+                            combinedChart.xAxis[0].removePlotLine(`marker-${i}`);
+                        }
+                        xMarkers.forEach((marker, index) => {
+                            combinedChart.xAxis[0].addPlotLine({
+                                id: `marker-${index}`,
+                                value: marker.value,
+                                color: marker.color,
+                                width: 3,
+                                dashStyle: 'Dash',
+                                label: {
+                                    text: marker.label,
+                                    style: {
+                                        color: 'white',
+                                        fontWeight: 'bold'
+                                    },
+                                    align: 'center'
+                                }
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.warn('Error updating Combined chart plot lines:', error);
+                }
+                
+                try {
+                    combinedChart.redraw();
+                } catch (error) {
+                    console.warn('Error redrawing Combined chart:', error);
+                }
+            }
+            
+            // Add visual indicators to chart container
+            updateChartIndicators(xMarkers, calcType);
+        }
+
         function updateChartIndicators(xMarkers, calcType) {
             // Remove existing indicators
             document.querySelectorAll('.chart-indicator').forEach(el => el.remove());
@@ -930,14 +2044,14 @@
                         align-items: center;
                         gap: 5px;
                         padding: 12px 20px;
-                        background: linear-gradient(135deg, rgba(255,192,192,0.25) 0%, rgba(255,160,160,0.15) 100%);
-                        border: 2px solid rgba(255,192,192,0.7);
+                        background: linear-gradient(135deg, rgba(255,165,120,0.25) 0%, rgba(255,140,100,0.15) 100%);
+                        border: 2px solid rgba(255,165,120,0.7);
                         border-radius: 8px;
-                        color: rgb(255,192,192);
+                        color: rgb(255,165,120);
                         font-weight: bold;
                         text-align: center;
                         min-width: 140px;
-                        box-shadow: 0 4px 12px rgba(255,192,192,0.3);
+                        box-shadow: 0 4px 12px rgba(255,165,120,0.3);
                     `;
                     
                     const mainResult = document.getElementById('mainResult').textContent;
@@ -970,1023 +2084,50 @@
             });
         }
 
-        let pdfChart, cdfChart, combinedChart;
-        let currentCalcType = 'probability';
-        
-        // Store chart data for animations
-        let chartDataStore = {
-            pdfData: [],
-            cdfData: [],
-            shadedPdfData: []
-        };
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof Highcharts === 'undefined') {
-                setTimeout(() => {
-                    initializeApp();
-                }, 100);
-            } else {
-                initializeApp();
-            }
-        });
-
-        function initializeApp() {
-            try {
-                initializeCharts();
-                updateInputSection();
-                updateRadioSelection();
-                updateStatistics();
-                calculate();
-                
-                // Remove the automatic animation trigger on load to prevent double rendering
-                // Charts will animate when user switches tabs
-                
-                document.getElementById('dof').addEventListener('input', debounce(calculateWithFeedback, 250));
-                document.getElementById('chartRange').addEventListener('input', function() {
-                    updateSliderValue('chartRange', 'chartRangeValue', '');
-                    debounce(calculateWithFeedback, 250)();
-                });
-                document.getElementById('precision').addEventListener('input', function() {
-                    updateSliderValue('precision', 'precisionValue', '');
-                    debounce(calculateWithFeedback, 100)();
-                });
-                
-                // Initialize slider values and add listeners
-                initializeSliders();
-                
-                const initialXValue = document.getElementById('xValue');
-                if (initialXValue) {
-                    initialXValue.addEventListener('input', debounce(calculateWithFeedback, 250));
-                }
-                
-                document.querySelectorAll('input[name="calcType"]').forEach(radio => {
-                    radio.addEventListener('change', function() {
-                        currentCalcType = this.value;
-                        updateInputSection();
-                        updateRadioSelection();
-                        calculateWithFeedback();
-                    });
-                });
-                
-            } catch (error) {
-                console.error('Initialization error:', error);
-            }
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        function initializeSliders() {
-            // Initialize precision slider
-            updateSliderValue('precision', 'precisionValue', '');
-            // Initialize chart range slider  
-            updateSliderValue('chartRange', 'chartRangeValue', '');
-        }
-
-        function updateSliderValue(sliderId, valueId, suffix) {
-            const slider = document.getElementById(sliderId);
-            const valueDisplay = document.getElementById(valueId);
+        function updateFormulaDisplay(type) {
+            const formulaDisplay = document.getElementById('formulaDisplay');
+            if (!formulaDisplay) return; // Safety check
             
-            if (slider && valueDisplay) {
-                let value = parseFloat(slider.value);
-                
-                // Format based on slider type
-                if (sliderId === 'precision') {
-                    valueDisplay.textContent = Math.round(value);
-                } else if (sliderId === 'chartRange') {
-                    valueDisplay.textContent = value.toFixed(1);
-                }
-            }
-        }
-
-        function updateRadioSelection() {
-            document.querySelectorAll('.radio-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            document.querySelector(`input[value="${currentCalcType}"]`).closest('.radio-option').classList.add('selected');
-        }
-
-        function updateInputSection() {
-            const inputSection = document.getElementById('inputSection');
-            const calcType = document.querySelector('input[name="calcType"]:checked').value;
+            let formula = '';
             
-            let html = '';
-            
-            switch(calcType) {
-                case 'probability':
-                    html = `
-                        <div class="input-group">
-                            <label>T Value
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Find probability up to this value</small>
-                            </label>
-                            <input type="number" id="xValue" class="input-field" value="0" step="0.1" placeholder="e.g., 1.5, -2, 0">
-                        </div>
+            switch(type) {
+                case 'cdf':
+                    formula = `
+                        <strong>Chi-Square Cumulative Distribution Function (CDF):</strong><br>
+                        P(X ≤ x) = γ(ν/2, x/2) / Γ(ν/2)<br><br>
+                        <strong>Where:</strong><br>
+                        • γ is the lower incomplete gamma function<br>
+                        • Γ is the gamma function<br>
+                        • ν = degrees of freedom
                     `;
                     break;
                 case 'between':
-                    html = `
-                        <div class="input-group">
-                            <label>Lower Bound (a)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Start of the range</small>
-                            </label>
-                            <input type="number" id="lowerBound" class="input-field" value="-1" step="0.1" placeholder="e.g., -2, 0, 1.5">
-                        </div>
-                        <div class="input-group">
-                            <label>Upper Bound (b)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">End of the range</small>
-                            </label>
-                            <input type="number" id="upperBound" class="input-field" value="1" step="0.1" placeholder="e.g., 2, 3.5, 10">
-                        </div>
+                    formula = `
+                        <strong>Probability Between Two Values:</strong><br>
+                        P(a ≤ X ≤ b) = P(X ≤ b) - P(X ≤ a)<br><br>
+                        <strong>Where:</strong><br>
+                        • P(X ≤ x) is the chi-square CDF<br>
+                        • ν = degrees of freedom
                     `;
                     break;
                 case 'quantile':
-                    html = `
-                        <div class="input-group">
-                            <label>Probability (0 to 1)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Decimal between 0 and 1 (e.g., 0.5 = 50%)</small>
-                            </label>
-                            <input type="number" id="probability" class="input-field" value="0.5" step="0.01" min="0" max="1" placeholder="e.g., 0.5, 0.95, 0.05">
-                        </div>
+                    formula = `
+                        <strong>Chi-Square Quantile Function (Inverse CDF):</strong><br>
+                        x = F⁻¹(p, ν)<br><br>
+                        <strong>Where:</strong><br>
+                        • F⁻¹ is the inverse chi-square CDF<br>
+                        • p = probability, ν = degrees of freedom
                     `;
                     break;
+                default:
+                    formula = 'Select a calculation type to see the relevant formula';
             }
             
-            inputSection.innerHTML = html;
-            
-            inputSection.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', debounce(calculateWithFeedback, 250));
-            });
-        }
-
-        function initializeCharts() {
-            try {
-                if (typeof Highcharts === 'undefined') {
-                    console.error('Highcharts not loaded');
-                    return;
-                }
-
-                Highcharts.setOptions({
-                    chart: {
-                        backgroundColor: 'transparent',
-                        style: {
-                            fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
-                        }
-                    },
-                    colors: ['#3498db', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
-                    title: {
-                        style: {
-                            color: 'white'
-                        }
-                    },
-                    xAxis: {
-                        gridLineColor: 'rgba(255,255,255,0.1)',
-                        lineColor: 'rgba(255,255,255,0.3)',
-                        tickColor: 'rgba(255,255,255,0.3)',
-                        labels: {
-                            style: {
-                                color: 'white'
-                            }
-                        },
-                        title: {
-                            style: {
-                                color: 'white'
-                            }
-                        }
-                    },
-                    yAxis: {
-                        gridLineColor: 'rgba(255,255,255,0.1)',
-                        lineColor: 'rgba(255,255,255,0.3)',
-                        tickColor: 'rgba(255,255,255,0.3)',
-                        labels: {
-                            style: {
-                                color: 'white'
-                            }
-                        },
-                        title: {
-                            style: {
-                                color: 'white'
-                            }
-                        }
-                    },
-                    legend: {
-                        itemStyle: {
-                            color: 'white'
-                        }
-                    },
-                    plotOptions: {
-                        line: {
-                            marker: {
-                                enabled: false
-                            }
-                        },
-                        area: {
-                            marker: {
-                                enabled: false
-                            }
-                        }
-                    }
-                });
-
-                // PDF Chart
-                pdfChart = Highcharts.chart('pdfChart', {
-                    chart: {
-                        type: 'line',
-                        animation: false
-                    },
-                    title: {
-                        text: null
-                    },
-                    xAxis: {
-                        title: {
-                            text: 'χ²'
-                        }
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Density'
-                        },
-                        min: 0
-                    },
-                    series: [{
-                        name: 'Probability Density',
-                        data: [],
-                        color: '#3498db',
-                        lineWidth: 3,
-                        shadow: true
-                    }, {
-                        name: 'Shaded Area',
-                        data: [],
-                        type: 'area',
-                        color: 'rgba(255, 192, 192, 0.4)',
-                        lineWidth: 2,
-                        fillOpacity: 0.3
-                    }],
-                    tooltip: {
-                        shared: true,
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        style: {
-                            color: 'white'
-                        },
-                        formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
-                            let tooltip = '<b>χ² = ' + this.x.toFixed(precision) + '</b><br/>';
-                            
-                            this.points.forEach(function(point) {
-                                tooltip += '<span style="color:' + point.color + '">\u25CF</span> ' + 
-                                          point.series.name + ': <b>' + point.y.toFixed(precision) + '</b><br/>';
-                            });
-                            
-                            return tooltip;
-                        }
-                    },
-                    credits: {
-                        enabled: false
-                    },
-                    exporting: {
-                        enabled: false
-                    }
-                });
-
-                // CDF Chart
-                cdfChart = Highcharts.chart('cdfChart', {
-                    chart: {
-                        type: 'line',
-                        animation: false
-                    },
-                    title: {
-                        text: null
-                    },
-                    xAxis: {
-                        title: {
-                            text: 'χ²'
-                        }
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'P(χ² ≤ x)'
-                        },
-                        min: 0,
-                        max: 1
-                    },
-                    series: [{
-                        name: 'Cumulative Probability',
-                        data: [],
-                        color: '#27ae60',
-                        lineWidth: 3,
-                        shadow: true
-                    }],
-                    tooltip: {
-                        shared: true,
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        style: {
-                            color: 'white'
-                        },
-                        formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
-                            let tooltip = '<b>χ² = ' + this.x.toFixed(precision) + '</b><br/>';
-                            
-                            this.points.forEach(function(point) {
-                                tooltip += '<span style="color:' + point.color + '">\u25CF</span> ' + 
-                                          point.series.name + ': <b>' + point.y.toFixed(precision) + '</b><br/>';
-                            });
-                            
-                            return tooltip;
-                        }
-                    },
-                    credits: {
-                        enabled: false
-                    },
-                    exporting: {
-                        enabled: false
-                    }
-                });
-
-                // Combined Chart
-                combinedChart = Highcharts.chart('combinedChart', {
-                    chart: {
-                        type: 'line',
-                        animation: false
-                    },
-                    title: {
-                        text: null
-                    },
-                    xAxis: {
-                        title: {
-                            text: 'χ²'
-                        }
-                    },
-                    yAxis: [{
-                        title: {
-                            text: 'PDF',
-                            style: {
-                                color: '#3498db'
-                            }
-                        },
-                        min: 0,
-                        labels: {
-                            style: {
-                                color: '#3498db'
-                            }
-                        }
-                    }, {
-                        title: {
-                            text: 'CDF',
-                            style: {
-                                color: '#27ae60'
-                            }
-                        },
-                        min: 0,
-                        max: 1,
-                        opposite: true,
-                        labels: {
-                            style: {
-                                color: '#27ae60'
-                            }
-                        }
-                    }],
-                    series: [{
-                        name: 'PDF',
-                        data: [],
-                        color: '#3498db',
-                        lineWidth: 3,
-                        shadow: true,
-                        yAxis: 0
-                    }, {
-                        name: 'CDF',
-                        data: [],
-                        color: '#27ae60',
-                        lineWidth: 3,
-                        shadow: true,
-                        yAxis: 1
-                    }, {
-                        name: 'PDF Shaded Area',
-                        data: [],
-                        type: 'area',
-                        color: 'rgba(255, 192, 192, 0.4)',
-                        lineWidth: 2,
-                        fillOpacity: 0.3,
-                        yAxis: 0
-                    }],
-                    tooltip: {
-                        shared: true,
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        style: {
-                            color: 'white'
-                        },
-                        formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
-                            let tooltip = '<b>χ² = ' + this.x.toFixed(precision) + '</b><br/>';
-                            
-                            this.points.forEach(function(point) {
-                                tooltip += '<span style="color:' + point.color + '">\u25CF</span> ' + 
-                                          point.series.name + ': <b>' + point.y.toFixed(precision) + '</b><br/>';
-                            });
-                            
-                            return tooltip;
-                        }
-                    },
-                    credits: {
-                        enabled: false
-                    },
-                    exporting: {
-                        enabled: false
-                    }
-                });
-
-            } catch (error) {
-                console.error('Chart initialization error:', error);
-            }
-        }
-
-        function chi2PDF(x, k) {
-            // Chi-squared PDF: f(x; k) = (1/(2^(k/2) * Γ(k/2))) * x^((k/2)-1) * e^(-x/2)
-            if (x < 0) return 0;
-            if (x === 0 && k < 2) return Infinity;
-            if (x === 0 && k === 2) return 0.5;
-            if (x === 0 && k > 2) return 0;
-            
-            const logPdf = (k/2 - 1) * Math.log(x) - x/2 - (k/2) * Math.log(2) - logGamma(k/2);
-            return Math.exp(logPdf);
-        }
-
-        function chi2CDF(x, k) {
-            // Chi-squared CDF using regularized incomplete gamma function
-            if (x <= 0) return 0;
-            return incompleteGamma(k/2, x/2) / gamma(k/2);
-        }
-
-        function gamma(z) {
-            // Improved gamma function for chi-squared calculations
-            if (z === 0.5) return Math.sqrt(Math.PI);
-            if (z === 1) return 1;
-            if (z === 1.5) return Math.sqrt(Math.PI) / 2;
-            if (z === 2) return 1;
-            if (z === 2.5) return (3 * Math.sqrt(Math.PI)) / 4;
-            if (z === 3) return 2;
-            if (z === 3.5) return (15 * Math.sqrt(Math.PI)) / 8;
-            if (z === 4) return 6;
-            if (z === 4.5) return (105 * Math.sqrt(Math.PI)) / 16;
-            if (z === 5) return 24;
-            
-            return Math.exp(logGamma(z));
-        }
-
-        function incompleteGamma(a, x) {
-            // Incomplete gamma function using series expansion for small x
-            // and continued fraction for large x
-            if (x < 0 || a <= 0) return 0;
-            if (x === 0) return 0;
-            if (x < a + 1) {
-                // Use series expansion
-                let sum = 1;
-                let term = 1;
-                for (let n = 1; n < 100; n++) {
-                    term *= x / (a + n - 1);
-                    sum += term;
-                    if (Math.abs(term) < 1e-15) break;
-                }
-                return Math.exp(-x + a * Math.log(x) - logGamma(a)) * sum;
-            } else {
-                // Use continued fraction (complementary)
-                const gln = logGamma(a);
-                let b = x + 1 - a;
-                let c = 1e30;
-                let d = 1/b;
-                let h = d;
-                
-                for (let i = 1; i <= 100; i++) {
-                    const an = -i * (i - a);
-                    b += 2;
-                    d = an * d + b;
-                    if (Math.abs(d) < 1e-30) d = 1e-30;
-                    c = b + an / c;
-                    if (Math.abs(c) < 1e-30) c = 1e-30;
-                    d = 1 / d;
-                    const del = d * c;
-                    h *= del;
-                    if (Math.abs(del - 1) < 1e-7) break;
-                }
-                
-                const gammcf = Math.exp(-x + a * Math.log(x) - gln) * h;
-                return gamma(a) - gammcf;
-            }
-        }
-
-        function incompleteBeta(a, b, x) {
-            // Simplified incomplete beta function using continued fraction
-            if (x <= 0) return 0;
-            if (x >= 1) return 1;
-            
-            const bt = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + 
-                               a * Math.log(x) + b * Math.log(1 - x));
-            
-            if (x < (a + 1) / (a + b + 2)) {
-                return bt * betacf(a, b, x) / a;
-            } else {
-                return 1 - bt * betacf(b, a, 1 - x) / b;
-            }
-        }
-
-        function logGamma(z) {
-            // Lanczos approximation for log gamma function
-            const g = 7;
-            const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-                      771.32342877765313, -176.61502916214059, 12.507343278686905,
-                      -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-            
-            if (z < 0.5) {
-                return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
-            }
-            
-            z -= 1;
-            let x = c[0];
-            for (let i = 1; i < g + 2; i++) {
-                x += c[i] / (z + i);
-            }
-            const t = z + g + 0.5;
-            return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
-        }
-
-        function betacf(a, b, x) {
-            // Continued fraction for incomplete beta function
-            const qab = a + b;
-            const qap = a + 1;
-            const qam = a - 1;
-            let c = 1;
-            let d = 1 - qab * x / qap;
-            
-            if (Math.abs(d) < 1e-30) d = 1e-30;
-            d = 1 / d;
-            let h = d;
-            
-            for (let m = 1; m <= 100; m++) {
-                const m2 = 2 * m;
-                let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
-                d = 1 + aa * d;
-                if (Math.abs(d) < 1e-30) d = 1e-30;
-                c = 1 + aa / c;
-                if (Math.abs(c) < 1e-30) c = 1e-30;
-                d = 1 / d;
-                h *= d * c;
-                
-                aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
-                d = 1 + aa * d;
-                if (Math.abs(d) < 1e-30) d = 1e-30;
-                c = 1 + aa / c;
-                if (Math.abs(c) < 1e-30) c = 1e-30;
-                d = 1 / d;
-                const del = d * c;
-                h *= del;
-                
-                if (Math.abs(del - 1) < 1e-7) break;
-            }
-            
-            return h;
-        }
-
-        function chi2Quantile(p, k) {
-            if (p <= 0) return 0;
-            if (p >= 1) return Infinity;
-            if (k <= 0) return 0;
-            
-            // Initial guess using Wilson-Hilferty transformation
-            let x = k;
-            if (p > 0.5) {
-                const h = 2/(9*k);
-                const z = 1.644854; // Approximate normal quantile for p=0.95
-                x = k * Math.pow(1 - h + z * Math.sqrt(h), 3);
-            }
-            
-            // Newton-Raphson method to refine
-            let tolerance = 1e-10;
-            let maxIterations = 100;
-            
-            for (let i = 0; i < maxIterations; i++) {
-                const fx = chi2CDF(x, k) - p;
-                const fpx = chi2PDF(x, k);
-                
-                if (Math.abs(fx) < tolerance) {
-                    break;
-                }
-                
-                if (Math.abs(fpx) < 1e-15) {
-                    break;
-                }
-                
-                const newX = x - fx / fpx;
-                if (newX <= 0) {
-                    x = x / 2; // Ensure we stay positive
-                } else {
-                    x = newX;
-                }
-                
-                if (Math.abs(fx) < tolerance) break;
-            }
-            
-            return Math.max(0, x);
-        }
-
-        function calculateWithFeedback() {
-            const inputFields = document.querySelectorAll('.input-field:not([style*="display: none"])');
-            inputFields.forEach(field => {
-                field.classList.add('updating');
-                setTimeout(() => field.classList.remove('updating'), 600);
-            });
-            
-            calculate();
-        }
-
-        function calculate() {
-            try {
-                const dof = parseFloat(document.getElementById('dof').value) || 10;
-                const precision = parseInt(document.getElementById('precision')?.value) || 4;
-                const calcType = document.querySelector('input[name="calcType"]:checked').value;
-                
-                if (dof <= 0) {
-                    const mainResultEl = document.getElementById('mainResult');
-                    if (mainResultEl) mainResultEl.textContent = 'Error: Degrees of freedom must be positive';
-                    return;
-                }
-                
-                let result, areaDescription;
-                
-                switch(calcType) {
-                    case 'probability':
-                        const xValue = parseFloat(document.getElementById('xValue')?.value) || 0;
-                        if (xValue < 0) {
-                            const mainResultEl = document.getElementById('mainResult');
-                            if (mainResultEl) mainResultEl.textContent = 'Error: χ² values must be non-negative';
-                            return;
-                        }
-                        result = chi2CDF(xValue, dof);
-                        areaDescription = `P(χ² ≤ ${xValue})`;
-                        break;
-                        
-                    case 'between':
-                        const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || 0;
-                        const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 2;
-                        if (lowerBound < 0 || upperBound < 0) {
-                            const mainResultEl = document.getElementById('mainResult');
-                            if (mainResultEl) mainResultEl.textContent = 'Error: χ² values must be non-negative';
-                            return;
-                        }
-                        const lowerProb = chi2CDF(lowerBound, dof);
-                        const upperProb = chi2CDF(upperBound, dof);
-                        result = upperProb - lowerProb;
-                        areaDescription = `P(${lowerBound} ≤ χ² ≤ ${upperBound})`;
-                        break;
-                        
-                    case 'quantile':
-                        const probability = parseFloat(document.getElementById('probability')?.value) || 0.5;
-                        if (probability < 0 || probability > 1) {
-                            const mainResultEl = document.getElementById('mainResult');
-                            if (mainResultEl) mainResultEl.textContent = 'Error: Probability must be between 0 and 1';
-                            return;
-                        }
-                        result = chi2Quantile(probability, dof);
-                        areaDescription = `χ² such that P(χ² ≤ x) = ${probability}`;
-                        break;
-                }
-                
-                const areaInfoEl = document.querySelector('.shaded-area-info');
-                if (areaInfoEl) {
-                    areaInfoEl.classList.add('updating');
-                    setTimeout(() => areaInfoEl.classList.remove('updating'), 1000);
-                }
-                
-                const mainResultEl = document.getElementById('mainResult');
-                if (mainResultEl) {
-                    animateNumber(mainResultEl, mainResultEl.textContent, result, 800);
-                }
-                
-                const areaDescEl = document.getElementById('areaDescription');
-                if (areaDescEl) {
-                    areaDescEl.style.opacity = '0.5';
-                    areaDescEl.style.transition = 'opacity 0.3s ease';
-                    setTimeout(() => {
-                        areaDescEl.textContent = areaDescription;
-                        areaDescEl.style.opacity = '1';
-                    }, 150);
-                }
-                
-                const areaValueEl = document.getElementById('areaValue');
-                if (areaValueEl) {
-                    const displayValue = calcType === 'quantile' ? result : (result * 100);
-                    const suffix = calcType === 'quantile' ? '' : '%';
-                    
-                    animateNumber(areaValueEl, parseFloat(areaValueEl.textContent) || 0, displayValue, 700, false);
-                    
-                    setTimeout(() => {
-                        if (areaValueEl.textContent && !areaValueEl.textContent.includes('%') && suffix) {
-                            areaValueEl.textContent += suffix;
-                        }
-                    }, 750);
-                }
-                
-                updateStatistics();
-                updateCharts();
-                
-            } catch (error) {
-                console.error('Calculation error:', error);
-                const mainResultEl = document.getElementById('mainResult');
-                if (mainResultEl) mainResultEl.textContent = 'Calculation Error';
-            }
-        }
-
-        function animateNumber(element, startValue, endValue, duration = 800, showVisualFeedback = true) {
-            if (!element) return;
-            
-            const start = performance.now();
-            const startNum = parseFloat(startValue) || 0;
-            const endNum = parseFloat(endValue) || 0;
-            const precision = parseInt(document.getElementById('precision')?.value) || 4;
-            
-            if (showVisualFeedback) {
-                const parentItem = element.closest('.embedded-stat-item');
-                if (parentItem) {
-                    parentItem.classList.add('updating');
-                }
-            }
-            
-            function updateValue(currentTime) {
-                const elapsed = currentTime - start;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                const easedProgress = 1 - Math.pow(1 - progress, 4);
-                
-                const currentValue = startNum + (endNum - startNum) * easedProgress;
-                element.textContent = currentValue.toFixed(precision);
-                
-                if (progress < 1) {
-                    requestAnimationFrame(updateValue);
-                } else {
-                    element.textContent = endNum.toFixed(precision);
-                    
-                    if (showVisualFeedback) {
-                        setTimeout(() => {
-                            const parentItem = element.closest('.embedded-stat-item');
-                            if (parentItem) {
-                                parentItem.classList.remove('updating');
-                            }
-                        }, 200);
-                    }
-                }
-            }
-            
-            requestAnimationFrame(updateValue);
-        }
-
-        function updateStatistics() {
-            const dof = parseFloat(document.getElementById('dof')?.value) || 5;
-            
-            // Chi-squared distribution statistics
-            const mean = dof; // Mean = k (degrees of freedom)
-            const variance = 2 * dof; // Variance = 2k
-            const stddev = Math.sqrt(variance); // Standard deviation = √(2k)
-            const median = dof * Math.pow(1 - 2/(9*dof), 3); // Approximation
-            const mode = Math.max(0, dof - 2); // Mode = k-2 for k≥2, 0 otherwise
-            const skewness = Math.sqrt(8/dof); // Skewness = √(8/k)
-            
-            const statsElements = [
-                { el: document.getElementById('dofStat'), value: dof, delay: 0 },
-                { el: document.getElementById('meanStat'), value: mean, delay: 100 },
-                { el: document.getElementById('stddevStat'), value: stddev, delay: 200 },
-                { el: document.getElementById('varianceStat'), value: variance, delay: 300 },
-                { el: document.getElementById('medianStat'), value: median, delay: 400 },
-                { el: document.getElementById('modeStat'), value: mode, delay: 500 },
-                { el: document.getElementById('skewnessStat'), value: skewness !== undefined ? skewness : 'N/A', delay: 600 }
-            ];
-            
-            statsElements.forEach(({ el, value, delay }) => {
-                if (el) {
-                    setTimeout(() => {
-                        if (typeof value === 'string') {
-                            el.textContent = value;
-                        } else if (value === Infinity) {
-                            el.textContent = '∞';
-                        } else {
-                            animateNumber(el, el.textContent, value, 600);
-                        }
-                    }, delay);
-                }
-            });
-        }
-
-        function updateCharts() {
-            const dof = parseFloat(document.getElementById('dof').value) || 5;
-            const range = parseFloat(document.getElementById('chartRange').value) || 4;
-            const calcType = document.querySelector('input[name="calcType"]:checked').value;
-            
-            const points = 1000;
-            const minX = 0; // Chi-squared is only defined for x ≥ 0
-            const maxX = Math.max(dof + range * Math.sqrt(2 * dof), 10);
-            const step = (maxX - minX) / points;
-            
-            const pdfData = [];
-            const cdfData = [];
-            const shadedPdfData = [];
-            
-            // Get X values for marking with dashed lines
-            let xMarkers = [];
-            switch(calcType) {
-                    case 'probability':
-                        const xValue = parseFloat(document.getElementById('xValue')?.value) || 0;
-                        xMarkers = [{ value: xValue, label: `χ² = ${xValue}`, color: '#ff6b6b' }];
-                        break;
-                    case 'between':
-                        const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || 0;
-                        const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 2;
-                        xMarkers = [
-                            { value: lowerBound, label: `a = ${lowerBound}`, color: '#4ecdc4' },
-                            { value: upperBound, label: `b = ${upperBound}`, color: '#45b7d1' }
-                        ];
-                        break;
-                    case 'quantile':
-                        const probability = parseFloat(document.getElementById('probability')?.value) || 0.5;
-                        const quantileValue = chi2Quantile(probability, dof);
-                        xMarkers = [{ value: quantileValue, label: `χ² = ${quantileValue.toFixed(3)}`, color: '#96ceb4' }];
-                        break;
-            }
-            
-            for (let i = 0; i <= points; i++) {
-                const x = minX + i * step;
-                const pdfValue = chi2PDF(x, dof);
-                const cdfValue = chi2CDF(x, dof);
-                
-                pdfData.push([x, pdfValue]);
-                cdfData.push([x, cdfValue]);
-                
-                // Only PDF has shaded areas now
-                let inPdfShadedArea = false;
-                
-                switch(calcType) {
-                    case 'probability':
-                        const xValue = parseFloat(document.getElementById('xValue')?.value) || 0;
-                        inPdfShadedArea = x <= xValue;
-                        break;
-                    case 'between':
-                        const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || 0;
-                        const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 2;
-                        inPdfShadedArea = x >= lowerBound && x <= upperBound;
-                        break;
-                    case 'quantile':
-                        inPdfShadedArea = false;
-                        break;
-                }
-                
-                if (inPdfShadedArea) {
-                    shadedPdfData.push([x, pdfValue]);
-                }
-            }
-            
-            chartDataStore.pdfData = [...pdfData];
-            chartDataStore.cdfData = [...cdfData];
-            chartDataStore.shadedPdfData = [...shadedPdfData];
-            
-            // Update PDF chart with plot lines
-            if (pdfChart && pdfChart.series && pdfChart.series[0]) {
-                try {
-                    pdfChart.series[0].setData(pdfData, false);
-                    if (pdfChart.series[1]) {
-                        pdfChart.series[1].setData(shadedPdfData, false);
-                    }
-                    if (pdfChart.xAxis && pdfChart.xAxis[0]) {
-                        pdfChart.xAxis[0].setExtremes(minX, maxX, false);
-                    }
-                    
-                    // Add dashed plot lines for markers
-                    if (pdfChart.xAxis && pdfChart.xAxis[0]) {
-                        // Remove existing plot lines
-                        for (let i = 0; i < 5; i++) {
-                            pdfChart.xAxis[0].removePlotLine(`marker-${i}`);
-                        }
-                        // Add new plot lines
-                        xMarkers.forEach((marker, index) => {
-                            pdfChart.xAxis[0].addPlotLine({
-                                id: `marker-${index}`,
-                                value: marker.value,
-                                color: marker.color,
-                                width: 3,
-                                dashStyle: 'Dash',
-                                label: {
-                                    text: marker.label,
-                                    style: {
-                                        color: 'white',
-                                        fontWeight: 'bold'
-                                    },
-                                    align: 'center'
-                                }
-                            });
-                        });
-                    }
-                    
-                    pdfChart.redraw();
-                } catch (error) {
-                    console.warn('Error updating PDF chart:', error);
-                }
-            }
-            
-            // Update CDF chart with plot lines (no shading)
-            if (cdfChart && cdfChart.series && cdfChart.series[0]) {
-                try {
-                    cdfChart.series[0].setData(cdfData, false);
-                    if (cdfChart.xAxis && cdfChart.xAxis[0]) {
-                        cdfChart.xAxis[0].setExtremes(minX, maxX, false);
-                    }
-                    
-                    // Add dashed plot lines for markers
-                    if (cdfChart.xAxis && cdfChart.xAxis[0]) {
-                        // Remove existing plot lines
-                        for (let i = 0; i < 5; i++) {
-                            cdfChart.xAxis[0].removePlotLine(`marker-${i}`);
-                        }
-                        // Add new plot lines
-                        xMarkers.forEach((marker, index) => {
-                            cdfChart.xAxis[0].addPlotLine({
-                                id: `marker-${index}`,
-                                value: marker.value,
-                                color: marker.color,
-                                width: 3,
-                                dashStyle: 'Dash',
-                                label: {
-                                    text: marker.label,
-                                    style: {
-                                        color: 'white',
-                                        fontWeight: 'bold'
-                                    },
-                                    align: 'center'
-                                }
-                            });
-                        });
-                    }
-                    
-                    cdfChart.redraw();
-                } catch (error) {
-                    console.warn('Error updating CDF chart:', error);
-                }
-            }
-            
-            // Update Combined chart with plot lines (only PDF shading)
-            if (combinedChart && combinedChart.series && combinedChart.series[0]) {
-                try {
-                    combinedChart.series[0].setData(pdfData, false);
-                    if (combinedChart.series[1]) {
-                        combinedChart.series[1].setData(cdfData, false);
-                    }
-                    if (combinedChart.series[2]) {
-                        combinedChart.series[2].setData(shadedPdfData, false);
-                    }
-                    if (combinedChart.xAxis && combinedChart.xAxis[0]) {
-                        combinedChart.xAxis[0].setExtremes(minX, maxX, false);
-                    }
-                    
-                    // Add dashed plot lines for markers
-                    if (combinedChart.xAxis && combinedChart.xAxis[0]) {
-                        // Remove existing plot lines
-                        for (let i = 0; i < 5; i++) {
-                            combinedChart.xAxis[0].removePlotLine(`marker-${i}`);
-                        }
-                        // Add new plot lines
-                        xMarkers.forEach((marker, index) => {
-                            combinedChart.xAxis[0].addPlotLine({
-                                id: `marker-${index}`,
-                                value: marker.value,
-                                color: marker.color,
-                                width: 3,
-                                dashStyle: 'Dash',
-                                label: {
-                                    text: marker.label,
-                                    style: {
-                                        color: 'white',
-                                        fontWeight: 'bold'
-                                    },
-                                    align: 'center'
-                                }
-                            });
-                        });
-                    }
-                    
-                    combinedChart.redraw();
-                } catch (error) {
-                    console.warn('Error updating Combined chart:', error);
-                }
-            }
-            
-            // Add visual indicators below charts
-            updateChartIndicators(xMarkers, calcType);
+            formulaDisplay.innerHTML = formula;
         }
 
         function switchTab(tabName, clickedElement) {
+            // Get the clicked element - either from parameter or event
             const tabElement = clickedElement || event?.target || document.querySelector(`.tab[onclick*="${tabName}"]`);
             
             if (!tabElement) {
@@ -1994,116 +2135,76 @@
                 return;
             }
             
+            // Add switching animation to the clicked tab
             tabElement.classList.add('switching');
             setTimeout(() => {
                 tabElement.classList.remove('switching');
             }, 800);
             
-            const activeContent = document.querySelector('.tab-content.active');
-            if (activeContent) {
-                activeContent.style.opacity = '0';
-                activeContent.style.transform = 'translateX(-20px)';
-                activeContent.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            }
+            // Hide all tab contents with fade out
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
             
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content with delay for smooth transition
             setTimeout(() => {
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                    content.style.opacity = '';
-                    content.style.transform = '';
-                });
+                document.getElementById(tabName + 'Tab').classList.add('active');
                 
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
+                // Add active class to selected tab
+                tabElement.classList.add('active');
                 
-                const newContent = document.getElementById(tabName + 'Tab');
-                if (newContent) {
-                    newContent.classList.add('active');
-                    tabElement.classList.add('active');
-                    
-                    clearTargetChart(tabName);
-                    
-                    setTimeout(() => {
-                        triggerChartAnimations(tabName);
-                    }, 100);
-                }
-            }, 200);
-        }
-
-        function clearTargetChart(tabName) {
-            try {
-                // First update charts normally to ensure plot lines are set
-                updateCharts();
-                
-                // Then clear only the series data, keeping plot lines
-                switch(tabName) {
-                    case 'pdf':
-                        if (pdfChart && pdfChart.series) {
-                            pdfChart.series.forEach(series => {
-                                if (series && series.setData) {
-                                    series.setData([], false);
-                                }
-                            });
-                            pdfChart.redraw(false);
-                        }
-                        break;
-                    case 'cdf':
-                        if (cdfChart && cdfChart.series) {
-                            cdfChart.series.forEach(series => {
-                                if (series && series.setData) {
-                                    series.setData([], false);
-                                }
-                            });
-                            cdfChart.redraw(false);
-                        }
-                        break;
-                    case 'both':
-                        if (combinedChart && combinedChart.series) {
-                            combinedChart.series.forEach(series => {
-                                if (series && series.setData) {
-                                    series.setData([], false);
-                                }
-                            });
-                            combinedChart.redraw(false);
-                        }
-                        break;
-                }
-            } catch (error) {
-                console.warn('Error clearing target chart:', error);
-            }
+                // Trigger chart animations when switching tabs
+                setTimeout(() => {
+                    triggerChartAnimations(tabName);
+                }, 300); // Delay to ensure tab content is visible
+            }, 100);
         }
 
         function triggerChartAnimations(tabName) {
-            const chartContainer = document.querySelector('.chart-container');
-            if (chartContainer) {
-                chartContainer.style.transform = 'scale(0.98)';
-                chartContainer.style.opacity = '0.6';
-                chartContainer.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-                
-                setTimeout(() => {
-                    chartContainer.style.transform = 'scale(1)';
-                    chartContainer.style.opacity = '1';
-                }, 100);
-            }
-            
+            // Force chart animations by temporarily hiding and showing series
             switch(tabName) {
                 case 'pdf':
                     if (pdfChart) {
                         animateChartSeries(pdfChart, 'pdf');
+                        // Animate chart indicators
+                        animateChartIndicators();
                     }
                     break;
                 case 'cdf':
                     if (cdfChart) {
                         animateChartSeries(cdfChart, 'cdf');
+                        animateChartIndicators();
                     }
                     break;
                 case 'both':
                     if (combinedChart) {
                         animateChartSeries(combinedChart, 'combined');
+                        animateChartIndicators();
                     }
                     break;
             }
+        }
+
+        function animateChartIndicators() {
+            // Add glow effect to chart indicators
+            const indicators = document.querySelectorAll('.chart-indicator');
+            indicators.forEach((indicator, index) => {
+                setTimeout(() => {
+                    indicator.style.transform = 'scale(1.05)';
+                    indicator.style.boxShadow = '0 8px 32px rgba(52, 152, 219, 0.4)';
+                    indicator.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                    
+                    setTimeout(() => {
+                        indicator.style.transform = 'scale(1)';
+                        indicator.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+                    }, 600);
+                }, index * 100);
+            });
         }
 
         function animateChartSeries(chart, chartType) {
@@ -2113,6 +2214,7 @@
                     return;
                 }
                 
+                // Get the stored data based on chart type
                 let originalData = [];
                 switch(chartType) {
                     case 'pdf':
@@ -2129,8 +2231,7 @@
                     case 'combined':
                         originalData = [
                             [...chartDataStore.pdfData],
-                            [...chartDataStore.cdfData],
-                            [...chartDataStore.shadedPdfData]
+                            [...chartDataStore.cdfData]
                         ];
                         break;
                     default:
@@ -2138,112 +2239,146 @@
                         return;
                 }
                 
+                // Add animating class to chart container
                 const chartContainer = chart.container.parentElement;
                 if (chartContainer) {
                     chartContainer.classList.add('animating', 'drawing-curves');
                 }
                 
-                const animationDuration = 1500;
-                const frameRate = 60;
-                const totalFrames = Math.floor((animationDuration / 1000) * frameRate);
-                let currentFrame = 0;
-                
-                const animateFrame = () => {
-                    if (currentFrame >= totalFrames) {
-                        // Final step - restore full data
-                        originalData.forEach((seriesData, seriesIndex) => {
-                            if (chart.series[seriesIndex] && seriesData && seriesData.length > 0) {
-                                try {
-                                    chart.series[seriesIndex].setData(seriesData, false);
-                                } catch (error) {
-                                    console.warn('Error in final frame:', error);
-                                }
-                            }
-                        });
-                        chart.redraw();
+                // Animate each series with true progressive drawing
+                chart.series.forEach((series, seriesIndex) => {
+                    if (series && typeof series.setData === 'function' && originalData[seriesIndex] && originalData[seriesIndex].length > 0) {
+                        const fullData = originalData[seriesIndex];
                         
-                        return;
-                    }
-                    
-                    const animationProgress = currentFrame / totalFrames;
-                    const easedProgress = 1 - Math.pow(1 - animationProgress, 2);
-                    
-                    originalData.forEach((seriesData, seriesIndex) => {
-                        if (chart.series[seriesIndex] && seriesData && seriesData.length > 0) {
-                            const targetLength = Math.floor(easedProgress * seriesData.length);
-                            const partialData = seriesData.slice(0, Math.max(1, targetLength));
+                        // Start the progressive drawing animation
+                        let pointIndex = 0;
+                        const totalPoints = fullData.length;
+                        const animationDuration = 1200; // 1.2 seconds
+                        const pointsPerFrame = Math.max(1, Math.floor(totalPoints / 60)); // ~60 frames for smooth animation
+                        
+                        const drawNextPoints = () => {
+                            if (pointIndex >= totalPoints) {
+                                // Animation complete - ensure all data is set
+                                try {
+                                    series.setData(fullData, false);
+                                    chart.redraw(false);
+                                } catch (finalError) {
+                                    console.warn('Error in final step:', finalError);
+                                }
+                                return;
+                            }
+                            
+                            // Calculate next chunk of points to add
+                            const nextIndex = Math.min(pointIndex + pointsPerFrame, totalPoints);
+                            const currentData = fullData.slice(0, nextIndex);
                             
                             try {
-                                chart.series[seriesIndex].setData(partialData, false);
-                            } catch (error) {
-                                console.warn('Error updating series during animation:', error);
+                                // Update series without internal animation to avoid conflicts
+                                series.setData(currentData, false);
+                                chart.redraw(false);
+                                
+                                pointIndex = nextIndex;
+                                
+                                // Schedule next frame
+                                requestAnimationFrame(drawNextPoints);
+                                
+                            } catch (animError) {
+                                console.warn('Error during progressive drawing:', animError);
+                                // Try to continue with next frame
+                                pointIndex = nextIndex;
+                                requestAnimationFrame(drawNextPoints);
                             }
-                        }
-                    });
-                    
-                    try {
-                        chart.redraw();
-                    } catch (error) {
-                        console.warn('Error redrawing during animation:', error);
+                        };
+                        
+                        // Start animation with staggered delay for multiple series
+                        setTimeout(() => {
+                            // Ensure series is empty before starting
+                            try {
+                                series.setData([], false);
+                                chart.redraw(false);
+                                // Start progressive drawing
+                                requestAnimationFrame(drawNextPoints);
+                            } catch (startError) {
+                                console.warn('Error starting animation:', startError);
+                            }
+                        }, seriesIndex * 300);
                     }
-                    
-                    currentFrame++;
-                    requestAnimationFrame(animateFrame);
-                };
+                });
                 
-                requestAnimationFrame(animateFrame);
-                
+                // Remove animating classes after animation completes
                 setTimeout(() => {
                     if (chartContainer) {
                         chartContainer.classList.remove('animating', 'drawing-curves');
                     }
-                }, animationDuration + 200);
+                }, 2000);
                 
             } catch (error) {
                 console.warn('Error in animateChartSeries:', error);
             }
         }
 
-
+        function toggleAdvanced() {
+            const content = document.getElementById('advancedContent');
+            const icon = document.getElementById('advancedIcon');
+            
+            content.classList.toggle('show');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        }
 
         function reloadCalculator() {
+            // Add visual feedback to all statistics boxes
             document.querySelectorAll('.embedded-stat-item').forEach(item => {
-                item.classList.add('updating');
-                setTimeout(() => item.classList.remove('updating'), 800);
+                item.classList.add('resetting');
+                setTimeout(() => item.classList.remove('resetting'), 800);
             });
             
+            // Show loading state
             const mainResultEl = document.getElementById('mainResult');
             if (mainResultEl) {
+                mainResultEl.classList.add('calculating');
                 mainResultEl.textContent = 'Resetting...';
             }
             
+            // Reset all input values to defaults with animation
             const inputs = [
-                { el: document.getElementById('dof'), value: '10' },
-                { el: document.getElementById('xValue'), value: '0' },
+                { el: document.getElementById('degreesOfFreedom'), value: '5' },
+                { el: document.getElementById('xValue'), value: '5' },
                 { el: document.getElementById('precision'), value: '4' },
-                { el: document.getElementById('chartRange'), value: '4' }
+                { el: document.getElementById('chartRange'), value: '3' }
             ];
             
             inputs.forEach(({ el, value }, index) => {
                 if (el) {
                     setTimeout(() => {
+                        el.style.transition = 'all 0.3s ease';
+                        el.style.transform = 'scale(1.05)';
                         el.value = value;
+                        
+                        setTimeout(() => {
+                            el.style.transform = 'scale(1)';
+                        }, 150);
                     }, index * 100);
                 }
             });
             
+            // Reset radio button to default (probability)
             const probabilityRadio = document.querySelector('input[value="probability"]');
             if (probabilityRadio) {
                 probabilityRadio.checked = true;
                 currentCalcType = 'probability';
             }
             
-            // Reset sliders to default values
-            setTimeout(() => {
-                updateSliderValue('precision', 'precisionValue', '');
-                updateSliderValue('chartRange', 'chartRangeValue', '');
-            }, 600);
+            // Reset advanced options
+            const advancedContent = document.getElementById('advancedContent');
+            const advancedIcon = document.getElementById('advancedIcon');
+            if (advancedContent && advancedIcon) {
+                advancedContent.classList.remove('show');
+                advancedIcon.classList.remove('fa-chevron-up');
+                advancedIcon.classList.add('fa-chevron-down');
+            }
             
+            // Reset tab to PDF view with animation
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
@@ -2254,23 +2389,51 @@
                 if (pdfTabContent) pdfTabContent.classList.add('active');
             }, 200);
             
+            // Clear any dynamic input sections and recreate default
             updateInputSection();
             updateRadioSelection();
             
+            // Animate reset with delay for better UX
             setTimeout(() => {
+                if (mainResultEl) {
+                    mainResultEl.classList.remove('calculating');
+                }
+                
+                // Recalculate with default values
                 updateStatistics();
                 calculate();
                 
+                // Show success message briefly
                 if (mainResultEl) {
+                    const originalText = mainResultEl.textContent;
                     mainResultEl.textContent = '✓ Reset Complete!';
                     mainResultEl.style.color = '#27ae60';
+                    mainResultEl.style.fontWeight = 'bold';
                     
                     setTimeout(() => {
                         mainResultEl.style.color = '';
-                        calculate();
+                        mainResultEl.style.fontWeight = '';
+                        mainResultEl.textContent = originalText;
                     }, 1500);
                 }
+                
+                // Add celebration effect
+                createCelebrationEffect();
+                
             }, 1000);
+        }
+
+        function createCelebrationEffect() {
+            // Create a subtle celebration effect
+            const header = document.querySelector('.header');
+            if (header) {
+                header.style.transform = 'scale(1.02)';
+                header.style.transition = 'transform 0.3s ease';
+                
+                setTimeout(() => {
+                    header.style.transform = 'scale(1)';
+                }, 300);
+            }
         }
     </script>
 </body>
