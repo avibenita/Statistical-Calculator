@@ -1,0 +1,2966 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Erlang C Calculator - Simple</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --panel-bg: #484b57;
+            --panel-radius: 10px;
+            --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+            --header-bg: #000;
+            --header-color: rgb(255,192,192);
+            --primary-blue: #3498db;
+            --primary-blue-hover: #2980b9;
+            --success-green: #27ae60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #282c39 0%, #1e2329 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--header-bg) 0%, #1a1a2e 100%);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--header-color);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 5px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .control-panel {
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+            padding: 25px;
+            min-height: 500px;
+        }
+
+        .visualization-panel {
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+            padding: 25px;
+            min-height: 500px;
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            color: var(--header-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px 20px;
+            border-radius: var(--panel-radius);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .parameter-section {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .parameter-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .parameter-icon {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .parameter-content {
+            flex: 1;
+        }
+
+        .parameter-label {
+            font-weight: 600;
+            color: #e8e8e8;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .parameter-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .manual-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #555;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .manual-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .distribution-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #555;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .distribution-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .distribution-select option {
+            background: #333;
+            color: white;
+            padding: 8px;
+        }
+
+        .slider-container {
+            flex: 1;
+        }
+
+        .slider-input {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.2);
+            outline: none;
+            -webkit-appearance: none;
+            transition: all 0.3s ease;
+        }
+
+        .slider-input::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .slider-input::-webkit-slider-thumb:hover {
+            background: var(--primary-blue-hover);
+            transform: scale(1.1);
+        }
+
+        .slider-input::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .slider-input::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-green) 0%, #16a085 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #2ecc71 0%, #17a2b8 100%);
+            transform: translateY(-2px);
+        }
+
+        .kpi-visualization {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .kpi-item {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .kpi-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .kpi-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .kpi-label {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            margin-bottom: 4px;
+        }
+
+        .kpi-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--header-color);
+        }
+
+        .chart-container {
+            height: 350px;
+            margin-top: 20px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .info-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            color: var(--header-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box p {
+            color: #b0b0b0;
+            line-height: 1.5;
+        }
+
+        /* Loading Spinner Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .spinner-container {
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--panel-shadow);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fa-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-text {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .spinner-subtext {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #2c2c2c;
+            transition: all 0.4s ease;
+            border-radius: 24px;
+            border: 2px solid #444;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #666;
+            transition: all 0.4s ease;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue-hover);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+            background-color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .toggle-switch:hover .toggle-slider {
+            border-color: #555;
+        }
+
+        .toggle-switch input:checked:hover + .toggle-slider {
+            border-color: var(--primary-blue-hover);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+
+<style>
+.toggle-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.toggle-container label {
+  flex: 1;
+}
+.toggle-container input[type="checkbox"] {
+  margin-left: 10px;
+}
+.disabled-section {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.parameter-section.disabled {
+  opacity: 0.4;
+  background: rgba(0,0,0,0.6) !important;
+  border: 1px solid rgba(255,255,255,0.05) !important;
+  transition: all 0.3s ease;
+}
+
+.parameter-section.disabled .parameter-row {
+  pointer-events: none;
+}
+
+.parameter-section.disabled .toggle-switch {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+.parameter-section.disabled .manual-input,
+.parameter-section.disabled .slider-input {
+  background: rgba(255,255,255,0.02) !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.parameter-section.disabled .parameter-label {
+  color: #666 !important;
+}
+
+.parameter-section.disabled .parameter-icon {
+  color: #444 !important;
+}
+
+.parameter-section.disabled .toggle-slider {
+  background-color: #1a1a1a;
+  border-color: #333;
+}
+
+.parameter-section.disabled .toggle-slider:before {
+  background-color: #444;
+}
+
+.parameter-section:not(.disabled) {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(52, 152, 219, 0.1);
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.05);
+  transition: all 0.3s ease;
+}
+
+        .parameter-section:not(.disabled):hover {
+            border-color: rgba(52, 152, 219, 0.2);
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Collapsible section styles */
+        .collapsible-section {
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+        }
+        
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-blue);
+            border-radius: 4px 0 0 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: rgba(52, 152, 219, 0.15);
+            border-color: rgba(52, 152, 219, 0.4);
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .section-header:hover::before {
+            opacity: 1;
+        }
+
+        .section-header:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(52, 152, 219, 0.15);
+        }
+
+        .section-header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header-icon {
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+        }
+
+        .section-header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e8e8e8;
+        }
+
+        .collapse-icon {
+            font-size: 1rem;
+            color: var(--primary-blue);
+            transition: transform 0.3s ease;
+            animation: subtle-pulse 3s ease-in-out infinite;
+        }
+
+        .collapse-icon.rotated {
+            transform: rotate(180deg);
+            animation: none; /* Remove pulse when expanded */
+        }
+        
+        .section-header:hover .collapse-icon {
+            transform: scale(1.2);
+        }
+        
+        .section-header:hover .collapse-icon.rotated {
+            transform: rotate(180deg) scale(1.2);
+        }
+        
+        @keyframes subtle-pulse {
+            0%, 70%, 100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            35% { 
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .collapsible-content {
+            max-height: 2000px;
+            opacity: 1;
+            transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.3s ease;
+            overflow: hidden;
+        }
+
+        .collapsible-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-calculator"></i> Interactive Call Center Staffing Calculator</h1>
+
+        </div>
+        <div class="main-content">
+            <div class="control-panel">
+                <h2 class="panel-title">
+                    <i class="fas fa-cogs"></i>
+                    Parameters
+                </h2>
+                <div class="parameter-section">
+                    <div class="parameter-row">
+                        <i class="fas fa-phone-alt parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Calls per Hour</div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="callsPerHourManual" max="1000" min="10" type="number" value="100"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="callsPerHour" max="1000" min="10" step="5" type="range" value="100"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="parameter-row">
+                        <i class="fas fa-clock parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Average Handling Time (seconds)</div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="ahtManual" max="600" min="30" type="number" value="300"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="aht" max="600" min="30" step="5" type="range" value="300"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="parameter-row">
+                        <i class="fas fa-percentage parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Service Level Target (%)</div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="targetSLManual" max="99" min="50" type="number" value="80"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="targetSL" max="99" min="50" step="1" type="range" value="80"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="parameter-row">
+                        <i class="fas fa-hourglass-half parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Max Wait Time (seconds)</div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="maxWaitManual" max="120" min="5" type="number" value="20"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="maxWait" max="120" min="5" step="5" type="range" value="20"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="parameter-row">
+                        <i class="fas fa-user-clock parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">
+                                Shrinkage (%)
+                                <label class="toggle-switch" title="Enable shrinkage calculation to account for breaks, training, and other non-productive time">
+                                    <input id="enableShrinkage" type="checkbox"/>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="shrinkageManual" max="50" min="10" type="number" value="30"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="shrinkage" max="50" min="10" step="1" type="range" value="30"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                                </div>
+                
+                <div class="parameter-section collapsible-section">
+                    <div class="section-header" onclick="toggleAdvancedOptions()" title="Click to expand/collapse advanced simulation options and distribution settings">
+                        <div class="section-header-content">
+                            <i class="fas fa-cogs section-header-icon"></i>
+                            <span class="section-header-title">Simulation Options</span>
+                        </div>
+                        <i class="fas fa-chevron-down collapse-icon" id="advancedOptionsToggle"></i>
+                    </div>
+                    <div class="collapsible-content" id="advancedOptionsContent">
+                    
+                    <!-- Service Time Distribution Controls -->
+                    <div class="parameter-row">
+                        <i class="fas fa-chart-bar parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Service Time Distribution</div>
+                            <div class="parameter-controls">
+                                <select class="distribution-select" id="serviceDistribution">
+                                    <option value="exponential">Exponential (Erlang C)</option>
+                                    <option value="normal">Normal/Gaussian</option>
+                                    <option value="lognormal">Lognormal</option>
+                                    <option value="uniform">Uniform</option>
+                                    <option value="gamma">Gamma</option>
+                                    <option value="deterministic">Deterministic/Constant</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Distribution-specific parameters -->
+                    <div class="parameter-row distribution-param" id="normalParams" style="display: none;">
+                        <i class="fas fa-wave-square parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Standard Deviation (seconds)</div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="serviceStdDevManual" max="300" min="5" type="number" value="60"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="serviceStdDev" max="300" min="5" step="5" type="range" value="60"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="parameter-row distribution-param" id="lognormalParams" style="display: none;">
+                        <i class="fas fa-chart-area parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Coefficient of Variation</div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="serviceCVManual" max="2.0" min="0.1" step="0.1" type="number" value="0.5"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="serviceCV" max="2.0" min="0.1" step="0.1" type="range" value="0.5"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="parameter-row distribution-param" id="uniformParams" style="display: none;">
+                        <i class="fas fa-arrows-alt-h parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Range Factor (±% of mean)</div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="serviceRangeFactorManual" max="0.9" min="0.1" step="0.1" type="number" value="0.5"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="serviceRangeFactor" max="0.9" min="0.1" step="0.1" type="range" value="0.5"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="parameter-row distribution-param" id="gammaParams" style="display: none;">
+                        <i class="fas fa-chart-line parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Coefficient of Variation</div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="serviceGammaCVManual" max="2.0" min="0.1" step="0.1" type="number" value="0.5"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="serviceGammaCV" max="2.0" min="0.1" step="0.1" type="range" value="0.5"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="parameter-row">
+                        <i class="fas fa-phone-alt parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">
+                                Abandonment Rate (%)
+                                <label class="toggle-switch" title="Enable abandonment rate simulation - percentage of callers who hang up before being served">
+                                    <input id="enableAbandonmentRate" type="checkbox"/>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="abandonmentRateManual" max="50" min="0" type="number" value="5"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="abandonmentRate" max="50" min="0" step="1" type="range" value="5"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="parameter-row">
+                        <i class="fas fa-clock parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">
+                                Patience Time Avg (sec)
+                                <label class="toggle-switch" title="Enable caller patience simulation - average time callers wait before hanging up">
+                                    <input id="enablePatience" type="checkbox"/>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="patienceManual" max="600" min="10" type="number" value="60"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="patience" max="600" min="10" step="5" type="range" value="60"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="parameter-row">
+                        <i class="fas fa-percentage parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Retrial Rate (%)
+                                <label class="toggle-switch" title="Enable retrial simulation - percentage of callers who call back after hanging up">
+                                    <input id="enableRetrialRate" type="checkbox"/>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="retrialRateManual" max="99" min="0" type="number" value="20"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="retrialRate" max="99" min="0" step="1" type="range" value="20"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="parameter-row">
+                        <i class="fas fa-hourglass-half parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">Retrial Delay (sec)
+                                <label class="toggle-switch" title="Enable retrial delay simulation - average time before callers retry their call">
+                                    <input id="enableRetrialDelay" type="checkbox"/>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="retrialDelayManual" max="1800" min="5" type="number" value="300"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="retrialDelay" max="1800" min="5" step="5" type="range" value="300"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="parameter-row">
+                        <i class="fas fa-server parameter-icon"></i>
+                        <div class="parameter-content">
+                            <div class="parameter-label">System Capacity (Max Concurrent Calls)
+                                <label class="toggle-switch" title="Enable system capacity limits - maximum number of customers/calls that can be in the system simultaneously">
+                                    <input id="enableCapacity" type="checkbox"/>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="parameter-controls">
+                                <input class="manual-input" id="capacityManual" max="500" min="5" type="number" value="50"/>
+                                <div class="slider-container">
+                                    <input class="slider-input" id="capacity" max="500" min="5" step="5" type="range" value="50"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div> <!-- Close collapsible-content -->
+                </div>
+
+                <button class="btn btn-success" onclick="calculateErlangC(true)">
+                    <i class="fas fa-calculator"></i>
+                    Calculate Staffing Requirements
+                </button>
+            </div>
+            <div class="visualization-panel">
+                <h2 class="panel-title" id="resultsPanelTitle">
+                    <i class="fas fa-chart-line"></i>
+                    Results
+                </h2>
+                <div class="kpi-visualization">
+                    <div class="kpi-item" id="totalAgentsKPI" style="display: none;">
+                        <i class="fas fa-users kpi-icon" style="color: #3498db;"></i>
+                        <div class="kpi-label">Total Agents to Hire</div>
+                        <div class="kpi-value" id="requiredAgents">-</div>
+                    </div>
+                    <div class="kpi-item">
+                        <i class="fas fa-users kpi-icon" style="color: #27ae60;"></i>
+                        <div class="kpi-label">Base Agents</div>
+                        <div class="kpi-value" id="baseAgents">-</div>
+                    </div>
+                    <div class="kpi-item">
+                        <i class="fas fa-chart-line kpi-icon" style="color: #f39c12;"></i>
+                        <div class="kpi-label">Service Level</div>
+                        <div class="kpi-value" id="serviceLevelAchieved">-</div>
+                    </div>
+                    <div class="kpi-item">
+                        <i class="fas fa-tachometer-alt kpi-icon" style="color: #9b59b6;"></i>
+                        <div class="kpi-label">Occupancy</div>
+                        <div class="kpi-value" id="agentOccupancy">-</div>
+                    </div>
+                    <div class="kpi-item">
+                        <i class="fas fa-clock kpi-icon" style="color: #e67e22;"></i>
+                        <div class="kpi-label">Avg Wait Time</div>
+                        <div class="kpi-value" id="avgWaitTime">-</div>
+                    </div>
+                    <div class="kpi-item" id="abandonmentKPI" style="display: none;">
+                        <i class="fas fa-user-times kpi-icon" style="color: #e74c3c;"></i>
+                        <div class="kpi-label">% Abandoned</div>
+                        <div class="kpi-value" id="abandonmentRate">-</div>
+                    </div>
+                    <div class="kpi-item" id="blockingKPI" style="display: none;">
+                        <i class="fas fa-ban kpi-icon" style="color: #dc3545;"></i>
+                        <div class="kpi-label">% Blocked</div>
+                        <div class="kpi-value" id="blockingRate">-</div>
+                    </div>
+                    <div class="kpi-item" id="effectiveSLAKPI" style="display: none;">
+                        <i class="fas fa-chart-pie kpi-icon" style="color: #17a2b8;"></i>
+                        <div class="kpi-label">Effective SLA</div>
+                        <div class="kpi-value" id="effectiveSLA">-</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div id="staffingChart"></div>
+                </div>
+                <div class="info-box">
+                    <h4><i class="fas fa-info-circle"></i> Results Summary</h4>
+                    <p id="interpretationText">Adjust the parameters above to see how different call volumes, handling times, and service level targets affect your staffing requirements.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="spinner-text">Running Simulation</div>
+            <div class="spinner-subtext" id="spinnerSubtext">Calculating optimal staffing...</div>
+        </div>
+    </div>
+
+    <script>
+        let staffingChart = null;
+
+        // Spinner control functions
+        function showSpinner(subtext = 'Calculating optimal staffing...') {
+            const overlay = document.getElementById('loadingOverlay');
+            const subtextElement = document.getElementById('spinnerSubtext');
+            
+            if (overlay && subtextElement) {
+                subtextElement.textContent = subtext;
+                overlay.style.display = 'flex';
+                
+                // Prevent scrolling while spinner is shown
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function hideSpinner() {
+            const overlay = document.getElementById('loadingOverlay');
+            
+            if (overlay) {
+                overlay.style.display = 'none';
+                
+                // Restore scrolling
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Function to toggle advanced options section
+        function toggleAdvancedOptions() {
+            const content = document.getElementById('advancedOptionsContent');
+            const toggleIcon = document.getElementById('advancedOptionsToggle');
+            
+            if (content && toggleIcon) {
+                const isCollapsed = content.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    // Expand
+                    content.classList.remove('collapsed');
+                    toggleIcon.classList.remove('rotated');
+                    localStorage.setItem('advancedOptionsExpanded', 'true');
+                    
+                    // Add subtle highlight effect when expanding
+                    const header = toggleIcon.closest('.section-header');
+                    if (header) {
+                        header.style.borderColor = 'rgba(52, 152, 219, 0.6)';
+                        setTimeout(() => {
+                            header.style.borderColor = 'rgba(52, 152, 219, 0.3)';
+                        }, 500);
+                    }
+                } else {
+                    // Collapse
+                    content.classList.add('collapsed');
+                    toggleIcon.classList.add('rotated');
+                    localStorage.setItem('advancedOptionsExpanded', 'false');
+                }
+            }
+        }
+
+        // Function to initialize advanced options state
+        function initializeAdvancedOptionsState() {
+            const content = document.getElementById('advancedOptionsContent');
+            const toggleIcon = document.getElementById('advancedOptionsToggle');
+            
+            // Get saved state from localStorage, default to collapsed for new users
+            const savedState = localStorage.getItem('advancedOptionsExpanded');
+            const isExpanded = savedState === 'true';
+            
+            if (content && toggleIcon) {
+                if (isExpanded) {
+                    content.classList.remove('collapsed');
+                    toggleIcon.classList.remove('rotated');
+                } else {
+                    content.classList.add('collapsed');
+                    toggleIcon.classList.add('rotated');
+                }
+            }
+            
+            // Update the options count badge
+            updateAdvancedOptionsCount();
+            
+            // Add expandable indicator to the title
+            addExpandableIndicator();
+        }
+        
+        // Function to add visual indicator that section is expandable
+        function addExpandableIndicator() {
+            const headerTitle = document.querySelector('.section-header-title');
+            if (headerTitle && !headerTitle.dataset.indicatorAdded) {
+                headerTitle.style.position = 'relative';
+                headerTitle.dataset.indicatorAdded = 'true';
+            }
+        }
+
+        // Function to update the count of enabled advanced options
+        function updateAdvancedOptionsCount() {
+            const advancedToggles = [
+                'enableAbandonmentRate',
+                'enablePatience', 
+                'enableRetrialRate',
+                'enableRetrialDelay',
+                'enableCapacity'
+            ];
+            
+            let enabledCount = 0;
+            advancedToggles.forEach(toggleId => {
+                const toggle = document.getElementById(toggleId);
+                if (toggle && toggle.checked) {
+                    enabledCount++;
+                }
+            });
+            
+            // Check if non-exponential distribution is selected
+            const serviceDistribution = document.getElementById('serviceDistribution');
+            const isNonExponential = serviceDistribution && serviceDistribution.value !== 'exponential';
+            if (isNonExponential) {
+                enabledCount++;
+            }
+            
+            const headerTitles = document.querySelectorAll('.section-header-title');
+            let advancedHeaderTitle = null;
+            
+            // Find the advanced options header title specifically
+            headerTitles.forEach(title => {
+                if (title.textContent.includes('Advanced Simulation Options')) {
+                    advancedHeaderTitle = title;
+                }
+            });
+            
+            if (advancedHeaderTitle) {
+                const baseTitle = 'Advanced Simulation Options';
+                if (enabledCount > 0) {
+                    advancedHeaderTitle.textContent = `${baseTitle} (${enabledCount} active)`;
+                    advancedHeaderTitle.style.color = '#3498db';
+                } else {
+                    advancedHeaderTitle.textContent = baseTitle;
+                    advancedHeaderTitle.style.color = '#e8e8e8';
+                }
+            }
+        }
+
+
+
+        // Function to update simulation panel title based on state
+        function updateSimulationPanelTitle(state, distributionName = null) {
+            const resultsPanelTitle = document.getElementById('resultsPanelTitle');
+            if (!resultsPanelTitle) return;
+            
+            const titleIcon = resultsPanelTitle.querySelector('i');
+            const titleText = resultsPanelTitle.childNodes[resultsPanelTitle.childNodes.length - 1];
+            
+            switch(state) {
+                case 'running':
+                    titleIcon.className = 'fas fa-sync-alt fa-spin';
+                    titleIcon.style.color = '#3498db';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        const dist = distributionName || document.getElementById('serviceDistribution').value;
+                        const distText = dist === 'exponential' ? 'Erlang C' : 
+                                        dist.charAt(0).toUpperCase() + dist.slice(1);
+                        titleText.textContent = `\n                    Running ${distText} Simulation...\n                `;
+                    }
+                    break;
+                    
+                case 'completed':
+                    titleIcon.className = 'fas fa-check-circle';
+                    titleIcon.style.color = '#27ae60';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        const dist = distributionName || document.getElementById('serviceDistribution').value;
+                        const distText = dist === 'exponential' ? 'Erlang C' : 
+                                        dist.charAt(0).toUpperCase() + dist.slice(1);
+                        titleText.textContent = `\n                    ${distText} Simulation Results\n                `;
+                    }
+                    break;
+                    
+                case 'error':
+                    titleIcon.className = 'fas fa-exclamation-triangle';
+                    titleIcon.style.color = '#e74c3c';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        titleText.textContent = '\n                    Simulation Error\n                ';
+                    }
+                    break;
+                    
+                case 'erlang_c':
+                    titleIcon.className = 'fas fa-calculator';
+                    titleIcon.style.color = '#f39c12';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        titleText.textContent = '\n                    Erlang C Results\n                ';
+                    }
+                    break;
+                    
+                default:
+                    // Reset icon color and fall back to original logic
+                    titleIcon.style.color = '';
+                    updateToggleBasedUI();
+                    break;
+            }
+        }
+
+        // Function to validate distribution parameters
+        function validateDistributionParameters() {
+            const distribution = document.getElementById('serviceDistribution').value;
+            
+            try {
+                if (distribution === 'normal') {
+                    const stdDev = parseFloat(document.getElementById('serviceStdDev').value);
+                    if (isNaN(stdDev) || stdDev <= 0) {
+                        throw new Error('Standard deviation must be positive');
+                    }
+                } else if (distribution === 'lognormal' || distribution === 'gamma') {
+                    const cvElement = distribution === 'lognormal' ? 
+                        document.getElementById('serviceCV') : 
+                        document.getElementById('serviceGammaCV');
+                    const cv = parseFloat(cvElement.value);
+                    if (isNaN(cv) || cv <= 0) {
+                        throw new Error('Coefficient of variation must be positive');
+                    }
+                } else if (distribution === 'uniform') {
+                    const rangeFactor = parseFloat(document.getElementById('serviceRangeFactor').value);
+                    if (isNaN(rangeFactor) || rangeFactor <= 0 || rangeFactor >= 1) {
+                        throw new Error('Range factor must be between 0 and 1');
+                    }
+                }
+                return true;
+            } catch (error) {
+                alert(`Distribution Parameter Error: ${error.message}`);
+                return false;
+            }
+        }
+
+        // Function to show/hide distribution-specific parameters
+        function updateDistributionParameters() {
+            const distribution = document.getElementById('serviceDistribution').value;
+            
+            // Hide all distribution parameter rows
+            const distributionParams = document.querySelectorAll('.distribution-param');
+            distributionParams.forEach(param => {
+                param.style.display = 'none';
+            });
+            
+            // Show relevant parameters based on selected distribution
+            switch(distribution) {
+                case 'normal':
+                    document.getElementById('normalParams').style.display = 'flex';
+                    break;
+                case 'lognormal':
+                    document.getElementById('lognormalParams').style.display = 'flex';
+                    break;
+                case 'uniform':
+                    document.getElementById('uniformParams').style.display = 'flex';
+                    break;
+                case 'gamma':
+                    document.getElementById('gammaParams').style.display = 'flex';
+                    break;
+                case 'exponential':
+                case 'deterministic':
+                default:
+                    // No additional parameters needed
+                    break;
+            }
+        }
+
+        // Initialize slider values and event listeners
+        function initializeSliders() {
+            // Parameters that trigger automatic calculation (exclude patience)
+            const autoCalculateParameters = [
+                { id: 'callsPerHour' },
+                { id: 'aht' },
+                { id: 'targetSL' },
+                { id: 'maxWait' },
+                { id: 'shrinkage' },
+                { id: 'capacity' }
+            ];
+
+            // All parameters for value synchronization
+            const allParameters = [
+                { id: 'callsPerHour' },
+                { id: 'aht' },
+                { id: 'targetSL' },
+                { id: 'maxWait' },
+                { id: 'shrinkage' },
+                { id: 'capacity' },
+                { id: 'patience' }
+            ];
+            
+            // Distribution parameters that need slider synchronization only
+            const distributionParameters = [
+                { id: 'serviceStdDev' },
+                { id: 'serviceCV' },
+                { id: 'serviceRangeFactor' },
+                { id: 'serviceGammaCV' }
+            ];
+
+            // Setup event listeners for auto-calculating parameters
+            autoCalculateParameters.forEach(param => {
+                const slider = document.getElementById(param.id);
+                const manualInput = document.getElementById(param.id + 'Manual');
+
+                // Add event listeners for sliders
+                slider.addEventListener('input', function() {
+                    manualInput.value = slider.value;
+                    
+                    // Special handling for shrinkage slider - update Total Agents immediately if toggle is on
+                    if (param.id === 'shrinkage') {
+                        updateTotalAgentsForShrinkage();
+                    }
+                    
+                    // Check if simulation results are displayed - if so, show tooltip instead of auto-calculating
+                    if (isSimulationResultsDisplayed()) {
+                        const parameterName = getParameterDisplayName(param.id);
+                        const parameterValue = getParameterValueWithUnit(param.id, slider.value);
+                        showParameterChangeTooltip(parameterName, parameterValue);
+                    } else {
+                        calculateErlangC();
+                    }
+                });
+
+                // Add event listeners for manual inputs
+                manualInput.addEventListener('input', function() {
+                    const value = parseFloat(manualInput.value);
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+
+                    if (!isNaN(value) && value >= min && value <= max) {
+                        slider.value = value;
+                        
+                        // Special handling for shrinkage manual input - update Total Agents immediately if toggle is on
+                        if (param.id === 'shrinkage') {
+                            updateTotalAgentsForShrinkage();
+                        }
+                        
+                        // Check if simulation results are displayed - if so, show tooltip instead of auto-calculating
+                        if (isSimulationResultsDisplayed()) {
+                            const parameterName = getParameterDisplayName(param.id);
+                            const parameterValue = getParameterValueWithUnit(param.id, value);
+                            showParameterChangeTooltip(parameterName, parameterValue);
+                        } else {
+                            calculateErlangC();
+                        }
+                    }
+                });
+
+                // Add blur event to validate manual input
+                manualInput.addEventListener('blur', function() {
+                    const value = parseFloat(manualInput.value);
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+
+                    if (isNaN(value) || value < min || value > max) {
+                        manualInput.value = slider.value;
+                    }
+                });
+            });
+
+            // Special handling for patience slider - no auto-calculation, just sync values and show tooltip
+            const patienceSlider = document.getElementById('patience');
+            const patienceManualInput = document.getElementById('patienceManual');
+            let patienceTooltipTimeout;
+
+            if (patienceSlider && patienceManualInput) {
+                // Patience slider - sync values but don't auto-calculate
+                patienceSlider.addEventListener('input', function() {
+                    patienceManualInput.value = patienceSlider.value;
+                    showPatienceTooltip();
+                });
+
+                // Patience manual input - sync values but don't auto-calculate  
+                patienceManualInput.addEventListener('input', function() {
+                    const value = parseFloat(patienceManualInput.value);
+                    const min = parseFloat(patienceSlider.min);
+                    const max = parseFloat(patienceSlider.max);
+
+                    if (!isNaN(value) && value >= min && value <= max) {
+                        patienceSlider.value = value;
+                        showPatienceTooltip();
+                    }
+                });
+
+                // Add blur event to validate manual input
+                patienceManualInput.addEventListener('blur', function() {
+                    const value = parseFloat(patienceManualInput.value);
+                    const min = parseFloat(patienceSlider.min);
+                    const max = parseFloat(patienceSlider.max);
+
+                    if (isNaN(value) || value < min || value > max) {
+                        patienceManualInput.value = patienceSlider.value;
+                    }
+                });
+            }
+            
+            // Add event listener for service distribution dropdown
+            const serviceDistribution = document.getElementById('serviceDistribution');
+            if (serviceDistribution) {
+                serviceDistribution.addEventListener('change', function() {
+                    const selectedDistribution = serviceDistribution.value;
+                    const isNonExponential = selectedDistribution !== 'exponential';
+                    const distributionText = serviceDistribution.options[serviceDistribution.selectedIndex].text;
+                    
+                    // Update distribution parameter visibility
+                    updateDistributionParameters();
+                    
+                    // Update advanced options count badge
+                    updateAdvancedOptionsCount();
+                    
+                    // For non-exponential distributions or when simulation results are displayed, show tooltip instead of auto-calculating
+                    if (isSimulationResultsDisplayed() || isNonExponential) {
+                        showDistributionChangeTooltip(distributionText, isNonExponential);
+                    } else {
+                        calculateErlangC();
+                    }
+                });
+            }
+
+            // Function to check if simulation results are currently displayed
+            function isSimulationResultsDisplayed() {
+                const patienceEnabled = document.getElementById('enablePatience').checked;
+                const capacityEnabled = document.getElementById('enableCapacity').checked;
+                const serviceDistribution = document.getElementById('serviceDistribution').value;
+                const isNonExponential = serviceDistribution !== 'exponential';
+                
+                // Check if any simulation feature is active
+                if (!patienceEnabled && !capacityEnabled && !isNonExponential) return false;
+                
+                // For patience mode, check abandonment rate display
+                if (patienceEnabled) {
+                    const abandonmentElement = document.getElementById('abandonmentRate');
+                    if (abandonmentElement) {
+                        return abandonmentElement.textContent !== 'Click Calculate' && abandonmentElement.textContent !== '-';
+                    }
+                }
+                
+                // For capacity or non-exponential distribution mode, check if we have calculated results
+                const agentsElement = document.getElementById('requiredAgents');
+                if (agentsElement) {
+                    return agentsElement.textContent !== '-' && agentsElement.textContent !== 'Calculating...' && !agentsElement.textContent.includes('Error');
+                }
+                
+                return false;
+            }
+
+            // Helper function to get display name for parameters
+            function getParameterDisplayName(paramId) {
+                const names = {
+                    'callsPerHour': 'Calls per Hour',
+                    'aht': 'Average Handle Time',
+                    'targetSL': 'Service Level Target',
+                    'maxWait': 'Max Wait Time',
+                    'shrinkage': 'Shrinkage',
+                    'capacity': 'System Capacity'
+                };
+                return names[paramId] || paramId;
+            }
+
+            // Helper function to format parameter value with appropriate unit
+            function getParameterValueWithUnit(paramId, value) {
+                const units = {
+                    'callsPerHour': ` calls/hour`,
+                    'aht': ` seconds`,
+                    'targetSL': `%`,
+                    'maxWait': ` seconds`,
+                    'shrinkage': `%`,
+                    'capacity': ` calls`
+                };
+                return value + (units[paramId] || '');
+            }
+
+            // Global tooltip timeout variable
+            let parameterTooltipTimeout;
+
+            // Function to show tooltip when parameters change and simulation results are displayed
+            function showParameterChangeTooltip(parameterName, parameterValue) {
+                // Clear any existing timeout
+                clearTimeout(parameterTooltipTimeout);
+
+                // Create or update tooltip
+                let tooltip = document.getElementById('parameterTooltip');
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.id = 'parameterTooltip';
+                    tooltip.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: #333;
+                        color: white;
+                        padding: 10px 15px;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        z-index: 1000;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                        border: 1px solid #555;
+                    `;
+                    document.body.appendChild(tooltip);
+                }
+
+                tooltip.innerHTML = `
+                    🔄 ${parameterName} updated to ${parameterValue}<br>
+                    💡 Click "Calculate" to run simulation with updated parameters
+                `;
+                tooltip.style.display = 'block';
+
+                // Hide tooltip after 3 seconds
+                parameterTooltipTimeout = setTimeout(() => {
+                    if (tooltip) {
+                        tooltip.style.display = 'none';
+                    }
+                }, 3000);
+            }
+
+            // Function to show tooltip when service distribution changes
+            function showDistributionChangeTooltip(distributionText, isNonExponential) {
+                // Clear any existing timeout
+                clearTimeout(parameterTooltipTimeout);
+
+                // Create or update tooltip
+                let tooltip = document.getElementById('parameterTooltip');
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.id = 'parameterTooltip';
+                    tooltip.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: #333;
+                        color: white;
+                        padding: 10px 15px;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        z-index: 1000;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                        border: 1px solid #555;
+                    `;
+                    document.body.appendChild(tooltip);
+                }
+
+                if (isNonExponential) {
+                    tooltip.innerHTML = `
+                        📊 Distribution changed to ${distributionText}<br>
+                        💡 Click "Calculate" to run simulation with new distribution
+                    `;
+                } else {
+                    tooltip.innerHTML = `
+                        🔄 Distribution changed to ${distributionText}<br>
+                        💡 Click "Calculate" to update with Erlang C calculations
+                    `;
+                }
+                tooltip.style.display = 'block';
+
+                // Hide tooltip after 3 seconds
+                parameterTooltipTimeout = setTimeout(() => {
+                    if (tooltip) {
+                        tooltip.style.display = 'none';
+                    }
+                }, 3000);
+            }
+
+            // Function to show tooltip when patience value changes
+            function showPatienceTooltip() {
+                const patienceEnabled = document.getElementById('enablePatience').checked;
+                if (!patienceEnabled) return;
+
+                // Clear any existing timeout
+                clearTimeout(patienceTooltipTimeout);
+
+                // Create or update tooltip
+                let tooltip = document.getElementById('patienceTooltip');
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.id = 'patienceTooltip';
+                    tooltip.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: #333;
+                        color: white;
+                        padding: 10px 15px;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        z-index: 1000;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                        border: 1px solid #555;
+                    `;
+                    document.body.appendChild(tooltip);
+                }
+
+                tooltip.innerHTML = `
+                    🔄 Patience value updated to ${patienceSlider.value} seconds<br>
+                    💡 Click "Calculate" to run simulation with new patience time
+                `;
+                tooltip.style.display = 'block';
+
+                // Hide tooltip after 3 seconds
+                patienceTooltipTimeout = setTimeout(() => {
+                    if (tooltip) {
+                        tooltip.style.display = 'none';
+                    }
+                }, 3000);
+            }
+
+            // Setup distribution parameter sliders (sync values but don't auto-calculate)
+            distributionParameters.forEach(param => {
+                const slider = document.getElementById(param.id);
+                const manualInput = document.getElementById(param.id + 'Manual');
+                
+                if (slider && manualInput) {
+                    // Slider input event
+                    slider.addEventListener('input', function() {
+                        manualInput.value = slider.value;
+                        
+                        // Update advanced options count
+                        updateAdvancedOptionsCount();
+                        
+                        // Show tooltip if simulation results are displayed
+                        if (isSimulationResultsDisplayed()) {
+                            const parameterName = getDistributionParameterDisplayName(param.id);
+                            const parameterValue = getDistributionParameterValueWithUnit(param.id, slider.value);
+                            showParameterChangeTooltip(parameterName, parameterValue);
+                        }
+                    });
+                    
+                    // Manual input event
+                    manualInput.addEventListener('input', function() {
+                        const value = parseFloat(manualInput.value);
+                        const min = parseFloat(slider.min);
+                        const max = parseFloat(slider.max);
+                        
+                        if (!isNaN(value) && value >= min && value <= max) {
+                            slider.value = value;
+                            
+                            // Update advanced options count
+                            updateAdvancedOptionsCount();
+                            
+                            // Show tooltip if simulation results are displayed
+                            if (isSimulationResultsDisplayed()) {
+                                const parameterName = getDistributionParameterDisplayName(param.id);
+                                const parameterValue = getDistributionParameterValueWithUnit(param.id, value);
+                                showParameterChangeTooltip(parameterName, parameterValue);
+                            }
+                        }
+                    });
+                    
+                    // Blur event for validation
+                    manualInput.addEventListener('blur', function() {
+                        const value = parseFloat(manualInput.value);
+                        const min = parseFloat(slider.min);
+                        const max = parseFloat(slider.max);
+                        
+                        if (isNaN(value) || value < min || value > max) {
+                            manualInput.value = slider.value;
+                        }
+                    });
+                }
+            });
+            
+            // Helper functions for distribution parameters
+            function getDistributionParameterDisplayName(paramId) {
+                const names = {
+                    'serviceStdDev': 'Service Time Std Dev',
+                    'serviceCV': 'Service Time CV',
+                    'serviceRangeFactor': 'Service Time Range Factor',
+                    'serviceGammaCV': 'Service Time CV (Gamma)'
+                };
+                return names[paramId] || paramId;
+            }
+            
+            function getDistributionParameterValueWithUnit(paramId, value) {
+                const units = {
+                    'serviceStdDev': ' seconds',
+                    'serviceCV': '',
+                    'serviceRangeFactor': '',
+                    'serviceGammaCV': ''
+                };
+                return value + (units[paramId] || '');
+            }
+
+            // Add event listeners for all simulation toggles
+            const allToggleIds = [
+                'enableAbandonmentRate',
+                'enablePatience', 
+                'enableRetrialRate',
+                'enableRetrialDelay',
+                'enableCapacity',
+                'enableShrinkage'
+            ];
+
+            allToggleIds.forEach(toggleId => {
+                const toggle = document.getElementById(toggleId);
+                if (toggle) {
+                    toggle.addEventListener('change', function() {
+                        // Special handling for patience toggle
+                        if (toggleId === 'enablePatience') {
+                            togglePatienceSection(toggle.checked);
+                        }
+                        
+                        // Special handling for capacity toggle
+                        if (toggleId === 'enableCapacity') {
+                            toggleCapacitySection(toggle.checked);
+                        }
+                        
+                        // Special handling for shrinkage toggle
+                        if (toggleId === 'enableShrinkage') {
+                            toggleShrinkageSection(toggle.checked);
+                        }
+                        
+                        // Update UI to reflect current state
+                        updateToggleBasedUI();
+                        
+                        // Update advanced options count
+                        updateAdvancedOptionsCount();
+                        
+                        // Don't auto-calculate when toggles change - let user click Calculate
+                    });
+                }
+            });
+        }
+
+        function toggleCapacitySection(enabled) {
+            // Handle capacity-related KPI visibility
+            const blockingKPI = document.getElementById('blockingKPI');
+            const effectiveSLAKPI = document.getElementById('effectiveSLAKPI');
+            const blockingElement = document.getElementById('blockingRate');
+            const effectiveSLAElement = document.getElementById('effectiveSLA');
+            
+            if (enabled) {
+                // Show capacity-related KPIs and set initial state
+                if (blockingKPI) {
+                    blockingKPI.style.display = 'block';
+                }
+                if (effectiveSLAKPI) {
+                    effectiveSLAKPI.style.display = 'block';
+                }
+                if (blockingElement) {
+                    blockingElement.textContent = 'Click Calculate';
+                }
+                if (effectiveSLAElement) {
+                    effectiveSLAElement.textContent = 'Click Calculate';
+                }
+            } else {
+                // Hide capacity-related KPIs when capacity is disabled
+                if (blockingKPI) {
+                    blockingKPI.style.display = 'none';
+                }
+                if (effectiveSLAKPI) {
+                    effectiveSLAKPI.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleShrinkageSection(enabled) {
+            // Handle shrinkage-related KPI visibility
+            const totalAgentsKPI = document.getElementById('totalAgentsKPI');
+            const totalAgentsElement = document.getElementById('requiredAgents');
+            
+            if (enabled) {
+                // Show Total Agents to Hire KPI when shrinkage is enabled
+                if (totalAgentsKPI) {
+                    totalAgentsKPI.style.display = 'block';
+                }
+                if (totalAgentsElement) {
+                    totalAgentsElement.textContent = 'Click Calculate';
+                }
+                // Update the total agents calculation immediately if we have base agents
+                updateTotalAgentsForShrinkage();
+            } else {
+                // Hide Total Agents to Hire KPI when shrinkage is disabled
+                if (totalAgentsKPI) {
+                    totalAgentsKPI.style.display = 'none';
+                }
+                // Reset total agents to equal base agents when shrinkage is disabled
+                updateTotalAgentsForShrinkage();
+            }
+        }
+
+        function updateTotalAgentsForShrinkage() {
+            // Get current base agents value
+            const baseAgentsElement = document.getElementById('baseAgents');
+            const totalAgentsElement = document.getElementById('requiredAgents');
+            
+            if (!baseAgentsElement || !totalAgentsElement) return;
+            
+            const baseAgentsText = baseAgentsElement.textContent;
+            
+            // Only update if we have valid calculated results
+            if (baseAgentsText === '-' || baseAgentsText === 'Error' || baseAgentsText === 'Calculating...' || isNaN(parseInt(baseAgentsText))) {
+                return;
+            }
+            
+            const baseAgents = parseInt(baseAgentsText);
+            const shrinkageEnabled = document.getElementById('enableShrinkage').checked;
+            let totalAgents;
+            
+            if (shrinkageEnabled) {
+                // Apply shrinkage calculation
+                const shrinkagePercent = parseFloat(document.getElementById('shrinkage').value);
+                totalAgents = Math.ceil(baseAgents / (1 - shrinkagePercent / 100));
+            } else {
+                // No shrinkage - total equals base
+                totalAgents = baseAgents;
+            }
+            
+            // Update the display
+            totalAgentsElement.textContent = totalAgents;
+        }
+
+        function togglePatienceSection(enabled) {
+            const patienceSection = document.getElementById('enablePatience').closest('.parameter-section');
+            const patienceInputs = [
+                document.getElementById('patience'),
+                document.getElementById('patienceManual')
+            ];
+            
+            // Handle abandonment KPI visibility and initial state
+            const abandonmentKPI = document.getElementById('abandonmentKPI');
+            const abandonmentElement = document.getElementById('abandonmentRate');
+            
+            if (enabled) {
+                patienceSection.classList.remove('disabled');
+                patienceInputs.forEach(input => {
+                    if (input) {
+                        input.disabled = false;
+                        input.style.pointerEvents = 'auto';
+                    }
+                });
+                
+                // Show abandonment KPI and set initial state
+                if (abandonmentKPI) {
+                    abandonmentKPI.style.display = 'block';
+                }
+                if (abandonmentElement) {
+                    abandonmentElement.textContent = 'Click Calculate';
+                }
+            } else {
+                patienceSection.classList.add('disabled');
+                patienceInputs.forEach(input => {
+                    if (input) {
+                        input.disabled = true;
+                        input.style.pointerEvents = 'none';
+                    }
+                });
+                
+                // Hide abandonment KPI when patience is disabled
+                if (abandonmentKPI) {
+                    abandonmentKPI.style.display = 'none';
+                }
+            }
+        }
+
+        // Update UI based on current toggle states
+        function updateToggleBasedUI() {
+            const anyToggleEnabled = areAnyTogglesEnabled();
+            const patienceEnabled = document.getElementById('enablePatience').checked;
+            const capacityEnabled = document.getElementById('enableCapacity').checked;
+            const serviceDistribution = document.getElementById('serviceDistribution').value;
+            const isNonExponential = serviceDistribution !== 'exponential';
+            const requiresSimulation = patienceEnabled || capacityEnabled || isNonExponential;
+            
+            // Update button text to reflect calculation mode
+            const calculateButton = document.querySelector('.btn.btn-success');
+            if (calculateButton) {
+                const buttonIcon = calculateButton.querySelector('i');
+                const buttonTextElement = calculateButton.childNodes[calculateButton.childNodes.length - 1];
+                
+                if (requiresSimulation) {
+                    if (buttonTextElement && buttonTextElement.nodeType === Node.TEXT_NODE) {
+                        buttonTextElement.textContent = '\n                    Calculate with Simulation\n                ';
+                    }
+                } else if (anyToggleEnabled) {
+                    if (buttonTextElement && buttonTextElement.nodeType === Node.TEXT_NODE) {
+                        buttonTextElement.textContent = '\n                    Calculate Staffing Requirements\n                ';
+                    }
+                } else {
+                    if (buttonTextElement && buttonTextElement.nodeType === Node.TEXT_NODE) {
+                        buttonTextElement.textContent = '\n                    Run Simulation\n                ';
+                    }
+                }
+            }
+            
+            // Update panel title to reflect mode
+            const panelTitle = document.querySelector('.control-panel .panel-title');
+            if (panelTitle) {
+                const titleIcon = panelTitle.querySelector('i');
+                const titleText = panelTitle.childNodes[panelTitle.childNodes.length - 1];
+                
+                if (anyToggleEnabled) {
+                    titleIcon.className = 'fas fa-cogs';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        titleText.textContent = ' Simulation Options';
+                    }
+                } else {
+                    titleIcon.className = 'fas fa-sliders-h';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        titleText.textContent = ' Parameters';
+                    }
+                }
+            }
+            
+            // Update results panel title to reflect mode
+            const resultsPanelTitle = document.getElementById('resultsPanelTitle');
+            if (resultsPanelTitle) {
+                const titleIcon = resultsPanelTitle.querySelector('i');
+                const titleText = resultsPanelTitle.childNodes[resultsPanelTitle.childNodes.length - 1];
+                
+                if (requiresSimulation) {
+                    titleIcon.className = 'fas fa-server';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        titleText.textContent = '\n                    Simulation Results\n                ';
+                    }
+                } else if (anyToggleEnabled) {
+                    titleIcon.className = 'fas fa-chart-line';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        titleText.textContent = '\n                    Advanced Results\n                ';
+                    }
+                } else {
+                    titleIcon.className = 'fas fa-calculator';
+                    if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                        titleText.textContent = '\n                    Erlang C Results\n                ';
+                    }
+                }
+            }
+            
+            // Update interpretation text placeholder for pure Erlang C mode
+            const interpretationText = document.getElementById('interpretationText');
+            if (interpretationText && !anyToggleEnabled) {
+                interpretationText.innerHTML = `
+                    <strong>Pure Erlang C Mode:</strong> Using classic queuing theory for precise mathematical calculations. 
+                    All simulation features are disabled. Adjust parameters above to see how call volumes, handling times, 
+                    and service level targets affect your staffing requirements using traditional Erlang C formulas.
+                `;
+            }
+            
+            // Ensure capacity and shrinkage toggles remain interactive after UI updates
+            const capacityToggle = document.getElementById('enableCapacity');
+            if (capacityToggle) {
+                const capacitySection = capacityToggle.closest('.parameter-section');
+                if (capacitySection) {
+                    capacitySection.classList.remove('disabled');
+                }
+                capacityToggle.disabled = false;
+                capacityToggle.style.pointerEvents = 'auto';
+            }
+            
+            const shrinkageToggle = document.getElementById('enableShrinkage');
+            if (shrinkageToggle) {
+                shrinkageToggle.disabled = false;
+                shrinkageToggle.style.pointerEvents = 'auto';
+            }
+
+            // Refresh chart to reflect current mode (only if we have existing results)
+            refreshChartForCurrentMode();
+        }
+        
+        // Refresh chart based on current mode and parameters
+        function refreshChartForCurrentMode() {
+            try {
+                // Get current input values
+                const calls = parseFloat(document.getElementById("callsPerHour").value);
+                const aht = parseFloat(document.getElementById("aht").value);
+                const targetSL = parseFloat(document.getElementById("targetSL").value) / 100;
+                const maxWait = parseFloat(document.getElementById("maxWait").value);
+                
+                // Check if we have valid inputs
+                if (isNaN(calls) || isNaN(aht) || isNaN(targetSL) || isNaN(maxWait)) {
+                    return; // Don't refresh if inputs are invalid
+                }
+                
+                const patienceEnabled = document.getElementById('enablePatience').checked;
+                const anyToggleEnabled = areAnyTogglesEnabled();
+                
+                // Calculate basic parameters for chart
+                const lambda = calls;
+                const mu = 3600 / aht;
+                const A = lambda / mu;
+                
+                // Get current results from the displayed values
+                const currentAgentsText = document.getElementById('requiredAgents').textContent;
+                const currentSLText = document.getElementById('serviceLevelAchieved').textContent;
+                const currentOccupancyText = document.getElementById('agentOccupancy').textContent;
+                
+                // Only refresh if we have existing calculated results
+                if (currentAgentsText && currentAgentsText !== '-' && !currentAgentsText.includes('Error')) {
+                    const currentAgents = parseInt(currentAgentsText);
+                    const currentSL = parseFloat(currentSLText.replace('%', '')) / 100;
+                    const currentOccupancy = parseFloat(currentOccupancyText.replace('%', '')) / 100;
+                    
+                                         if (!isNaN(currentAgents) && !isNaN(currentSL) && !isNaN(currentOccupancy)) {
+                         // Update chart with current results
+                         if (patienceEnabled) {
+                             // For patience mode, show placeholder chart until calculation is run
+                             showPatienceModeChartPlaceholder();
+                         } else {
+                             // For local mode, we can refresh the chart
+                             updateChart(lambda, mu, currentAgents, currentSL, currentOccupancy, maxWait);
+                         }
+                     } else if (patienceEnabled) {
+                         // Show placeholder chart for patience mode when no results exist yet
+                         showPatienceModeChartPlaceholder();
+                     }
+                 }
+            } catch (error) {
+                console.log('Chart refresh skipped:', error.message);
+                // Silently continue - chart will update on next calculation
+            }
+        }
+        
+        // Show placeholder chart for patience mode
+        function showPatienceModeChartPlaceholder() {
+            if (staffingChart) {
+                staffingChart.destroy();
+            }
+
+            const chartConfig = {
+                chart: {
+                    type: 'column',
+                    backgroundColor: 'transparent',
+                    style: {
+                        fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+                    },
+                    height: 320
+                },
+                title: {
+                    text: 'Simulation Mode - Click Calculate',
+                    style: {
+                        color: '#ffc0c0',
+                        fontSize: '16px'
+                    }
+                },
+                xAxis: {
+                    categories: ['Service Level', 'Occupancy', 'Abandonment'],
+                    labels: {
+                        style: { color: '#e8e8e8' }
+                    },
+                    gridLineColor: '#555',
+                    lineColor: '#555',
+                    tickColor: '#555'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Percentage (%)',
+                        style: { color: '#e8e8e8' }
+                    },
+                    labels: {
+                        style: { color: '#e8e8e8' }
+                    },
+                    gridLineColor: '#555',
+                    lineColor: '#555',
+                    tickColor: '#555',
+                    min: 0,
+                    max: 100
+                },
+                series: [{
+                    name: 'Simulation Results',
+                    data: [0, 0, 0], // Placeholder data
+                    color: '#7f8c8d',
+                    dataLabels: {
+                        enabled: true,
+                        style: { color: '#e8e8e8' },
+                        formatter: function() {
+                            return 'Click Calculate';
+                        }
+                    }
+                }],
+                legend: {
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    column: {
+                        animation: false
+                    }
+                }
+            };
+
+            staffingChart = Highcharts.chart('staffingChart', chartConfig);
+        }
+
+        // Factorial function
+        function factorial(n) {
+            if (n <= 1) return 1;
+            if (n > 170) return Infinity;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        // Erlang C calculation
+        function erlangC(A, N) {
+            if (A >= N) return 1.0;
+            let numer = (Math.pow(A, N) / factorial(N)) * (N / (N - A));
+            let denom = 0.0;
+            for (let k = 0; k < N; k++) {
+                denom += Math.pow(A, k) / factorial(k);
+            }
+            denom += numer;
+            return numer / denom;
+        }
+
+        // Service level calculation
+        function serviceLevel(A, N, mu, tSec) {
+            let Pw = erlangC(A, N);
+            let expTerm = Math.exp(-(N - A) * mu * tSec / 3600);
+            return 1 - Pw * expTerm;
+        }
+
+        // Check if any simulation toggles are enabled (excluding capacity and shrinkage which are pure constraints)
+        function areAnyTogglesEnabled() {
+            const toggleIds = [
+                'enableAbandonmentRate',
+                'enablePatience', 
+                'enableRetrialRate',
+                'enableRetrialDelay'
+                // Note: enableCapacity and enableShrinkage are excluded as they are pure constraints
+                // that can work with basic Erlang C without triggering Advanced Mode
+            ];
+            
+            return toggleIds.some(id => {
+                const toggle = document.getElementById(id);
+                return toggle && toggle.checked;
+            });
+        }
+        
+
+
+        function calculateErlangC(showSpinnerOverlay = false) {
+            const anyToggleEnabled = areAnyTogglesEnabled();
+            const patienceEnabled = document.getElementById('enablePatience').checked;
+            const capacityEnabled = document.getElementById('enableCapacity').checked;
+            const serviceDistribution = document.getElementById('serviceDistribution').value;
+            const isNonExponential = serviceDistribution !== 'exponential';
+            
+            // Validate distribution parameters for non-exponential distributions
+            if (isNonExponential && !validateDistributionParameters()) {
+                if (showSpinnerOverlay) {
+                    hideSpinner();
+                }
+                return; // Stop execution if validation fails
+            }
+            
+            // Use server simulation if patience OR capacity is enabled OR non-exponential distribution
+            // These features require simulation to model accurately
+            if (patienceEnabled || capacityEnabled || isNonExponential) {
+                if (showSpinnerOverlay) {
+                    if (patienceEnabled && capacityEnabled && isNonExponential) {
+                        showSpinner('Running simulation with abandonment, capacity, and custom distribution...');
+                    } else if (patienceEnabled && capacityEnabled) {
+                        showSpinner('Running simulation with abandonment and capacity constraints...');
+                    } else if (patienceEnabled && isNonExponential) {
+                        showSpinner('Running simulation with abandonment and custom distribution...');
+                    } else if (capacityEnabled && isNonExponential) {
+                        showSpinner('Running simulation with capacity constraints and custom distribution...');
+                    } else if (patienceEnabled) {
+                        showSpinner('Running server simulation with abandonment...');
+                    } else if (capacityEnabled) {
+                        showSpinner('Running simulation with capacity constraints...');
+                    } else if (isNonExponential) {
+                        showSpinner(`Running simulation with ${serviceDistribution} distribution...`);
+                    }
+                }
+                // Use server simulation when patience or capacity is enabled
+                runServerSimulation(showSpinnerOverlay);
+            } else {
+                if (showSpinnerOverlay) {
+                    if (anyToggleEnabled) {
+                        showSpinner('Calculating with simulation features...');
+                    } else {
+                        showSpinner('Calculating optimal staffing (Erlang C)...');
+                    }
+                }
+                // Use local Erlang C calculation when neither patience nor capacity is enabled
+                runLocalErlangC(showSpinnerOverlay);
+            }
+        }
+
+        async function runServerSimulation(showSpinnerOverlay = false) {
+            try {
+                // Update panel title to show simulation is running
+                updateSimulationPanelTitle('running');
+                
+                // Show loading state
+                updateResults({
+                    baseAgents: 'Calculating...',
+                    totalAgents: 'Calculating...',
+                    serviceLevelAchieved: 'Calculating...',
+                    agentOccupancy: 'Calculating...',
+                    avgWaitTime: 'Calculating...'
+                });
+
+                // Get input values
+                const calls = parseFloat(document.getElementById("callsPerHour").value);
+                const aht = parseFloat(document.getElementById("aht").value);
+                const targetSL = parseFloat(document.getElementById("targetSL").value);
+                const maxWait = parseFloat(document.getElementById("maxWait").value);
+                
+                // Check which simulation features are enabled
+                const patienceEnabled = document.getElementById('enablePatience').checked;
+                
+                // Get patience value (use default if not enabled)
+                const patience = patienceEnabled ? parseFloat(document.getElementById("patience").value) : 3600; // 1 hour default
+                
+                // Get service distribution selection
+                const serviceDistribution = document.getElementById('serviceDistribution').value;
+                
+                // Prepare server request
+                const payload = {
+                    arrival_rate: calls / 60,  // Convert to per-minute
+                    mean_service_time: aht / 60,  // Convert to minutes
+                    service_distribution: serviceDistribution,  // Service time distribution type
+                    sla_target_pct: targetSL,
+                    sla_threshold_seconds: maxWait,
+                    abandonment_threshold_minutes: patience / 60,  // Convert to minutes
+                    sim_time: 1000,  // 1000 minutes simulation
+                    seed: null  // Random seed for different results
+                };
+                
+                // Add distribution-specific parameters
+                if (serviceDistribution === 'normal') {
+                    payload.service_std_dev = parseFloat(document.getElementById('serviceStdDev').value) / 60; // Convert to minutes
+                } else if (serviceDistribution === 'lognormal') {
+                    payload.service_cv = parseFloat(document.getElementById('serviceCV').value);
+                } else if (serviceDistribution === 'uniform') {
+                    payload.service_range_factor = parseFloat(document.getElementById('serviceRangeFactor').value);
+                } else if (serviceDistribution === 'gamma') {
+                    payload.service_cv = parseFloat(document.getElementById('serviceGammaCV').value);
+                }
+                
+                // Add capacity constraint if enabled
+                if (document.getElementById('enableCapacity').checked) {
+                    const capacity = parseFloat(document.getElementById("capacity").value);
+                    payload.system_capacity = capacity;  // Maximum concurrent customers
+                }
+
+                // First, get optimal agents with optimization endpoint
+                const optimizeResponse = await fetch('http://localhost:5000/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!optimizeResponse.ok) {
+                    throw new Error(`Server error: ${optimizeResponse.status}`);
+                }
+
+                const optimizeData = await optimizeResponse.json();
+
+                if (optimizeData.error) {
+                    throw new Error(optimizeData.error);
+                }
+
+                // Now run simulation with the optimal agent count
+                const simPayload = {
+                    ...payload,
+                    num_servers: optimizeData.minimum_agents
+                };
+
+                const simResponse = await fetch('http://localhost:5000/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(simPayload)
+                });
+
+                if (!simResponse.ok) {
+                    throw new Error(`Server error: ${simResponse.status}`);
+                }
+
+                const simData = await simResponse.json();
+
+                if (simData.error) {
+                    throw new Error(simData.error);
+                }
+
+                // Check if service level target is met, if not try with more agents
+                let finalAgents = optimizeData.minimum_agents;
+                let finalSimData = simData;
+                
+                if (simData.pct_within_sla < targetSL) {
+                    console.log(`Initial SL ${simData.pct_within_sla.toFixed(1)}% < target ${targetSL}%. Trying with more agents...`);
+                    
+                    // Try with additional agents until we meet the target (max 3 additional attempts)
+                    for (let additionalAgents = 1; additionalAgents <= 3; additionalAgents++) {
+                        const retryPayload = {
+                            ...payload,
+                            num_servers: optimizeData.minimum_agents + additionalAgents
+                        };
+                        
+                        try {
+                            const retryResponse = await fetch('http://localhost:5000/simulate', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(retryPayload)
+                            });
+                            
+                            if (retryResponse.ok) {
+                                const retryData = await retryResponse.json();
+                                if (!retryData.error && retryData.pct_within_sla >= targetSL) {
+                                    console.log(`Found solution with ${optimizeData.minimum_agents + additionalAgents} agents: ${retryData.pct_within_sla.toFixed(1)}% SL`);
+                                    finalAgents = optimizeData.minimum_agents + additionalAgents;
+                                    finalSimData = retryData;
+                                    break;
+                                }
+                            }
+                        } catch (retryError) {
+                            console.log(`Retry attempt ${additionalAgents} failed:`, retryError);
+                        }
+                    }
+                }
+
+                // Calculate total agents including shrinkage if enabled
+                const shrinkageEnabled = document.getElementById('enableShrinkage').checked;
+                let totalAgents = finalAgents;
+                
+                if (shrinkageEnabled) {
+                    const shrinkagePercent = parseFloat(document.getElementById('shrinkage').value);
+                    totalAgents = Math.ceil(finalAgents / (1 - shrinkagePercent / 100));
+                }
+
+                // Check if capacity constraint is active (server handles the actual constraint)
+                let isCapacityConstrained = false;
+                if (document.getElementById('enableCapacity').checked) {
+                    const capacityLimit = parseInt(document.getElementById('capacity').value);
+                    const calls = parseFloat(document.getElementById("callsPerHour").value);
+                    const aht = parseFloat(document.getElementById("aht").value);
+                    const trafficIntensity = (calls * aht) / 3600; // Average concurrent customers
+                    
+                    if (trafficIntensity > capacityLimit) {
+                        // Mark as constrained for interpretation message
+                        // Server simulation handles the actual capacity constraint
+                        isCapacityConstrained = true;
+                    }
+                }
+
+                // Calculate blocking rate and effective SLA if capacity is enabled
+                let blockingRate = null;
+                let effectiveSLA = null;
+                
+                if (document.getElementById('enableCapacity').checked) {
+                    const capacityLimit = parseInt(document.getElementById('capacity').value);
+                    const calls = parseFloat(document.getElementById("callsPerHour").value);
+                    const aht = parseFloat(document.getElementById("aht").value);
+                    const trafficIntensity = (calls * aht) / 3600; // Average concurrent customers
+                    
+                    // Calculate blocking rate based on capacity constraint
+                    if (trafficIntensity > capacityLimit) {
+                        // Simple blocking calculation: excess traffic gets blocked
+                        blockingRate = Math.min(((trafficIntensity - capacityLimit) / trafficIntensity) * 100, 100);
+                    } else {
+                        blockingRate = 0;
+                    }
+                    
+                    // Calculate effective SLA: SLA of admitted customers × (1 - blocking rate)
+                    const admittedSLA = finalSimData.pct_within_sla / 100;
+                    effectiveSLA = admittedSLA * (1 - blockingRate / 100) * 100;
+                }
+
+                // Update results with server data
+                updateResults({
+                    baseAgents: finalAgents,
+                    totalAgents: totalAgents,
+                    serviceLevelAchieved: finalSimData.pct_within_sla.toFixed(1) + '%',
+                    agentOccupancy: finalSimData.utilization_pct.toFixed(1) + '%',
+                    avgWaitTime: finalSimData.avg_wait_seconds.toFixed(1) + 's',
+                    abandonmentRate: finalSimData.abandonment_rate.toFixed(1) + '%',
+                    blockingRate: blockingRate !== null ? blockingRate.toFixed(1) + '%' : '-',
+                    effectiveSLA: effectiveSLA !== null ? effectiveSLA.toFixed(1) + '%' : '-'
+                });
+
+                // Update interpretation with server results
+                updateInterpretation(finalAgents, totalAgents, 
+                                   finalSimData.pct_within_sla / 100, finalSimData.utilization_pct / 100, 
+                                   finalSimData.abandonment_rate, isCapacityConstrained);
+
+                // Update chart (simplified for server mode)
+                updateChartWithServerData(finalSimData, {minimum_agents: finalAgents});
+
+                // Update panel title to show completion
+                updateSimulationPanelTitle('completed', serviceDistribution);
+
+                // Hide loading spinner on success
+                if (showSpinnerOverlay) {
+                    hideSpinner();
+                }
+
+            } catch (error) {
+                console.error('Server simulation error:', error);
+                updateResults({
+                    baseAgents: 'Error',
+                    totalAgents: 'Error',
+                    serviceLevelAchieved: 'Server Error',
+                    agentOccupancy: 'Check Console',
+                    avgWaitTime: 'N/A',
+                    abandonmentRate: 'Server Error',
+                    blockingRate: 'Server Error',
+                    effectiveSLA: 'Server Error'
+                });
+                
+                // Update panel title to show error
+                updateSimulationPanelTitle('error');
+                
+                // Show error message
+                document.getElementById('interpretationText').textContent = 
+                    `Error connecting to simulation server: ${error.message}. Please make sure the local server is running on localhost:5000.`;
+                
+                // Hide loading spinner on error
+                if (showSpinnerOverlay) {
+                    hideSpinner();
+                }
+            }
+        }
+
+        function runLocalErlangC(showSpinnerOverlay = false) {
+            // Update panel title for Erlang C calculation
+            updateSimulationPanelTitle('erlang_c');
+            
+            // Get input values
+            const calls = parseFloat(document.getElementById("callsPerHour").value);
+            const aht = parseFloat(document.getElementById("aht").value);
+            const targetSL = parseFloat(document.getElementById("targetSL").value) / 100;
+            const maxWait = parseFloat(document.getElementById("maxWait").value);
+
+            // Calculate traffic intensity
+            const lambda = calls;
+            const mu = 3600 / aht;
+            const A = lambda / mu;
+
+            // Find optimal agent count
+            let bestAgents = Math.ceil(A);
+            let bestMetrics = null;
+
+            for (let N = Math.ceil(A); N < A + 30; N++) {
+                const sla = serviceLevel(A, N, mu, maxWait);
+                const occupancy = A / N;
+                const Pw = erlangC(A, N);
+                const avgWait = N > A ? (Pw * aht) / (N - A) : 0;
+
+                if (sla >= targetSL) {
+                    bestMetrics = {
+                        agents: N,
+                        serviceLevel: sla,
+                        occupancy: occupancy,
+                        avgWaitTime: avgWait
+                    };
+                    break;
+                }
+            }
+
+            // If no solution found, use fallback
+            if (!bestMetrics) {
+                let N = Math.ceil(A) + 5;
+                const sla = serviceLevel(A, N, mu, maxWait);
+                const occupancy = A / N;
+                const Pw = erlangC(A, N);
+                const avgWait = N > A ? (Pw * aht) / (N - A) : 0;
+
+                bestMetrics = {
+                    agents: N,
+                    serviceLevel: sla,
+                    occupancy: occupancy,
+                    avgWaitTime: avgWait
+                };
+            }
+
+            // Calculate total agents including shrinkage if enabled
+            const shrinkageEnabled = document.getElementById('enableShrinkage').checked;
+            let totalAgents = bestMetrics.agents;
+            
+            if (shrinkageEnabled) {
+                const shrinkagePercent = parseFloat(document.getElementById('shrinkage').value);
+                totalAgents = Math.ceil(bestMetrics.agents / (1 - shrinkagePercent / 100));
+            }
+
+            // Apply capacity constraint if enabled - based on concurrent customers, not agents
+            const capacityEnabled = document.getElementById('enableCapacity').checked;
+            let isCapacityConstrained = false;
+            let actualServiceLevel = bestMetrics.serviceLevel;
+            let actualOccupancy = bestMetrics.occupancy;
+            
+            if (capacityEnabled) {
+                const capacityLimit = parseInt(document.getElementById('capacity').value);
+                const trafficIntensity = A; // A already represents average concurrent customers
+                
+                if (trafficIntensity > capacityLimit) {
+                    // System cannot handle the traffic - calculate max agents for available capacity
+                    const maxPossibleAgents = Math.floor(capacityLimit);
+                    if (totalAgents > maxPossibleAgents) {
+                        totalAgents = maxPossibleAgents;
+                        
+                        // Recalculate metrics with capacity-constrained agent count
+                        actualServiceLevel = serviceLevel(A, totalAgents, mu, maxWait);
+                        actualOccupancy = A / totalAgents;
+                    }
+                    isCapacityConstrained = true;
+                }
+            }
+
+            // Calculate blocking rate and effective SLA if capacity is enabled
+            let blockingRate = null;
+            let effectiveSLA = null;
+            
+            if (capacityEnabled) {
+                const capacityLimit = parseInt(document.getElementById('capacity').value);
+                const trafficIntensity = A; // A already represents average concurrent customers
+                
+                // Calculate blocking rate based on capacity constraint
+                if (trafficIntensity > capacityLimit) {
+                    // Approximate blocking calculation for Erlang C with capacity
+                    blockingRate = Math.min(((trafficIntensity - capacityLimit) / trafficIntensity) * 100, 100);
+                } else {
+                    blockingRate = 0;
+                }
+                
+                // Calculate effective SLA: SLA of admitted customers × (1 - blocking rate)
+                effectiveSLA = (actualServiceLevel * 100) * (1 - blockingRate / 100);
+            }
+
+            // Update results
+            updateResults({
+                baseAgents: bestMetrics.agents,
+                totalAgents: totalAgents,
+                serviceLevelAchieved: (actualServiceLevel * 100).toFixed(1) + '%',
+                agentOccupancy: (actualOccupancy * 100).toFixed(1) + '%',
+                avgWaitTime: bestMetrics.avgWaitTime.toFixed(1) + 's',
+                blockingRate: blockingRate !== null ? blockingRate.toFixed(1) + '%' : '-',
+                effectiveSLA: effectiveSLA !== null ? effectiveSLA.toFixed(1) + '%' : '-'
+            });
+
+            // Update chart
+            updateChart(lambda, mu, bestMetrics.agents, bestMetrics.serviceLevel, bestMetrics.occupancy, maxWait);
+
+            // Update interpretation
+            updateInterpretation(bestMetrics.agents, totalAgents, actualServiceLevel, actualOccupancy, null, isCapacityConstrained);
+            
+            // Hide loading spinner
+            if (showSpinnerOverlay) {
+                hideSpinner();
+            }
+        }
+
+        function updateResults(results) {
+            document.getElementById('baseAgents').textContent = results.baseAgents;
+            document.getElementById('requiredAgents').textContent = results.totalAgents;
+            document.getElementById('serviceLevelAchieved').textContent = results.serviceLevelAchieved;
+            document.getElementById('agentOccupancy').textContent = results.agentOccupancy;
+            document.getElementById('avgWaitTime').textContent = results.avgWaitTime;
+            
+            // Show/hide abandonment KPI based on patience toggle
+            const patienceEnabled = document.getElementById('enablePatience').checked;
+            const abandonmentKPI = document.getElementById('abandonmentKPI');
+            
+            if (patienceEnabled) {
+                abandonmentKPI.style.display = 'block';
+                // Show abandonment rate if available, otherwise show waiting message
+                const abandonmentElement = document.getElementById('abandonmentRate');
+                if (results.abandonmentRate && results.abandonmentRate !== '-') {
+                    abandonmentElement.textContent = results.abandonmentRate;
+                } else {
+                    abandonmentElement.textContent = 'Click Calculate';
+                }
+            } else {
+                abandonmentKPI.style.display = 'none';
+            }
+            
+            // Show/hide capacity KPIs based on capacity toggle
+            const capacityEnabled = document.getElementById('enableCapacity').checked;
+            const blockingKPI = document.getElementById('blockingKPI');
+            const effectiveSLAKPI = document.getElementById('effectiveSLAKPI');
+            
+            if (capacityEnabled) {
+                blockingKPI.style.display = 'block';
+                effectiveSLAKPI.style.display = 'block';
+                
+                // Show blocking rate if available
+                const blockingElement = document.getElementById('blockingRate');
+                if (results.blockingRate && results.blockingRate !== '-') {
+                    blockingElement.textContent = results.blockingRate;
+                } else {
+                    blockingElement.textContent = 'Click Calculate';
+                }
+                
+                // Show effective SLA if available
+                const effectiveSLAElement = document.getElementById('effectiveSLA');
+                if (results.effectiveSLA && results.effectiveSLA !== '-') {
+                    effectiveSLAElement.textContent = results.effectiveSLA;
+                } else {
+                    effectiveSLAElement.textContent = 'Click Calculate';
+                }
+            } else {
+                blockingKPI.style.display = 'none';
+                effectiveSLAKPI.style.display = 'none';
+            }
+            
+            // Show/hide Total Agents to Hire KPI based on shrinkage toggle
+            const shrinkageEnabled = document.getElementById('enableShrinkage').checked;
+            const totalAgentsKPI = document.getElementById('totalAgentsKPI');
+            
+            if (shrinkageEnabled) {
+                totalAgentsKPI.style.display = 'block';
+                // Total agents value is already set above via document.getElementById('requiredAgents').textContent
+            } else {
+                totalAgentsKPI.style.display = 'none';
+            }
+        }
+
+        function updateChart(arrivalRate, serviceRate, optimalAgents, serviceLevelAchieved, occupancy, maxWaitSeconds) {
+            const chartData = [];
+            const serviceLevelData = [];
+            const occupancyData = [];
+
+            const traffic = arrivalRate / serviceRate;
+            const startAgents = Math.max(1, Math.ceil(traffic) - 3);
+            const endAgents = Math.min(optimalAgents + 8, 50);
+
+            for (let agents = startAgents; agents <= endAgents; agents++) {
+                const A = traffic;
+                const sla = serviceLevel(A, agents, serviceRate, maxWaitSeconds);
+                const occ = A / agents;
+
+                chartData.push(agents);
+                serviceLevelData.push(Math.round(sla * 100 * 10) / 10);
+                occupancyData.push(Math.round(occ * 100 * 10) / 10);
+            }
+
+            if (staffingChart) {
+                staffingChart.destroy();
+            }
+
+            const chartConfig = {
+                chart: {
+                    type: 'line',
+                    backgroundColor: 'transparent',
+                    style: {
+                        fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+                    },
+                    height: 320
+                },
+                title: {
+                    text: 'Agent Count vs Performance',
+                    style: {
+                        color: '#ffc0c0',
+                        fontSize: '16px'
+                    }
+                },
+                xAxis: {
+                    title: {
+                        text: 'Number of Agents',
+                        style: { color: '#e8e8e8' }
+                    },
+                    labels: {
+                        style: { color: '#e8e8e8' }
+                    },
+                    gridLineColor: '#555',
+                    lineColor: '#555',
+                    tickColor: '#555'
+                },
+                yAxis: [{
+                    title: {
+                        text: 'Service Level (%)',
+                        style: { color: '#3498db' }
+                    },
+                    labels: {
+                        style: { color: '#e8e8e8' }
+                    },
+                    gridLineColor: '#555',
+                    lineColor: '#555',
+                    tickColor: '#555',
+                    min: 0,
+                    max: 100
+                }, {
+                    title: {
+                        text: 'Occupancy (%)',
+                        style: { color: '#27ae60' }
+                    },
+                    labels: {
+                        style: { color: '#e8e8e8' }
+                    },
+                    opposite: true,
+                    gridLineColor: '#555',
+                    lineColor: '#555',
+                    tickColor: '#555',
+                    min: 0,
+                    max: 100
+                }],
+                series: [{
+                    name: 'Service Level',
+                    data: serviceLevelData.map((sl, i) => [chartData[i], sl]),
+                    color: '#3498db',
+                    yAxis: 0,
+                    marker: { enabled: true, radius: 2 }
+                }, {
+                    name: 'Occupancy',
+                    data: occupancyData.map((occ, i) => [chartData[i], occ]),
+                    color: '#27ae60',
+                    yAxis: 1,
+                    marker: { enabled: true, radius: 2 }
+                }],
+                plotOptions: {
+                    line: {
+                        lineWidth: 2,
+                        marker: {
+                            enabled: true,
+                            radius: 3
+                        }
+                    }
+                },
+                legend: {
+                    itemStyle: {
+                        color: '#e8e8e8'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#484b57',
+                    style: {
+                        color: '#e8e8e8'
+                    },
+                    borderColor: '#555',
+                    borderRadius: 5
+                },
+                credits: {
+                    enabled: false
+                }
+            };
+
+            staffingChart = Highcharts.chart('staffingChart', chartConfig);
+        }
+
+        function updateInterpretation(baseAgents, totalAgents, serviceLevel, occupancy, abandonmentRate = null, isCapacityConstrained = false) {
+            const targetSL = parseFloat(document.getElementById("targetSL").value);
+            const patienceEnabled = document.getElementById('enablePatience').checked;
+            const anyToggleEnabled = areAnyTogglesEnabled();
+
+            let interpretation = `You need ${totalAgents} agents to meet your ${targetSL}% service level target.
+
+            Performance with ${baseAgents} agents:
+            • ${(serviceLevel * 100).toFixed(1)}% service level achieved
+            • ${(occupancy * 100).toFixed(1)}% agent occupancy`;
+
+            if (patienceEnabled && abandonmentRate !== null) {
+                interpretation += `
+            • ${abandonmentRate.toFixed(1)}% abandonment rate`;
+            }
+
+            if (serviceLevel * 100 >= targetSL) {
+                interpretation += `
+                ✓ Service level target met.`;
+            } else {
+                interpretation += `
+                ⚠ Service level below target - consider adding more agents.`;
+            }
+
+            if (occupancy > 0.90) {
+                interpretation += `
+                ⚠ Very high occupancy may lead to agent burnout.`;
+            }
+
+            if (isCapacityConstrained) {
+                const capacityLimit = parseInt(document.getElementById('capacity').value);
+                const calls = parseFloat(document.getElementById("callsPerHour").value);
+                const aht = parseFloat(document.getElementById("aht").value);
+                const trafficIntensity = (calls * aht) / 3600;
+                interpretation += `
+                ⚠ CAPACITY CONSTRAINT: System can only handle ${capacityLimit} concurrent calls, but traffic requires ${trafficIntensity.toFixed(1)} concurrent customers.
+                Consider increasing system capacity or reducing call volume/handle time to achieve desired service levels.`;
+            }
+
+            if (patienceEnabled && abandonmentRate !== null) {
+                if (abandonmentRate > 15) {
+                    interpretation += `
+                ⚠ High abandonment rate - customers are leaving due to long waits.`;
+                } else if (abandonmentRate < 5) {
+                    interpretation += `
+                ✓ Low abandonment rate - good customer patience management.`;
+                }
+            }
+
+            // Add mode-specific notes
+            const capacityEnabled = document.getElementById('enableCapacity').checked;
+            const serviceDistribution = document.getElementById('serviceDistribution').value;
+            const isNonExponential = serviceDistribution !== 'exponential';
+            
+            // Build feature list
+            let features = [];
+            if (patienceEnabled) features.push('customer abandonment');
+            if (capacityEnabled) features.push('system capacity constraints');
+            if (isNonExponential) features.push(`${serviceDistribution} service time distribution`);
+            
+            if (features.length > 0) {
+                const featureText = features.length === 1 ? features[0] : 
+                                   features.length === 2 ? features.join(' and ') :
+                                   features.slice(0, -1).join(', ') + ', and ' + features[features.length - 1];
+                
+                interpretation += `
+                
+                📊 Note: Results include simulation with ${featureText}.`;
+            } else if (!anyToggleEnabled && !isNonExponential) {
+                interpretation += `
+                
+                📐 Erlang C Mode: Results calculated using classic queuing theory mathematics. 
+                Assumptions: Infinite patience, no abandonment, Poisson arrivals, exponential service times.`;
+            } else {
+                interpretation += `
+                
+                ⚙️ Advanced Mode: Enhanced calculations with additional features enabled.`;
+            }
+
+            document.getElementById('interpretationText').textContent = interpretation;
+        }
+
+        function updateChartWithServerData(simData, optimizeData) {
+            // For server mode, create a simplified chart showing the optimal point
+            if (staffingChart) {
+                staffingChart.destroy();
+            }
+
+            const chartConfig = {
+                chart: {
+                    type: 'column',
+                    backgroundColor: 'transparent',
+                    style: {
+                        fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+                    },
+                    height: 320
+                },
+                title: {
+                    text: 'Simulation Results',
+                    style: {
+                        color: '#ffc0c0',
+                        fontSize: '16px'
+                    }
+                },
+                xAxis: {
+                    categories: ['Service Level', 'Occupancy', 'Abandonment'],
+                    labels: {
+                        style: { color: '#e8e8e8' }
+                    },
+                    gridLineColor: '#555',
+                    lineColor: '#555',
+                    tickColor: '#555'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Percentage (%)',
+                        style: { color: '#e8e8e8' }
+                    },
+                    labels: {
+                        style: { color: '#e8e8e8' }
+                    },
+                    gridLineColor: '#555',
+                    lineColor: '#555',
+                    tickColor: '#555',
+                    min: 0,
+                    max: 100
+                },
+                series: [{
+                    name: 'Performance Metrics',
+                    data: [
+                        {
+                            name: 'Service Level',
+                            y: simData.pct_within_sla,
+                            color: '#3498db'
+                        },
+                        {
+                            name: 'Occupancy',
+                            y: simData.utilization_pct,
+                            color: '#27ae60'
+                        },
+                        {
+                            name: 'Abandonment',
+                            y: simData.abandonment_rate,
+                            color: '#e74c3c'
+                        }
+                    ],
+                    dataLabels: {
+                        enabled: true,
+                        style: { color: '#e8e8e8' },
+                        formatter: function() {
+                            return this.y.toFixed(1) + '%';
+                        }
+                    }
+                }],
+                plotOptions: {
+                    column: {
+                        borderRadius: 5,
+                        borderColor: 'transparent'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    backgroundColor: '#484b57',
+                    style: {
+                        color: '#e8e8e8'
+                    },
+                    borderColor: '#555',
+                    borderRadius: 5,
+                    formatter: function() {
+                        return `<b>${this.point.name}</b><br/>${this.y.toFixed(1)}%`;
+                    }
+                },
+                credits: {
+                    enabled: false
+                }
+            };
+
+            staffingChart = Highcharts.chart('staffingChart', chartConfig);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSliders();
+            
+            // Initialize simulation toggles as disabled (but allow capacity and shrinkage to remain as set)
+            const simulationToggleIds = [
+                'enableAbandonmentRate',
+                'enablePatience', 
+                'enableRetrialRate',
+                'enableRetrialDelay'
+            ];
+            
+            simulationToggleIds.forEach(toggleId => {
+                const toggle = document.getElementById(toggleId);
+                if (toggle) {
+                    toggle.checked = false;
+                    // Special handling for patience toggle
+                    if (toggleId === 'enablePatience') {
+                        togglePatienceSection(false);
+                    }
+                }
+            });
+            
+            // Capacity and shrinkage can remain enabled if desired - they work with basic Erlang C
+            // No forced initialization to false for enableCapacity and enableShrinkage
+            
+            // Ensure capacity section is interactive and not disabled
+            const capacityToggle = document.getElementById('enableCapacity');
+            if (capacityToggle) {
+                // Find the capacity parameter section and ensure it's not disabled
+                const capacitySection = capacityToggle.closest('.parameter-section');
+                if (capacitySection) {
+                    capacitySection.classList.remove('disabled');
+                    console.log('Capacity section enabled for interaction');
+                }
+                
+                // Ensure the toggle itself is not disabled
+                capacityToggle.disabled = false;
+                capacityToggle.style.pointerEvents = 'auto';
+                
+                // Initialize capacity KPIs based on toggle state
+                toggleCapacitySection(capacityToggle.checked);
+                
+                if (capacityToggle.checked) {
+                    console.log('Capacity constraint enabled at startup');
+                }
+            }
+            
+            // Ensure shrinkage section is also interactive and not disabled
+            const shrinkageToggle = document.getElementById('enableShrinkage');
+            if (shrinkageToggle) {
+                // Shrinkage is in the main parameter section, but ensure it's interactive
+                shrinkageToggle.disabled = false;
+                shrinkageToggle.style.pointerEvents = 'auto';
+                
+                // Initialize shrinkage KPIs based on toggle state
+                toggleShrinkageSection(shrinkageToggle.checked);
+                
+                if (shrinkageToggle.checked) {
+                    console.log('Shrinkage constraint enabled at startup');
+                }
+            }
+            
+            // Update UI to reflect current mode (pure Erlang C or with constraints)
+            updateToggleBasedUI();
+            
+            // Initialize distribution parameter visibility
+            updateDistributionParameters();
+            
+            // Initialize advanced options collapse state
+            initializeAdvancedOptionsState();
+            
+            // Initial calculation
+            calculateErlangC();
+        });
+    </script>
+
+
+
+
+
+</body>
+</html> 

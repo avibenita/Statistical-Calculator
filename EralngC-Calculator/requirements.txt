@@ -1,0 +1,5 @@
+simpy==4.0.1
+functions-framework==3.4.0
+flask
+flask-cors
+requests
