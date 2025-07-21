@@ -42,7 +42,7 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>
-        Poisson Distribution Calculator
+        Binomial Distribution Calculator
     </title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/annotations.js"></script>
@@ -56,9 +56,9 @@
             --panel-radius: 10px;
             --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
             --header-bg: #000;
-            --header-color: rgb(165,120,255);
-            --highlight-bg: rgba(165, 120, 255, 0.2);
-            --highlight-text: rgb(165, 120, 255);
+            --header-color: rgb(120,165,255);
+            --highlight-bg: rgba(120, 165, 255, 0.2);
+            --highlight-text: rgb(120, 165, 255);
             --primary-blue: #3498db;
             --primary-blue-hover: #2980b9;
             --success-green: #27ae60;
@@ -318,9 +318,9 @@
         .tab.active {
             color: var(--header-color);
             border-bottom-color: var(--header-color);
-            background: rgba(165,120,255,0.1);
+            background: rgba(120,165,255,0.1);
             transform: translateY(0);
-            box-shadow: 0 4px 12px rgba(165,120,255,0.3);
+            box-shadow: 0 4px 12px rgba(120,165,255,0.3);
         }
 
         .tab.switching {
@@ -330,15 +330,15 @@
         @keyframes tabSwitchPulse {
             0% {
                 transform: translateY(0);
-                box-shadow: 0 4px 12px rgba(165,120,255,0.3);
+                box-shadow: 0 4px 12px rgba(120,165,255,0.3);
             }
             50% {
                 transform: translateY(-4px);
-                box-shadow: 0 8px 24px rgba(165,120,255,0.5);
+                box-shadow: 0 8px 24px rgba(120,165,255,0.5);
             }
             100% {
                 transform: translateY(0);
-                box-shadow: 0 4px 12px rgba(165,120,255,0.3);
+                box-shadow: 0 4px 12px rgba(120,165,255,0.3);
             }
         }
 
@@ -389,7 +389,7 @@
             align-items: center;
             margin-top: 10px;
             padding: 10px;
-            background: rgba(165,120,255,0.1);
+            background: rgba(120,165,255,0.1);
             border-radius: 6px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -589,12 +589,12 @@
         }
 
         .probability-result {
-            background: linear-gradient(135deg, rgba(165,120,255,0.2) 0%, rgba(140,100,255,0.2) 100%);
-            border: 2px solid rgba(165,120,255,0.6);
+            background: linear-gradient(135deg, rgba(120,165,255,0.2) 0%, rgba(100,140,255,0.2) 100%);
+            border: 2px solid rgba(120,165,255,0.6);
             padding: 8px 12px;
             border-radius: 6px;
             font-weight: bold;
-            color: rgb(165,120,255);
+            color: rgb(120,165,255);
             text-align: center;
             min-width: 120px;
         }
@@ -666,14 +666,14 @@
         }
 
         .embedded-stat-item.primary-result {
-            background: rgba(165,120,255,0.15);
-            border: 1px solid rgba(165,120,255,0.3);
+            background: rgba(120,165,255,0.15);
+            border: 1px solid rgba(120,165,255,0.3);
             min-width: 65px;
         }
 
         .embedded-stat-item.primary-result:hover {
-            background: rgba(165,120,255,0.25);
-            box-shadow: 0 4px 16px rgba(165,120,255,0.3);
+            background: rgba(120,165,255,0.25);
+            box-shadow: 0 4px 16px rgba(120,165,255,0.3);
         }
 
         .embedded-stat-value {
@@ -691,7 +691,7 @@
         }
 
         .embedded-stat-item.primary-result .embedded-stat-value {
-            color: rgb(165,120,255);
+            color: rgb(120,165,255);
         }
 
         .embedded-stat-label {
@@ -910,8 +910,8 @@
             <div class="container">
                 <div class="header">
                     <h1>
-                        <i class="fas fa-signal"></i>
-                        Poisson Distribution Calculator
+                        <i class="fas fa-coins"></i>
+                        Binomial Distribution Calculator
                     </h1>
                     <div style="text-align: center; padding: 10px; background: rgba(52, 152, 219, 0.1); border-radius: 6px; border: 0px solid rgba(52, 152, 219, 0.3); margin-top: 15px;">
                         <i class="fas fa-bolt" style="color: #3498db; margin-right: 8px;"></i>
@@ -932,11 +932,20 @@
                         </div>
                         <div class="input-group">
                             <label>
-                                Rate Parameter (λ)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Average number of events per interval (must be > 0)</small>
+                                Number of Trials (n)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Positive integer (1, 2, 3, ...)</small>
                             </label>
                             <div class="input-row">
-                                <input class="input-field" id="lambda" min="0.1" step="0.1" type="number" value="3" placeholder="e.g., 1, 3, 5"/>
+                                <input class="input-field" id="nTrials" min="1" step="1" type="number" value="10" placeholder="e.g., 5, 10, 20"/>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                Probability of Success (p)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Between 0 and 1 (e.g., 0.5 = 50%)</small>
+                            </label>
+                            <div class="input-row">
+                                <input class="input-field" id="pSuccess" min="0" max="1" step="0.01" type="number" value="0.5" placeholder="e.g., 0.3, 0.5, 0.7"/>
                             </div>
                         </div>
                         <div class="calculation-type">
@@ -948,21 +957,21 @@
                                     <input checked="" name="calcType" type="radio" value="probability"/>
                                     <div>
                                         <strong>Find P(X = k)</strong>
-                                        <small style="color: #bbb; display: block; margin-top: 2px;">Probability of exactly k events</small>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">Probability of exactly k successes</small>
                                     </div>
                                 </label>
                                 <label class="radio-option">
                                     <input name="calcType" type="radio" value="cumulative"/>
                                     <div>
                                         <strong>Find P(X ≤ k)</strong>
-                                        <small style="color: #bbb; display: block; margin-top: 2px;">Probability of k or fewer events</small>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">Probability of k or fewer successes</small>
                                     </div>
                                 </label>
                                 <label class="radio-option">
                                     <input name="calcType" type="radio" value="between"/>
                                     <div>
                                         <strong>Find P(a ≤ X ≤ b)</strong>
-                                        <small style="color: #bbb; display: block; margin-top: 2px;">Probability between a and b events</small>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">Probability between a and b successes</small>
                                     </div>
                                 </label>
                             </div>
@@ -970,9 +979,9 @@
                         <div id="inputSection">
                             <div class="input-group">
                                 <label>
-                                    k Value (number of events)
+                                    k Value (number of successes)
                                 </label>
-                                <input class="input-field" id="kValue" min="0" step="1" type="number" value="3"/>
+                                <input class="input-field" id="kValue" min="0" step="1" type="number" value="5"/>
                             </div>
                         </div>
                     </div>
@@ -1017,11 +1026,9 @@
                                         Range
                                     </label>
                                     <select class="mini-dropdown" id="chartRange">
-                                        <option value="2">2λ</option>
-                                        <option value="3">3λ</option>
-                                        <option selected value="4">4λ</option>
-                                        <option value="5">5λ</option>
-                                        <option value="6">6λ</option>
+                                        <option value="full">Full (0-n)</option>
+                                        <option selected value="centered">Centered</option>
+                                        <option value="custom">Custom</option>
                                     </select>
                                 </div>
                             </div>
@@ -1074,16 +1081,24 @@
                                         </div>
                                     </div>
                                     <div class="embedded-stat-item">
-                                        <div class="embedded-stat-value" id="lambdaStat">
-                                            3
+                                        <div class="embedded-stat-value" id="nStat">
+                                            10
                                         </div>
                                         <div class="embedded-stat-label">
-                                            λ (Rate)
+                                            n (Trials)
+                                        </div>
+                                    </div>
+                                    <div class="embedded-stat-item">
+                                        <div class="embedded-stat-value" id="pStat">
+                                            0.5
+                                        </div>
+                                        <div class="embedded-stat-label">
+                                            p (Success)
                                         </div>
                                     </div>
                                     <div class="embedded-stat-item">
                                         <div class="embedded-stat-value" id="meanStat">
-                                            3
+                                            5
                                         </div>
                                         <div class="embedded-stat-label">
                                             Mean
@@ -1091,7 +1106,7 @@
                                     </div>
                                     <div class="embedded-stat-item">
                                         <div class="embedded-stat-value" id="varianceStat">
-                                            3
+                                            2.5
                                         </div>
                                         <div class="embedded-stat-label">
                                             Variance
@@ -1099,18 +1114,10 @@
                                     </div>
                                     <div class="embedded-stat-item">
                                         <div class="embedded-stat-value" id="stddevStat">
-                                            1.73
+                                            1.58
                                         </div>
                                         <div class="embedded-stat-label">
                                             Std Dev
-                                        </div>
-                                    </div>
-                                    <div class="embedded-stat-item">
-                                        <div class="embedded-stat-value" id="modeStat">
-                                            3
-                                        </div>
-                                        <div class="embedded-stat-label">
-                                            Mode
                                         </div>
                                     </div>
                                 </div>
@@ -1163,7 +1170,8 @@
                 }, 800); // Delay to ensure all data is ready
 
                 // Add event listeners with visual feedback
-                document.getElementById('lambda').addEventListener('input', debounce(calculateWithFeedback, 250));
+                document.getElementById('nTrials').addEventListener('input', debounce(calculateWithFeedback, 250));
+                document.getElementById('pSuccess').addEventListener('input', debounce(calculateWithFeedback, 250));
                 document.getElementById('chartRange').addEventListener('change', debounce(calculateWithFeedback, 250));
                 document.getElementById('precision').addEventListener('change', debounce(calculateWithFeedback, 250));
 
@@ -1233,20 +1241,20 @@
                 case 'probability':
                     html = `
                         <div class="input-group">
-                            <label>k Value (number of events)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer</small>
+                            <label>k Value (number of successes)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer ≤ n</small>
                             </label>
-                            <input type="number" id="kValue" class="input-field" value="3" step="1" min="0" placeholder="e.g., 0, 1, 3, 5">
+                            <input type="number" id="kValue" class="input-field" value="5" step="1" min="0" placeholder="e.g., 0, 1, 5, 10">
                         </div>
                     `;
                     break;
                 case 'cumulative':
                     html = `
                         <div class="input-group">
-                            <label>k Value (maximum events)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer</small>
+                            <label>k Value (maximum successes)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer ≤ n</small>
                             </label>
-                            <input type="number" id="kValue" class="input-field" value="3" step="1" min="0" placeholder="e.g., 0, 1, 3, 5">
+                            <input type="number" id="kValue" class="input-field" value="5" step="1" min="0" placeholder="e.g., 0, 1, 5, 10">
                         </div>
                     `;
                     break;
@@ -1254,15 +1262,15 @@
                     html = `
                         <div class="input-group">
                             <label>Lower Bound (a)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer</small>
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer ≤ n</small>
                             </label>
-                            <input type="number" id="lowerBound" class="input-field" value="1" step="1" min="0" placeholder="e.g., 0, 1, 2">
+                            <input type="number" id="lowerBound" class="input-field" value="3" step="1" min="0" placeholder="e.g., 0, 1, 3">
                         </div>
                         <div class="input-group">
                             <label>Upper Bound (b)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer</small>
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer ≤ n</small>
                             </label>
-                            <input type="number" id="upperBound" class="input-field" value="5" step="1" min="0" placeholder="e.g., 3, 5, 10">
+                            <input type="number" id="upperBound" class="input-field" value="7" step="1" min="0" placeholder="e.g., 5, 7, 10">
                         </div>
                     `;
                     break;
@@ -1291,7 +1299,7 @@
                             fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                         }
                     },
-                    colors: ['#9b59b6', '#3498db', '#e74c3c', '#f39c12', '#27ae60'],
+                    colors: ['#3498db', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
                     title: {
                         style: {
                             color: 'white'
@@ -1355,7 +1363,7 @@
                     },
                     xAxis: {
                         title: {
-                            text: 'k (Number of Events)'
+                            text: 'k (Number of Successes)'
                         },
                         tickInterval: 1
                     },
@@ -1368,15 +1376,15 @@
                     series: [{
                         name: 'P(X = k)',
                         data: [],
-                        color: '#9b59b6',
+                        color: '#3498db',
                         borderWidth: 1,
-                        borderColor: '#8e44ad'
+                        borderColor: '#2980b9'
                     }, {
                         name: 'Highlighted',
                         data: [],
-                        color: 'rgba(165, 120, 255, 0.8)',
+                        color: 'rgba(120, 165, 255, 0.8)',
                         borderWidth: 2,
-                        borderColor: '#a078ff'
+                        borderColor: '#78a5ff'
                     }],
                     tooltip: {
                         shared: false,
@@ -1407,7 +1415,7 @@
                     },
                     xAxis: {
                         title: {
-                            text: 'k (Number of Events)'
+                            text: 'k (Number of Successes)'
                         },
                         tickInterval: 1
                     },
@@ -1421,7 +1429,7 @@
                     series: [{
                         name: 'Cumulative Probability',
                         data: [],
-                        color: '#3498db',
+                        color: '#27ae60',
                         lineWidth: 3,
                         shadow: true,
                         step: 'left'
@@ -1454,7 +1462,7 @@
                     },
                     xAxis: {
                         title: {
-                            text: 'k (Number of Events)'
+                            text: 'k (Number of Successes)'
                         },
                         tickInterval: 1
                     },
@@ -1462,20 +1470,20 @@
                         title: {
                             text: 'PMF',
                             style: {
-                                color: '#9b59b6'
+                                color: '#3498db'
                             }
                         },
                         min: 0,
                         labels: {
                             style: {
-                                color: '#9b59b6'
+                                color: '#3498db'
                             }
                         }
                     }, {
                         title: {
                             text: 'CDF',
                             style: {
-                                color: '#3498db'
+                                color: '#27ae60'
                             }
                         },
                         min: 0,
@@ -1483,7 +1491,7 @@
                         opposite: true,
                         labels: {
                             style: {
-                                color: '#3498db'
+                                color: '#27ae60'
                             }
                         }
                     }],
@@ -1491,15 +1499,15 @@
                         name: 'PMF',
                         data: [],
                         type: 'column',
-                        color: '#9b59b6',
+                        color: '#3498db',
                         yAxis: 0,
                         borderWidth: 1,
-                        borderColor: '#8e44ad'
+                        borderColor: '#2980b9'
                     }, {
                         name: 'CDF',
                         data: [],
                         type: 'line',
-                        color: '#3498db',
+                        color: '#27ae60',
                         lineWidth: 3,
                         yAxis: 1,
                         step: 'left'
@@ -1524,21 +1532,21 @@
             }
         }
 
-        // Poisson distribution functions using jStat library
-        function poissonPMF(k, lambda) {
+        // Binomial distribution functions using jStat library
+        function binomialPMF(k, n, p) {
             if (typeof jStat === 'undefined') {
                 console.error('jStat library not loaded');
                 return NaN;
             }
-            return jStat.poisson.pdf(k, lambda);
+            return jStat.binomial.pdf(k, n, p);
         }
 
-        function poissonCDF(k, lambda) {
+        function binomialCDF(k, n, p) {
             if (typeof jStat === 'undefined') {
                 console.error('jStat library not loaded');
                 return NaN;
             }
-            return jStat.poisson.cdf(k, lambda);
+            return jStat.binomial.cdf(k, n, p);
         }
 
         function calculateWithFeedback() {
@@ -1555,13 +1563,20 @@
 
         function calculate() {
             try {
-                const lambda = parseFloat(document.getElementById('lambda')?.value) || 3;
+                const n = parseInt(document.getElementById('nTrials')?.value) || 10;
+                const p = parseFloat(document.getElementById('pSuccess')?.value) || 0.5;
                 const precision = parseInt(document.getElementById('precision')?.value) || 4;
                 const calcType = document.querySelector('input[name="calcType"]:checked').value;
 
-                if (lambda <= 0) {
+                if (n <= 0) {
                     const mainResultEl = document.getElementById('mainResult');
-                    if (mainResultEl) mainResultEl.textContent = 'Error: Rate parameter λ must be positive';
+                    if (mainResultEl) mainResultEl.textContent = 'Error: Number of trials must be positive';
+                    return;
+                }
+
+                if (p < 0 || p > 1) {
+                    const mainResultEl = document.getElementById('mainResult');
+                    if (mainResultEl) mainResultEl.textContent = 'Error: Probability must be between 0 and 1';
                     return;
                 }
 
@@ -1569,33 +1584,33 @@
 
                 switch(calcType) {
                     case 'probability':
-                        const kValue = parseInt(document.getElementById('kValue')?.value) || 3;
-                        if (kValue < 0) {
+                        const kValue = parseInt(document.getElementById('kValue')?.value) || 5;
+                        if (kValue < 0 || kValue > n) {
                             const mainResultEl = document.getElementById('mainResult');
-                            if (mainResultEl) mainResultEl.textContent = 'Error: k must be non-negative';
+                            if (mainResultEl) mainResultEl.textContent = `Error: k must be between 0 and ${n}`;
                             return;
                         }
-                        result = poissonPMF(kValue, lambda);
+                        result = binomialPMF(kValue, n, p);
                         areaDescription = `P(X = ${kValue})`;
                         break;
 
                     case 'cumulative':
-                        const kValueCum = parseInt(document.getElementById('kValue')?.value) || 3;
-                        if (kValueCum < 0) {
+                        const kValueCum = parseInt(document.getElementById('kValue')?.value) || 5;
+                        if (kValueCum < 0 || kValueCum > n) {
                             const mainResultEl = document.getElementById('mainResult');
-                            if (mainResultEl) mainResultEl.textContent = 'Error: k must be non-negative';
+                            if (mainResultEl) mainResultEl.textContent = `Error: k must be between 0 and ${n}`;
                             return;
                         }
-                        result = poissonCDF(kValueCum, lambda);
+                        result = binomialCDF(kValueCum, n, p);
                         areaDescription = `P(X ≤ ${kValueCum})`;
                         break;
 
                     case 'between':
-                        const lowerBound = parseInt(document.getElementById('lowerBound')?.value) || 1;
-                        const upperBound = parseInt(document.getElementById('upperBound')?.value) || 5;
-                        if (lowerBound < 0 || upperBound < 0) {
+                        const lowerBound = parseInt(document.getElementById('lowerBound')?.value) || 3;
+                        const upperBound = parseInt(document.getElementById('upperBound')?.value) || 7;
+                        if (lowerBound < 0 || upperBound < 0 || lowerBound > n || upperBound > n) {
                             const mainResultEl = document.getElementById('mainResult');
-                            if (mainResultEl) mainResultEl.textContent = 'Error: Bounds must be non-negative';
+                            if (mainResultEl) mainResultEl.textContent = `Error: Bounds must be between 0 and ${n}`;
                             return;
                         }
                         if (lowerBound > upperBound) {
@@ -1603,8 +1618,8 @@
                             if (mainResultEl) mainResultEl.textContent = 'Error: Lower bound must be ≤ upper bound';
                             return;
                         }
-                        const lowerProb = lowerBound > 0 ? poissonCDF(lowerBound - 1, lambda) : 0;
-                        const upperProb = poissonCDF(upperBound, lambda);
+                        const lowerProb = lowerBound > 0 ? binomialCDF(lowerBound - 1, n, p) : 0;
+                        const upperProb = binomialCDF(upperBound, n, p);
                         result = upperProb - lowerProb;
                         areaDescription = `P(${lowerBound} ≤ X ≤ ${upperBound})`;
                         break;
@@ -1775,22 +1790,22 @@
         }
 
         function updateStatistics() {
-            const lambda = parseFloat(document.getElementById('lambda')?.value) || 3;
+            const n = parseInt(document.getElementById('nTrials')?.value) || 10;
+            const p = parseFloat(document.getElementById('pSuccess')?.value) || 0.5;
             const precision = parseInt(document.getElementById('precision')?.value) || 4;
 
-            // Poisson distribution statistics
-            const mean = lambda;
-            const variance = lambda;
-            const stddev = Math.sqrt(lambda);
-            const mode = Math.floor(lambda);
+            // Binomial distribution statistics
+            const mean = n * p;
+            const variance = n * p * (1 - p);
+            const stddev = Math.sqrt(variance);
 
             // Get current values for animation start points
             const statsElements = [
-                { el: document.getElementById('lambdaStat'), value: lambda, delay: 0, isInteger: false },
-                { el: document.getElementById('meanStat'), value: mean, delay: 100, isInteger: false },
-                { el: document.getElementById('varianceStat'), value: variance, delay: 200, isInteger: false },
-                { el: document.getElementById('stddevStat'), value: stddev, delay: 300, isInteger: false },
-                { el: document.getElementById('modeStat'), value: mode, delay: 400, isInteger: true }
+                { el: document.getElementById('nStat'), value: n, delay: 0, isInteger: true },
+                { el: document.getElementById('pStat'), value: p, delay: 100, isInteger: false },
+                { el: document.getElementById('meanStat'), value: mean, delay: 200, isInteger: false },
+                { el: document.getElementById('varianceStat'), value: variance, delay: 300, isInteger: false },
+                { el: document.getElementById('stddevStat'), value: stddev, delay: 400, isInteger: false }
             ];
 
             // Animate the value changes with staggered timing
@@ -1804,12 +1819,20 @@
         }
 
         function updateCharts() {
-            const lambda = parseFloat(document.getElementById('lambda')?.value) || 3;
-            const range = parseFloat(document.getElementById('chartRange')?.value) || 4;
+            const n = parseInt(document.getElementById('nTrials')?.value) || 10;
+            const p = parseFloat(document.getElementById('pSuccess')?.value) || 0.5;
+            const chartRange = document.getElementById('chartRange')?.value || 'centered';
             const calcType = document.querySelector('input[name="calcType"]:checked').value;
 
-            // Generate data points for discrete distribution
-            const maxK = Math.max(20, Math.ceil(lambda * range));
+            // Determine chart range
+            let minK = 0, maxK = n;
+            if (chartRange === 'centered') {
+                const mean = n * p;
+                const stddev = Math.sqrt(n * p * (1 - p));
+                minK = Math.max(0, Math.floor(mean - 3 * stddev));
+                maxK = Math.min(n, Math.ceil(mean + 3 * stddev));
+            }
+
             const pmfData = [];
             const cdfData = [];
             const highlightedData = [];
@@ -1818,24 +1841,30 @@
             let highlightValues = [];
             switch(calcType) {
                 case 'probability':
-                    const kValue = parseInt(document.getElementById('kValue')?.value) || 3;
-                    highlightValues = [kValue];
+                    const kValue = parseInt(document.getElementById('kValue')?.value) || 5;
+                    if (kValue >= 0 && kValue <= n) {
+                        highlightValues = [kValue];
+                    }
                     break;
                 case 'cumulative':
-                    const kValueCum = parseInt(document.getElementById('kValue')?.value) || 3;
-                    highlightValues = Array.from({length: kValueCum + 1}, (_, i) => i);
+                    const kValueCum = parseInt(document.getElementById('kValue')?.value) || 5;
+                    if (kValueCum >= 0 && kValueCum <= n) {
+                        highlightValues = Array.from({length: kValueCum + 1}, (_, i) => i);
+                    }
                     break;
                 case 'between':
-                    const lowerBound = parseInt(document.getElementById('lowerBound')?.value) || 1;
-                    const upperBound = parseInt(document.getElementById('upperBound')?.value) || 5;
-                    highlightValues = Array.from({length: upperBound - lowerBound + 1}, (_, i) => lowerBound + i);
+                    const lowerBound = parseInt(document.getElementById('lowerBound')?.value) || 3;
+                    const upperBound = parseInt(document.getElementById('upperBound')?.value) || 7;
+                    if (lowerBound >= 0 && upperBound <= n && lowerBound <= upperBound) {
+                        highlightValues = Array.from({length: upperBound - lowerBound + 1}, (_, i) => lowerBound + i);
+                    }
                     break;
             }
 
             // Generate chart data
-            for (let k = 0; k <= maxK; k++) {
-                const pmfValue = poissonPMF(k, lambda);
-                const cdfValue = poissonCDF(k, lambda);
+            for (let k = minK; k <= maxK; k++) {
+                const pmfValue = binomialPMF(k, n, p);
+                const cdfValue = binomialCDF(k, n, p);
 
                 pmfData.push([k, pmfValue]);
                 cdfData.push([k, cdfValue]);
@@ -1861,7 +1890,7 @@
 
                     // Update X axis range
                     if (pmfChart.xAxis && pmfChart.xAxis[0]) {
-                        pmfChart.xAxis[0].setExtremes(0, maxK, false);
+                        pmfChart.xAxis[0].setExtremes(minK, maxK, false);
                     }
                 } catch (error) {
                     console.warn('Error updating PMF chart data:', error);
@@ -1881,7 +1910,7 @@
 
                     // Update X axis range
                     if (cdfChart.xAxis && cdfChart.xAxis[0]) {
-                        cdfChart.xAxis[0].setExtremes(0, maxK, false);
+                        cdfChart.xAxis[0].setExtremes(minK, maxK, false);
                     }
                 } catch (error) {
                     console.warn('Error updating CDF chart data:', error);
@@ -1904,7 +1933,7 @@
 
                     // Update X axis range
                     if (combinedChart.xAxis && combinedChart.xAxis[0]) {
-                        combinedChart.xAxis[0].setExtremes(0, maxK, false);
+                        combinedChart.xAxis[0].setExtremes(minK, maxK, false);
                     }
                 } catch (error) {
                     console.warn('Error updating Combined chart data:', error);
@@ -1950,7 +1979,7 @@
                     highlightValues.forEach((k, index) => {
                         const markerEl = document.createElement('div');
                         markerEl.className = 'x-marker';
-                        const color = '#9b59b6';
+                        const color = '#3498db';
                         markerEl.style.cssText = `
                             display: flex;
                             align-items: center;
@@ -2000,7 +2029,7 @@
                     // Show range instead of individual values
                     const rangeEl = document.createElement('div');
                     rangeEl.className = 'x-marker';
-                    const color = '#9b59b6';
+                    const color = '#3498db';
                     rangeEl.style.cssText = `
                         display: flex;
                         align-items: center;
@@ -2055,14 +2084,14 @@
                     align-items: center;
                     gap: 5px;
                     padding: 12px 20px;
-                    background: linear-gradient(135deg, rgba(165,120,255,0.25) 0%, rgba(140,100,255,0.15) 100%);
-                    border: 2px solid rgba(165,120,255,0.7);
+                    background: linear-gradient(135deg, rgba(120,165,255,0.25) 0%, rgba(100,140,255,0.15) 100%);
+                    border: 2px solid rgba(120,165,255,0.7);
                     border-radius: 8px;
-                    color: rgb(165,120,255);
+                    color: rgb(120,165,255);
                     font-weight: bold;
                     text-align: center;
                     min-width: 140px;
-                    box-shadow: 0 4px 12px rgba(165,120,255,0.3);
+                    box-shadow: 0 4px 12px rgba(120,165,255,0.3);
                 `;
 
                 const mainResult = document.getElementById('mainResult').textContent;
@@ -2215,10 +2244,11 @@
 
             // Reset all input values to defaults with animation
             const inputs = [
-                { el: document.getElementById('lambda'), value: '3' },
-                { el: document.getElementById('kValue'), value: '3' },
+                { el: document.getElementById('nTrials'), value: '10' },
+                { el: document.getElementById('pSuccess'), value: '0.5' },
+                { el: document.getElementById('kValue'), value: '5' },
                 { el: document.getElementById('precision'), value: '4' },
-                { el: document.getElementById('chartRange'), value: '4' }
+                { el: document.getElementById('chartRange'), value: 'centered' }
             ];
 
             inputs.forEach(({ el, value }, index) => {
@@ -2246,7 +2276,7 @@
             const precisionDropdown = document.getElementById('precision');
             const chartRangeDropdown = document.getElementById('chartRange');
             if (precisionDropdown) precisionDropdown.value = '4';
-            if (chartRangeDropdown) chartRangeDropdown.value = '4';
+            if (chartRangeDropdown) chartRangeDropdown.value = 'centered';
 
             // Reset tab to PMF view with animation
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));

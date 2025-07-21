@@ -1,13 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        #main-wrapper {
+            width: 75vw;
+            max-width: 1000px;
+            margin: 0 auto;
+            height: 95vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding: 1rem;
+        }
+    </style>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .main-container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+    </style>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>T-Distribution Calculator</title>
+    <title>
+        t-Distribution Calculator
+    </title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/annotations.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
     <style>
         :root {
@@ -15,9 +56,9 @@
             --panel-radius: 10px;
             --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
             --header-bg: #000;
-            --header-color: rgb(255,192,192);
-            --highlight-bg: rgba(255, 192, 192, 0.2);
-            --highlight-text: rgb(255, 192, 192);
+            --header-color: rgb(120,255,165);
+            --highlight-bg: rgba(120, 255, 165, 0.2);
+            --highlight-text: rgb(120, 255, 165);
             --primary-blue: #3498db;
             --primary-blue-hover: #2980b9;
             --success-green: #27ae60;
@@ -61,6 +102,12 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
+        .header p {
+            color: #bbb;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
         .main-content {
             display: grid;
             grid-template-columns: 1fr 2fr;
@@ -68,21 +115,12 @@
             margin-bottom: 30px;
         }
 
-        .control-panel-wrapper,
-        .visualization-panel-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
         .control-panel {
             background: var(--panel-bg);
             border-radius: var(--panel-radius);
             box-shadow: var(--panel-shadow);
             padding: 25px;
-            min-height: 750px;
-            display: flex;
-            flex-direction: column;
+            height: fit-content;
         }
 
         .visualization-panel {
@@ -90,22 +128,16 @@
             border-radius: var(--panel-radius);
             box-shadow: var(--panel-shadow);
             padding: 25px;
-            min-height: 750px;
-            display: flex;
-            flex-direction: column;
+            min-height: 500px;
         }
 
         .panel-title {
             font-size: 1.4rem;
             color: var(--header-color);
-            margin-bottom: 0;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(0,0,0,0.3);
-            padding: 15px 20px;
-            border-radius: var(--panel-radius);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .input-group {
@@ -119,8 +151,14 @@
             color: #e8e8e8;
         }
 
+        .input-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
         .input-field {
-            width: 100%;
+            flex: 1;
             padding: 12px;
             border: 2px solid #555;
             border-radius: 8px;
@@ -154,7 +192,19 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
             justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #2c3e50 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-blue-hover) 0%, #34495e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
 
         .btn-success {
@@ -196,6 +246,8 @@
         .radio-option input[type="radio"] {
             margin-right: 10px;
             accent-color: var(--primary-blue);
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .radio-option.selected {
@@ -203,58 +255,48 @@
             background: var(--highlight-bg);
         }
 
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin-top: 20px;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .results-panel {
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+            padding: 25px;
+            margin-top: 30px;
         }
 
-        .chart-container.animating {
-            transform: scale(1.01);
-            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.25);
-            border-radius: 12px;
+        .result-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--header-color);
         }
 
-        .chart-container.drawing-curves {
-            animation: curvePulse 2.5s ease-in-out;
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--header-color);
+            margin-bottom: 5px;
         }
 
-        @keyframes curvePulse {
-            0% { 
-                box-shadow: 0 4px 20px rgba(52, 152, 219, 0.2);
-            }
-            25% { 
-                box-shadow: 0 8px 40px rgba(52, 152, 219, 0.4);
-                transform: scale(1.02);
-            }
-            50% { 
-                box-shadow: 0 12px 60px rgba(52, 152, 219, 0.6);
-                transform: scale(1.015);
-            }
-            75% { 
-                box-shadow: 0 8px 40px rgba(52, 152, 219, 0.4);
-                transform: scale(1.01);
-            }
-            100% { 
-                box-shadow: 0 4px 20px rgba(52, 152, 219, 0.2);
-                transform: scale(1);
-            }
+        .result-label {
+            color: #bbb;
+            font-size: 0.95rem;
         }
 
-        .tabs-and-controls {
+        /* Combined Tabs and Options Row */
+        .tabs-and-options-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             margin-bottom: 20px;
-            gap: 20px;
+            border-bottom: 2px solid #555;
+            padding-bottom: 10px;
         }
 
         .tabs {
             display: flex;
-            border-bottom: 2px solid #555;
-            flex: 1;
+            margin-bottom: 0;
+            border-bottom: none;
         }
 
         .tab {
@@ -263,17 +305,22 @@
             border-bottom: 3px solid transparent;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             color: #bbb;
+            position: relative;
+            overflow: hidden;
         }
 
         .tab:hover {
             color: white;
             background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
         }
 
         .tab.active {
             color: var(--header-color);
             border-bottom-color: var(--header-color);
-            background: rgba(255,192,192,0.1);
+            background: rgba(120,255,165,0.1);
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(120,255,165,0.3);
         }
 
         .tab.switching {
@@ -283,45 +330,50 @@
         @keyframes tabSwitchPulse {
             0% {
                 transform: translateY(0);
-                box-shadow: 0 4px 12px rgba(255,192,192,0.3);
+                box-shadow: 0 4px 12px rgba(120,255,165,0.3);
             }
             50% {
                 transform: translateY(-4px);
-                box-shadow: 0 8px 24px rgba(255,192,192,0.5);
+                box-shadow: 0 8px 24px rgba(120,255,165,0.5);
             }
             100% {
                 transform: translateY(0);
-                box-shadow: 0 4px 12px rgba(255,192,192,0.3);
+                box-shadow: 0 4px 12px rgba(120,255,165,0.3);
             }
         }
 
         .tab-content {
             display: none;
-            opacity: 0;
-            transform: translateX(20px);
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .tab-content.active {
             display: block;
-            opacity: 1;
-            transform: translateX(0);
-            animation: tabSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes tabSlideIn {
-            0% {
-                opacity: 0;
-                transform: translateX(30px) scale(0.95);
-            }
-            50% {
-                opacity: 0.7;
-                transform: translateX(10px) scale(0.98);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--header-color);
+        }
+
+        .stat-label {
+            color: #bbb;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
 
         .probability-visualization {
@@ -337,7 +389,7 @@
             align-items: center;
             margin-top: 10px;
             padding: 10px;
-            background: rgba(255,192,192,0.1);
+            background: rgba(120,255,165,0.1);
             border-radius: 6px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -349,11 +401,227 @@
             box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
         }
 
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .results-row .probability-visualization {
+                flex: 0 0 45%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-and-options-row {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .chart-options-toolbar {
+                justify-content: center;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .option-label {
+                font-size: 0.8rem;
+            }
+
+            .mini-dropdown {
+                font-size: 0.75rem;
+                min-width: 45px;
+            }
+
+            .results-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .results-row .probability-visualization {
+                flex: none;
+            }
+
+            .results-row .embedded-results-panel {
+                flex: none;
+            }
+
+            .embedded-stats-grid {
+                gap: 3px;
+                justify-content: flex-start;
+            }
+
+            .embedded-stat-item {
+                min-width: 45px;
+                padding: 3px 4px;
+            }
+
+            .embedded-stat-value {
+                font-size: 0.6rem;
+            }
+
+            .embedded-stat-label {
+                font-size: 0.45rem;
+            }
+        }
+
+        /* Chart Options Toolbar Styles */
+        .chart-options-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .chart-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #bbb;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .option-label i {
+            font-size: 0.8rem;
+            color: var(--primary-blue);
+            opacity: 0.8;
+        }
+
+        .mini-dropdown {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            color: white;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            min-width: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mini-dropdown:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: var(--primary-blue);
+        }
+
+        .mini-dropdown:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: rgba(52, 152, 219, 0.1);
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .mini-dropdown option {
+            background: #2c3e50;
+            color: white;
+            padding: 4px;
+        }
+
+        .formula-display {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            color: #e8e8e8;
+            font-size: 0.95rem;
+        }
+
+        .chart-indicator {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .x-marker {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .x-marker::before {
+            content: '';
+            width: 3px;
+            height: 20px;
+            border-radius: 1px;
+            opacity: 0.8;
+        }
+
+        .probability-result {
+            background: linear-gradient(135deg, rgba(120,255,165,0.2) 0%, rgba(100,255,140,0.2) 100%);
+            border: 2px solid rgba(120,255,165,0.6);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: rgb(120,255,165);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        /* Results Row Layout */
+        .results-row {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            align-items: stretch;
+        }
+
+        .results-row .probability-visualization {
+            flex: 0 0 40%;
+            margin-top: 0;
+        }
+
+        .results-row .embedded-results-panel {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        /* Embedded Results Panel Styles - Small Horizontal Boxes */
         .embedded-results-panel {
             background: rgba(0,0,0,0.2);
             border-radius: 6px;
             padding: 10px;
-            margin-top: 15px;
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -368,18 +636,21 @@
 
         .embedded-stats-grid {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            gap: 4px;
+            flex-wrap: nowrap;
             justify-content: center;
+            overflow-x: auto;
         }
 
         .embedded-stat-item {
             background: rgba(255,255,255,0.08);
-            padding: 6px 10px;
+            padding: 4px 6px;
             border-radius: 4px;
             text-align: center;
-            min-width: 70px;
+            min-width: 55px;
+            flex: 0 0 auto;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
         }
 
         .embedded-stat-item.updating {
@@ -388,165 +659,113 @@
             box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
         }
 
+        .embedded-stat-item:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
         .embedded-stat-item.primary-result {
-            background: rgba(255,192,192,0.15);
-            border: 1px solid rgba(255,192,192,0.3);
+            background: rgba(120,255,165,0.15);
+            border: 1px solid rgba(120,255,165,0.3);
+            min-width: 65px;
+        }
+
+        .embedded-stat-item.primary-result:hover {
+            background: rgba(120,255,165,0.25);
+            box-shadow: 0 4px 16px rgba(120,255,165,0.3);
         }
 
         .embedded-stat-value {
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             font-weight: bold;
             color: var(--header-color);
             line-height: 1.1;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .embedded-stat-value.animating {
+            color: #3498db;
+            transform: scale(1.1);
+            text-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+        }
+
         .embedded-stat-item.primary-result .embedded-stat-value {
-            color: rgb(255,192,192);
+            color: rgb(120,255,165);
         }
 
         .embedded-stat-label {
             color: #bbb;
-            font-size: 0.6rem;
-            margin-top: 2px;
+            font-size: 0.5rem;
+            margin-top: 1px;
             line-height: 1;
+            transition: color 0.3s ease;
         }
 
-        .control-sliders {
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            padding: 12px 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            align-items: center;
-            flex-shrink: 0;
-            min-width: 400px;
+        /* Chart animation enhancements */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
+        .chart-container > div {
+            transition: opacity 0.3s ease;
         }
 
-        .slider-label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: 600;
-            color: #e8e8e8;
-            font-size: 0.8rem;
-            min-width: 90px;
-            flex-shrink: 0;
+        .chart-container.animating {
+            transform: scale(1.02);
+            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.3);
+            border-radius: 12px;
         }
 
-        .slider-value {
-            background: rgba(52, 152, 219, 0.2);
-            color: var(--primary-blue);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            min-width: 30px;
-            text-align: center;
-            border: 1px solid rgba(52, 152, 219, 0.3);
-        }
-
-        .slider-input {
-            width: 80px;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255,255,255,0.1);
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .slider-input::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #2980b9 100%);
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .slider-input::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.6);
-        }
-
-        .slider-input::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #2980b9 100%);
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .slider-input::-moz-range-track {
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-        }
-
-        .slider-input:focus {
-            background: rgba(52, 152, 219, 0.1);
-        }
-
-        .slider-input:focus::-webkit-slider-thumb {
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-        }
-
-        /* Highcharts styling */
+        /* Highcharts specific styling for dark theme */
         .highcharts-container {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
         }
-        
+
         .highcharts-background {
             fill: transparent !important;
         }
-        
+
         .highcharts-title {
             fill: white !important;
         }
-        
+
+        .highcharts-subtitle {
+            fill: #bbb !important;
+        }
+
         .highcharts-axis-labels text {
             fill: white !important;
         }
-        
+
         .highcharts-axis-title {
             fill: white !important;
         }
-        
+
         .highcharts-legend-item text {
             fill: white !important;
         }
 
-        /* Chart indicators */
+        .highcharts-plot-line-label {
+            color: white !important;
+        }
+
+        /* Animated chart indicators */
         .chart-indicator {
             animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes slideInUp {
-            from { 
-                opacity: 0; 
+            from {
+                opacity: 0;
                 transform: translateY(20px);
             }
-            to { 
-                opacity: 1; 
+            to {
+                opacity: 1;
                 transform: translateY(0);
             }
         }
@@ -583,396 +802,329 @@
             }
         }
 
-        .probability-result {
-            background: linear-gradient(135deg, rgba(255,192,192,0.2) 0%, rgba(255,160,160,0.2) 100%);
-            border: 2px solid rgba(255,192,192,0.6);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: rgb(255,192,192);
-            text-align: center;
-            min-width: 120px;
+        /* Tab switching animations */
+        .tab-content {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
         }
 
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
+        .tab-content.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+            animation: tabSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes tabSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(30px) scale(0.95);
             }
-            
-            .control-panel-wrapper,
-            .visualization-panel-wrapper {
-                gap: 10px;
+            50% {
+                opacity: 0.7;
+                transform: translateX(10px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
             }
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+        .tab {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab:hover {
+            transform: translateY(-1px);
+        }
+
+        .tab.active {
+            transform: translateY(0);
+        }
+
+        /* Reset animation effects */
+        .resetting {
+            animation: resetPulse 0.8s ease-in-out;
+        }
+
+        @keyframes resetPulse {
+            0% {
+                transform: scale(1);
+                background: rgba(255,255,255,0.08);
             }
-            
-            .embedded-stats-grid {
-                gap: 6px;
+            25% {
+                transform: scale(1.05);
+                background: rgba(39, 174, 96, 0.2);
             }
-            
-            .embedded-stat-item {
-                min-width: 60px;
-                padding: 5px 8px;
+            50% {
+                transform: scale(1.02);
+                background: rgba(39, 174, 96, 0.15);
             }
-            
-            .tabs-and-controls {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
+            75% {
+                transform: scale(1.01);
+                background: rgba(39, 174, 96, 0.1);
             }
-            
-            .control-sliders {
-                flex-direction: column;
-                gap: 12px;
-                padding: 10px;
-                min-width: auto;
+            100% {
+                transform: scale(1);
+                background: rgba(255,255,255,0.08);
             }
-            
-            .slider-group {
-                flex-direction: column;
-                gap: 6px;
-                align-items: stretch;
-            }
-            
-            .slider-label {
-                min-width: auto;
-                font-size: 0.75rem;
-            }
-            
-            .slider-input {
-                width: 100%;
-            }
+        }
+
+        .btn-success {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-success::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-success:hover::before {
+            left: 100%;
+        }
+
+        /* Loading pulse effect for calculations */
+        .calculating {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>
-                <i class="fas fa-chart-line"></i>
-               T-Distribution Calculator
-            </h1>
-            <button class="btn btn-success" onclick="reloadCalculator()">
-                <i class="fas fa-redo"></i>
-                Reset Calculator
-            </button>
-        </div>
-
-        <div class="main-content">
-            <div class="control-panel-wrapper">
-                <h3 class="panel-title">
-                    <i class="fas fa-edit"></i>
-                    Input Panel 
-                </h3>
-                <div class="control-panel">
-                    <div class="input-group">
-                        <label>
-                            Degrees of Freedom (ν)
-                            <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Shape parameter of the distribution (must be positive)</small>
-                        </label>
-                        <input class="input-field" id="dof" min="1" step="1" type="number" value="10" placeholder="e.g., 1, 5, 10, 30"/>
-                    </div>
-
-                    <div class="calculation-type">
-                        <h4 style="margin-bottom: 15px; color: var(--header-color);">
-                            Calculation Type
-                        </h4>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input checked="" name="calcType" type="radio" value="probability"/>
-                                <div>
-                                    <strong>Find Probability P(X ≤ x)</strong>
-                                    <small style="color: #bbb; display: block; margin-top: 2px;">What's the chance of getting a value ≤ x?</small>
-                                </div>
-                            </label>
-                            <label class="radio-option">
-                                <input name="calcType" type="radio" value="between"/>
-                                <div>
-                                    <strong>Find P(a ≤ X ≤ b)</strong>
-                                    <small style="color: #bbb; display: block; margin-top: 2px;">What's the chance of getting a value between a and b?</small>
-                                </div>
-                            </label>
-                            <label class="radio-option">
-                                <input name="calcType" type="radio" value="quantile"/>
-                                <div>
-                                    <strong>Find Value for Given Probability</strong>
-                                    <small style="color: #bbb; display: block; margin-top: 2px;">What value has this probability below it?</small>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="inputSection">
-                        <div class="input-group">
-                            <label>X Value</label>
-                            <input class="input-field" id="xValue" step="0.1" type="number" value="0"/>
-                        </div>
-                    </div>
-
-                    <div style="text-align: center; padding: 10px; background: rgba(52, 152, 219, 0.1); border-radius: 6px; border: 1px solid rgba(52, 152, 219, 0.3); margin-top: 10px;">
+<body style="margin: 0; overflow: hidden;">
+    <div style="width: 100vw; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+        <div id="mainContentWrapper" style="width: 90%; max-width: 1200px; height: auto;">
+            <div class="container">
+                <div class="header">
+                    <h1>
+                        <i class="fas fa-chart-area"></i>
+                        t-Distribution Calculator
+                    </h1>
+                    <div style="text-align: center; padding: 10px; background: rgba(52, 152, 219, 0.1); border-radius: 6px; border: 0px solid rgba(52, 152, 219, 0.3); margin-top: 15px;">
                         <i class="fas fa-bolt" style="color: #3498db; margin-right: 8px;"></i>
                         <span style="color: #3498db; font-weight: 600; font-size: 0.9rem;">Results update instantly as you type!</span>
                     </div>
                 </div>
-            </div>
-
-            <div class="visualization-panel-wrapper">
-                <h3 class="panel-title">
-                    <i class="fas fa-chart-area"></i>
-                    Results Panel - Visualizations & Statistics
-                </h3>
-                <div class="visualization-panel">
-                    <div class="tabs-and-controls">
-                        <div class="tabs">
-                            <div class="tab active" onclick="switchTab('pdf', this)">PDF View</div>
-                            <div class="tab" onclick="switchTab('cdf', this)">CDF View</div>
-                            <div class="tab" onclick="switchTab('both', this)">Combined View</div>
+                <div class="main-content">
+                    <div class="control-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 class="panel-title" style="margin-bottom: 0;">
+                                <i class="fas fa-edit"></i>
+                                Input Panel
+                            </h3>
+                            <button class="btn btn-success" onclick="reloadCalculator()" style="padding: 8px 12px; font-size: 0.85rem;">
+                                <i class="fas fa-redo"></i>
+                                Reset
+                            </button>
                         </div>
-
-                        <div class="control-sliders">
-                            <div class="slider-group">
-                                <label class="slider-label">
-                                    Precision
-                                    <span class="slider-value" id="precisionValue">4</span>
+                        <div class="input-group">
+                            <label>
+                                Degrees of Freedom (ν)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Must be a positive number</small>
+                            </label>
+                            <div class="input-row">
+                                <input class="input-field" id="degreesOfFreedom" min="0.1" step="0.1" type="number" value="10" placeholder="e.g., 1, 5, 10, 30"/>
+                            </div>
+                        </div>
+                        <div class="calculation-type">
+                            <h4 style="margin-bottom: 15px; color: var(--header-color);">
+                                Calculation Type
+                            </h4>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input checked="" name="calcType" type="radio" value="probability"/>
+                                    <div>
+                                        <strong>Find Probability P(T ≤ t)</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">What's the chance of getting a value ≤ t?</small>
+                                    </div>
                                 </label>
-                                <input type="range" class="slider-input" id="precision" min="2" max="6" step="1" value="4"/>
-                            </div>
-                            <div class="slider-group">
-                                <label class="slider-label">
-                                    Range (σ)
-                                    <span class="slider-value" id="chartRangeValue">4.0</span>
+                                <label class="radio-option">
+                                    <input name="calcType" type="radio" value="between"/>
+                                    <div>
+                                        <strong>Find P(a ≤ T ≤ b)</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">What's the chance of getting a value between a and b?</small>
+                                    </div>
                                 </label>
-                                <input type="range" class="slider-input" id="chartRange" min="2" max="6" step="0.5" value="4"/>
+                                <label class="radio-option">
+                                    <input name="calcType" type="radio" value="quantile"/>
+                                    <div>
+                                        <strong>Find Value for Given Probability</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">What value has this probability below it?</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="inputSection">
+                            <div class="input-group">
+                                <label>
+                                    t Value
+                                </label>
+                                <input class="input-field" id="tValue" step="0.1" type="number" value="0"/>
                             </div>
                         </div>
                     </div>
-
-                    <div class="tab-content active" id="pdfTab">
-                        <div class="chart-container">
-                            <div id="pdfChart"></div>
+                    <div class="visualization-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-chart-area"></i>
+                            Results Panel - Visualizations & Statistics
+                        </h3>
+                        <!-- Combined Tabs and Chart Options Row -->
+                        <div class="tabs-and-options-row">
+                            <!-- Tabs on the Left -->
+                            <div class="tabs">
+                                <div class="tab active" onclick="switchTab('pdf', this)">
+                                    PDF View
+                                </div>
+                                <div class="tab" onclick="switchTab('cdf', this)">
+                                    CDF View
+                                </div>
+                                <div class="tab" onclick="switchTab('both', this)">
+                                    Combined View
+                                </div>
+                            </div>
+                            
+                            <!-- Chart Options on the Right -->
+                            <div class="chart-options-toolbar">
+                                <div class="chart-option">
+                                    <label for="precision" class="option-label">
+                                        <i class="fas fa-decimal"></i>
+                                        Precision
+                                    </label>
+                                    <select class="mini-dropdown" id="precision">
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option selected value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                </div>
+                                <div class="chart-option">
+                                    <label for="chartRange" class="option-label">
+                                        <i class="fas fa-expand-arrows-alt"></i>
+                                        Range
+                                    </label>
+                                    <select class="mini-dropdown" id="chartRange">
+                                        <option value="2">2x</option>
+                                        <option value="3">3x</option>
+                                        <option selected value="4">4x</option>
+                                        <option value="5">5x</option>
+                                        <option value="6">6x</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="tab-content" id="cdfTab">
-                        <div class="chart-container">
-                            <div id="cdfChart"></div>
+                        <div class="tab-content active" id="pdfTab">
+                            <div class="chart-container">
+                                <div id="pdfChart"></div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="tab-content" id="bothTab">
-                        <div class="chart-container">
-                            <div id="combinedChart"></div>
+                        <div class="tab-content" id="cdfTab">
+                            <div class="chart-container">
+                                <div id="cdfChart"></div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="probability-visualization">
-                        <h4 style="color: var(--header-color); margin-bottom: 10px;">
-                            <i class="fas fa-area-chart"></i>
-                            Shaded Area Representation
-                        </h4>
-                        <div class="shaded-area-info">
-                            <span id="areaDescription">Select calculation type to see shaded area</span>
-                            <span id="areaValue" style="font-weight: bold; color: var(--header-color);">--</span>
+                        <div class="tab-content" id="bothTab">
+                            <div class="chart-container">
+                                <div id="combinedChart"></div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="embedded-results-panel">
-                        <h4 class="embedded-panel-title">
-                            <i class="fas fa-chart-bar"></i>
-                            Results &amp; Statistics
-                        </h4>
-                        <div class="embedded-stats-grid">
-                            <div class="embedded-stat-item primary-result">
-                                <div class="embedded-stat-value" id="mainResult">--</div>
-                                <div class="embedded-stat-label">Result</div>
+                        <!-- Combined Results Row - Shaded Area + Statistics -->
+                        <div class="results-row">
+                            <div class="probability-visualization">
+                                <h4 style="color: var(--header-color); margin-bottom: 10px;">
+                                    <i class="fas fa-area-chart"></i>
+                                    Shaded Area Representation
+                                </h4>
+                                <div class="shaded-area-info">
+                                    <span id="areaDescription">
+                                        Select calculation type to see shaded area
+                                    </span>
+                                    <span id="areaValue" style="font-weight: bold; color: var(--header-color);">
+                                        --
+                                    </span>
+                                </div>
                             </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="dofStat">10</div>
-                                <div class="embedded-stat-label">DOF (ν)</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="meanStat">0</div>
-                                <div class="embedded-stat-label">Mean (μ)</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="stddevStat">∞</div>
-                                <div class="embedded-stat-label">Std Dev (σ)</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="varianceStat">∞</div>
-                                <div class="embedded-stat-label">Variance (σ²)</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="medianStat">0</div>
-                                <div class="embedded-stat-label">Median</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="modeStat">0</div>
-                                <div class="embedded-stat-label">Mode</div>
-                            </div>
-                            <div class="embedded-stat-item">
-                                <div class="embedded-stat-value" id="skewnessStat">0</div>
-                                <div class="embedded-stat-label">Skewness</div>
+                            
+                            <!-- Embedded Results & Statistics Panel -->
+                            <div class="embedded-results-panel">
+                                <h4 class="embedded-panel-title">
+                                    <i class="fas fa-chart-bar"></i>
+                                    Results &amp; Statistics
+                                </h4>
+                                <div class="embedded-stats-grid">
+                                    <div class="embedded-stat-item primary-result">
+                                        <div class="embedded-stat-value" id="mainResult">
+                                            --
+                                        </div>
+                                        <div class="embedded-stat-label">
+                                            Result
+                                        </div>
+                                    </div>
+                                    <div class="embedded-stat-item">
+                                        <div class="embedded-stat-value" id="dfStat">
+                                            10
+                                        </div>
+                                        <div class="embedded-stat-label">
+                                            DoF (ν)
+                                        </div>
+                                    </div>
+                                    <div class="embedded-stat-item">
+                                        <div class="embedded-stat-value" id="meanStat">
+                                            0
+                                        </div>
+                                        <div class="embedded-stat-label">
+                                            Mean
+                                        </div>
+                                    </div>
+                                    <div class="embedded-stat-item">
+                                        <div class="embedded-stat-value" id="varianceStat">
+                                            1.25
+                                        </div>
+                                        <div class="embedded-stat-label">
+                                            Variance
+                                        </div>
+                                    </div>
+                                    <div class="embedded-stat-item">
+                                        <div class="embedded-stat-value" id="stddevStat">
+                                            1.12
+                                        </div>
+                                        <div class="embedded-stat-label">
+                                            Std Dev
+                                        </div>
+                                    </div>
+                                    <div class="embedded-stat-item">
+                                        <div class="embedded-stat-value" id="skewnessStat">
+                                            0
+                                        </div>
+                                        <div class="embedded-stat-label">
+                                            Skewness
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-                
-
-             
-
-            
-            </div>
         </div>
-   
-
+    </div>
     <script>
-        function updateChartIndicators(xMarkers, calcType) {
-            // Remove existing indicators
-            document.querySelectorAll('.chart-indicator').forEach(el => el.remove());
-            
-            // Create visual indicators below charts
-            const chartContainers = document.querySelectorAll('.chart-container');
-            chartContainers.forEach(container => {
-                const indicator = document.createElement('div');
-                indicator.className = 'chart-indicator';
-                indicator.style.cssText = `
-                    margin-top: 15px;
-                    padding: 15px;
-                    background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(20,20,30,0.4) 100%);
-                    border-radius: 8px;
-                    display: flex;
-                    gap: 20px;
-                    flex-wrap: wrap;
-                    justify-content: center;
-                    align-items: center;
-                    font-size: 14px;
-                    border: 1px solid rgba(255,255,255,0.1);
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                `;
-                
-                // Add X value markers
-                xMarkers.forEach((marker, index) => {
-                    const markerEl = document.createElement('div');
-                    markerEl.className = 'x-marker';
-                    markerEl.style.cssText = `
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                        padding: 8px 15px;
-                        background: linear-gradient(135deg, ${marker.color}30 0%, ${marker.color}20 100%);
-                        border: 2px solid ${marker.color};
-                        border-radius: 6px;
-                        color: white;
-                        font-weight: bold;
-                        box-shadow: 0 2px 8px ${marker.color}40;
-                        transition: all 0.3s ease;
-                    `;
-                    
-                    // Add vertical line indicator
-                    const lineEl = document.createElement('div');
-                    lineEl.style.cssText = `
-                        width: 4px;
-                        height: 20px;
-                        background: linear-gradient(to bottom, ${marker.color} 0%, ${marker.color}80 100%);
-                        border-radius: 2px;
-                        box-shadow: 0 0 4px ${marker.color}60;
-                    `;
-                    
-                    // Add label
-                    const labelEl = document.createElement('span');
-                    labelEl.textContent = marker.label;
-                    labelEl.style.fontSize = '13px';
-                    
-                    markerEl.appendChild(lineEl);
-                    markerEl.appendChild(labelEl);
-                    
-                    // Add hover effect
-                    markerEl.addEventListener('mouseenter', function() {
-                        this.style.transform = 'translateY(-2px)';
-                        this.style.boxShadow = `0 4px 16px ${marker.color}60`;
-                    });
-                    
-                    markerEl.addEventListener('mouseleave', function() {
-                        this.style.transform = 'translateY(0)';
-                        this.style.boxShadow = `0 2px 8px ${marker.color}40`;
-                    });
-                    
-                    indicator.appendChild(markerEl);
-                });
-                
-                // Add separator if we have both markers and result
-                if (xMarkers.length > 0 && calcType !== 'quantile') {
-                    const separator = document.createElement('div');
-                    separator.style.cssText = `
-                        width: 2px;
-                        height: 30px;
-                        background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-                        border-radius: 1px;
-                    `;
-                    indicator.appendChild(separator);
-                }
-                
-                // Add calculation result
-                if (calcType !== 'quantile') {
-                    const resultEl = document.createElement('div');
-                    resultEl.className = 'probability-result';
-                    resultEl.style.cssText = `
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        gap: 5px;
-                        padding: 12px 20px;
-                        background: linear-gradient(135deg, rgba(255,192,192,0.25) 0%, rgba(255,160,160,0.15) 100%);
-                        border: 2px solid rgba(255,192,192,0.7);
-                        border-radius: 8px;
-                        color: rgb(255,192,192);
-                        font-weight: bold;
-                        text-align: center;
-                        min-width: 140px;
-                        box-shadow: 0 4px 12px rgba(255,192,192,0.3);
-                    `;
-                    
-                    const mainResult = document.getElementById('mainResult').textContent;
-                    if (!isNaN(parseFloat(mainResult))) {
-                        const percentage = parseFloat(mainResult) * 100;
-                        
-                        const probabilityLabel = document.createElement('div');
-                        probabilityLabel.textContent = 'Probability';
-                        probabilityLabel.style.cssText = 'font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px;';
-                        
-                        const probabilityValue = document.createElement('div');
-                        probabilityValue.textContent = `${percentage.toFixed(2)}%`;
-                        probabilityValue.style.cssText = 'font-size: 16px; font-weight: bold;';
-                        
-                        const decimalValue = document.createElement('div');
-                        decimalValue.textContent = `(${parseFloat(mainResult).toFixed(4)})`;
-                        decimalValue.style.cssText = 'font-size: 10px; opacity: 0.7;';
-                        
-                        resultEl.appendChild(probabilityLabel);
-                        resultEl.appendChild(probabilityValue);
-                        resultEl.appendChild(decimalValue);
-                    } else {
-                        resultEl.textContent = mainResult;
-                    }
-                    
-                    indicator.appendChild(resultEl);
-                }
-                
-                container.appendChild(indicator);
-            });
-        }
-
         let pdfChart, cdfChart, combinedChart;
         let currentCalcType = 'probability';
-        
+
         // Store chart data for animations
         let chartDataStore = {
             pdfData: [],
@@ -980,8 +1132,12 @@
             shadedPdfData: []
         };
 
+        // Track if this is initial load to prevent double animation
+        let isInitialLoad = true;
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            // Wait for Highcharts to load
             if (typeof Highcharts === 'undefined') {
                 setTimeout(() => {
                     initializeApp();
@@ -998,28 +1154,25 @@
                 updateRadioSelection();
                 updateStatistics();
                 calculate();
-                
-                // Remove the automatic animation trigger on load to prevent double rendering
-                // Charts will animate when user switches tabs
-                
-                document.getElementById('dof').addEventListener('input', debounce(calculateWithFeedback, 250));
-                document.getElementById('chartRange').addEventListener('input', function() {
-                    updateSliderValue('chartRange', 'chartRangeValue', '');
-                    debounce(calculateWithFeedback, 250)();
-                });
-                document.getElementById('precision').addEventListener('input', function() {
-                    updateSliderValue('precision', 'precisionValue', '');
-                    debounce(calculateWithFeedback, 100)();
-                });
-                
-                // Initialize slider values and add listeners
-                initializeSliders();
-                
-                const initialXValue = document.getElementById('xValue');
-                if (initialXValue) {
-                    initialXValue.addEventListener('input', debounce(calculateWithFeedback, 250));
+
+                // Trigger initial curve building animation for PDF view (active by default)
+                setTimeout(() => {
+                    if (pdfChart && chartDataStore.pdfData.length > 0) {
+                        triggerChartAnimations('pdf');
+                    }
+                }, 800); // Delay to ensure all data is ready
+
+                // Add event listeners with visual feedback
+                document.getElementById('degreesOfFreedom').addEventListener('input', debounce(calculateWithFeedback, 250));
+                document.getElementById('chartRange').addEventListener('change', debounce(calculateWithFeedback, 250));
+                document.getElementById('precision').addEventListener('change', debounce(calculateWithFeedback, 250));
+
+                // Add event listener to initial t value input
+                const initialTValue = document.getElementById('tValue');
+                if (initialTValue) {
+                    initialTValue.addEventListener('input', debounce(calculateWithFeedback, 250));
                 }
-                
+
                 document.querySelectorAll('input[name="calcType"]').forEach(radio => {
                     radio.addEventListener('change', function() {
                         currentCalcType = this.value;
@@ -1028,9 +1181,26 @@
                         calculateWithFeedback();
                     });
                 });
-                
+
+                // Add keyboard shortcuts
+                document.addEventListener('keydown', function(e) {
+                    // Ctrl+R or Cmd+R for reload (prevent default browser reload)
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                        e.preventDefault();
+                        reloadCalculator();
+                    }
+                    // F5 for reload
+                    if (e.key === 'F5') {
+                        e.preventDefault();
+                        reloadCalculator();
+                    }
+                });
+
             } catch (error) {
                 console.error('Initialization error:', error);
+                // Fallback: show error message
+                const mainResultEl = document.getElementById('mainResult');
+                if (mainResultEl) mainResultEl.textContent = 'Loading...';
             }
         }
 
@@ -1046,29 +1216,6 @@
             };
         }
 
-        function initializeSliders() {
-            // Initialize precision slider
-            updateSliderValue('precision', 'precisionValue', '');
-            // Initialize chart range slider  
-            updateSliderValue('chartRange', 'chartRangeValue', '');
-        }
-
-        function updateSliderValue(sliderId, valueId, suffix) {
-            const slider = document.getElementById(sliderId);
-            const valueDisplay = document.getElementById(valueId);
-            
-            if (slider && valueDisplay) {
-                let value = parseFloat(slider.value);
-                
-                // Format based on slider type
-                if (sliderId === 'precision') {
-                    valueDisplay.textContent = Math.round(value);
-                } else if (sliderId === 'chartRange') {
-                    valueDisplay.textContent = value.toFixed(1);
-                }
-            }
-        }
-
         function updateRadioSelection() {
             document.querySelectorAll('.radio-option').forEach(option => {
                 option.classList.remove('selected');
@@ -1079,17 +1226,17 @@
         function updateInputSection() {
             const inputSection = document.getElementById('inputSection');
             const calcType = document.querySelector('input[name="calcType"]:checked').value;
-            
+
             let html = '';
-            
+
             switch(calcType) {
                 case 'probability':
                     html = `
                         <div class="input-group">
-                            <label>T Value
+                            <label>t Value
                                 <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Find probability up to this value</small>
                             </label>
-                            <input type="number" id="xValue" class="input-field" value="0" step="0.1" placeholder="e.g., 1.5, -2, 0">
+                            <input type="number" id="tValue" class="input-field" value="0" step="0.1" placeholder="e.g., 0, 1.5, -2">
                         </div>
                     `;
                     break;
@@ -1099,13 +1246,13 @@
                             <label>Lower Bound (a)
                                 <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Start of the range</small>
                             </label>
-                            <input type="number" id="lowerBound" class="input-field" value="-1" step="0.1" placeholder="e.g., -2, 0, 1.5">
+                            <input type="number" id="lowerBound" class="input-field" value="-1" step="0.1" placeholder="e.g., -2, 0, 1">
                         </div>
                         <div class="input-group">
                             <label>Upper Bound (b)
                                 <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">End of the range</small>
                             </label>
-                            <input type="number" id="upperBound" class="input-field" value="1" step="0.1" placeholder="e.g., 2, 3.5, 10">
+                            <input type="number" id="upperBound" class="input-field" value="1" step="0.1" placeholder="e.g., 1, 2, 3">
                         </div>
                     `;
                     break;
@@ -1120,9 +1267,10 @@
                     `;
                     break;
             }
-            
+
             inputSection.innerHTML = html;
-            
+
+            // Add event listeners to new inputs
             inputSection.querySelectorAll('input').forEach(input => {
                 input.addEventListener('input', debounce(calculateWithFeedback, 250));
             });
@@ -1135,6 +1283,7 @@
                     return;
                 }
 
+                // Set dark theme for all charts
                 Highcharts.setOptions({
                     chart: {
                         backgroundColor: 'transparent',
@@ -1142,7 +1291,7 @@
                             fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                         }
                     },
-                    colors: ['#3498db', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
+                    colors: ['#27ae60', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
                     title: {
                         style: {
                             color: 'white'
@@ -1201,7 +1350,10 @@
                 pdfChart = Highcharts.chart('pdfChart', {
                     chart: {
                         type: 'line',
-                        animation: false
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
                     },
                     title: {
                         text: null
@@ -1220,14 +1372,14 @@
                     series: [{
                         name: 'Probability Density',
                         data: [],
-                        color: '#3498db',
+                        color: '#27ae60',
                         lineWidth: 3,
                         shadow: true
                     }, {
                         name: 'Shaded Area',
                         data: [],
                         type: 'area',
-                        color: 'rgba(255, 192, 192, 0.4)',
+                        color: 'rgba(120, 255, 165, 0.4)',
                         lineWidth: 2,
                         fillOpacity: 0.3
                     }],
@@ -1236,17 +1388,6 @@
                         backgroundColor: 'rgba(0,0,0,0.8)',
                         style: {
                             color: 'white'
-                        },
-                        formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
-                            let tooltip = '<b>T = ' + this.x.toFixed(precision) + '</b><br/>';
-                            
-                            this.points.forEach(function(point) {
-                                tooltip += '<span style="color:' + point.color + '">\u25CF</span> ' + 
-                                          point.series.name + ': <b>' + point.y.toFixed(precision) + '</b><br/>';
-                            });
-                            
-                            return tooltip;
                         }
                     },
                     credits: {
@@ -1261,7 +1402,10 @@
                 cdfChart = Highcharts.chart('cdfChart', {
                     chart: {
                         type: 'line',
-                        animation: false
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
                     },
                     title: {
                         text: null
@@ -1281,26 +1425,14 @@
                     series: [{
                         name: 'Cumulative Probability',
                         data: [],
-                        color: '#27ae60',
+                        color: '#3498db',
                         lineWidth: 3,
                         shadow: true
                     }],
                     tooltip: {
-                        shared: true,
                         backgroundColor: 'rgba(0,0,0,0.8)',
                         style: {
                             color: 'white'
-                        },
-                        formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
-                            let tooltip = '<b>T = ' + this.x.toFixed(precision) + '</b><br/>';
-                            
-                            this.points.forEach(function(point) {
-                                tooltip += '<span style="color:' + point.color + '">\u25CF</span> ' + 
-                                          point.series.name + ': <b>' + point.y.toFixed(precision) + '</b><br/>';
-                            });
-                            
-                            return tooltip;
                         }
                     },
                     credits: {
@@ -1315,7 +1447,10 @@
                 combinedChart = Highcharts.chart('combinedChart', {
                     chart: {
                         type: 'line',
-                        animation: false
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
                     },
                     title: {
                         text: null
@@ -1329,20 +1464,20 @@
                         title: {
                             text: 'PDF',
                             style: {
-                                color: '#3498db'
+                                color: '#27ae60'
                             }
                         },
                         min: 0,
                         labels: {
                             style: {
-                                color: '#3498db'
+                                color: '#27ae60'
                             }
                         }
                     }, {
                         title: {
                             text: 'CDF',
                             style: {
-                                color: '#27ae60'
+                                color: '#3498db'
                             }
                         },
                         min: 0,
@@ -1350,49 +1485,30 @@
                         opposite: true,
                         labels: {
                             style: {
-                                color: '#27ae60'
+                                color: '#3498db'
                             }
                         }
                     }],
                     series: [{
                         name: 'PDF',
                         data: [],
-                        color: '#3498db',
+                        color: '#27ae60',
                         lineWidth: 3,
                         shadow: true,
                         yAxis: 0
                     }, {
                         name: 'CDF',
                         data: [],
-                        color: '#27ae60',
+                        color: '#3498db',
                         lineWidth: 3,
                         shadow: true,
                         yAxis: 1
-                    }, {
-                        name: 'PDF Shaded Area',
-                        data: [],
-                        type: 'area',
-                        color: 'rgba(255, 192, 192, 0.4)',
-                        lineWidth: 2,
-                        fillOpacity: 0.3,
-                        yAxis: 0
                     }],
                     tooltip: {
                         shared: true,
                         backgroundColor: 'rgba(0,0,0,0.8)',
                         style: {
                             color: 'white'
-                        },
-                        formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
-                            let tooltip = '<b>T = ' + this.x.toFixed(precision) + '</b><br/>';
-                            
-                            this.points.forEach(function(point) {
-                                tooltip += '<span style="color:' + point.color + '">\u25CF</span> ' + 
-                                          point.series.name + ': <b>' + point.y.toFixed(precision) + '</b><br/>';
-                            });
-                            
-                            return tooltip;
                         }
                     },
                     credits: {
@@ -1408,185 +1524,88 @@
             }
         }
 
-        function tPDF(x, dof) {
-            // Simplified t-distribution PDF using log-gamma for numerical stability
-            const logGammaRatio = logGamma((dof + 1) / 2) - logGamma(dof / 2);
-            const logDenominator = 0.5 * Math.log(dof * Math.PI);
-            const logPowerTerm = -(dof + 1) / 2 * Math.log(1 + (x * x) / dof);
-            return Math.exp(logGammaRatio - logDenominator + logPowerTerm);
+        // t-distribution functions using jStat library
+        function tPDF(x, df) {
+            if (typeof jStat === 'undefined') {
+                console.error('jStat library not loaded');
+                return NaN;
+            }
+            return jStat.studentt.pdf(x, df);
         }
 
-        function tCDF(x, dof) {
-            // Using the incomplete beta function approach
-            const a = 0.5 * dof;
-            const b = 0.5;
-            const z = dof / (dof + x * x);
-            
-            if (x >= 0) {
-                return 0.5 + 0.5 * (1 - incompleteBeta(a, b, z));
-            } else {
-                return 0.5 * incompleteBeta(a, b, z);
+        function tCDF(x, df) {
+            if (typeof jStat === 'undefined') {
+                console.error('jStat library not loaded');
+                return NaN;
             }
+            return jStat.studentt.cdf(x, df);
         }
 
-        function gamma(z) {
-            // Stirling's approximation for gamma function
-            if (z === 0.5) return Math.sqrt(Math.PI);
-            if (z === 1) return 1;
-            if (z === 1.5) return Math.sqrt(Math.PI) / 2;
-            if (z === 2) return 1;
-            if (z === 2.5) return (3 * Math.sqrt(Math.PI)) / 4;
-            if (z === 3) return 2;
-            
-            // For other values, use Stirling's approximation
-            if (z > 1) {
-                return Math.sqrt(2 * Math.PI / z) * Math.pow(z / Math.E, z);
-            } else {
-                // Use the recurrence relation Γ(z) = Γ(z+1) / z
-                return gamma(z + 1) / z;
+        function tQuantile(p, df) {
+            if (typeof jStat === 'undefined') {
+                console.error('jStat library not loaded');
+                return NaN;
             }
-        }
-
-        function incompleteBeta(a, b, x) {
-            // Simplified incomplete beta function using continued fraction
-            if (x <= 0) return 0;
-            if (x >= 1) return 1;
-            
-            const bt = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + 
-                               a * Math.log(x) + b * Math.log(1 - x));
-            
-            if (x < (a + 1) / (a + b + 2)) {
-                return bt * betacf(a, b, x) / a;
-            } else {
-                return 1 - bt * betacf(b, a, 1 - x) / b;
-            }
-        }
-
-        function logGamma(z) {
-            // Lanczos approximation for log gamma function
-            const g = 7;
-            const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-                      771.32342877765313, -176.61502916214059, 12.507343278686905,
-                      -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-            
-            if (z < 0.5) {
-                return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
-            }
-            
-            z -= 1;
-            let x = c[0];
-            for (let i = 1; i < g + 2; i++) {
-                x += c[i] / (z + i);
-            }
-            const t = z + g + 0.5;
-            return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
-        }
-
-        function betacf(a, b, x) {
-            // Continued fraction for incomplete beta function
-            const qab = a + b;
-            const qap = a + 1;
-            const qam = a - 1;
-            let c = 1;
-            let d = 1 - qab * x / qap;
-            
-            if (Math.abs(d) < 1e-30) d = 1e-30;
-            d = 1 / d;
-            let h = d;
-            
-            for (let m = 1; m <= 100; m++) {
-                const m2 = 2 * m;
-                let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
-                d = 1 + aa * d;
-                if (Math.abs(d) < 1e-30) d = 1e-30;
-                c = 1 + aa / c;
-                if (Math.abs(c) < 1e-30) c = 1e-30;
-                d = 1 / d;
-                h *= d * c;
-                
-                aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
-                d = 1 + aa * d;
-                if (Math.abs(d) < 1e-30) d = 1e-30;
-                c = 1 + aa / c;
-                if (Math.abs(c) < 1e-30) c = 1e-30;
-                d = 1 / d;
-                const del = d * c;
-                h *= del;
-                
-                if (Math.abs(del - 1) < 1e-7) break;
-            }
-            
-            return h;
-        }
-
-        function tQuantile(p, dof) {
-            if (p <= 0) return -Infinity;
-            if (p >= 1) return Infinity;
-            if (p === 0.5) return 0;
-            
-            // Use Newton-Raphson method to find the inverse
-            let x = 0; // Initial guess
-            let tolerance = 1e-10;
-            let maxIterations = 100;
-            
-            for (let i = 0; i < maxIterations; i++) {
-                const fx = tCDF(x, dof) - p;
-                const fpx = tPDF(x, dof);
-                
-                if (Math.abs(fx) < tolerance) {
-                    break;
-                }
-                
-                if (Math.abs(fpx) < 1e-15) {
-                    break;
-                }
-                
-                x = x - fx / fpx;
-            }
-            
-            return x;
+            return jStat.studentt.inv(p, df);
         }
 
         function calculateWithFeedback() {
+            // Add visual feedback to input fields (only visible ones)
             const inputFields = document.querySelectorAll('.input-field:not([style*="display: none"])');
             inputFields.forEach(field => {
                 field.classList.add('updating');
                 setTimeout(() => field.classList.remove('updating'), 600);
             });
-            
+
+            // Call main calculate function
             calculate();
         }
 
         function calculate() {
             try {
-                const dof = parseFloat(document.getElementById('dof').value) || 10;
+                const df = parseFloat(document.getElementById('degreesOfFreedom')?.value) || 10;
                 const precision = parseInt(document.getElementById('precision')?.value) || 4;
                 const calcType = document.querySelector('input[name="calcType"]:checked').value;
-                
-                if (dof <= 0) {
+
+                if (df <= 0) {
                     const mainResultEl = document.getElementById('mainResult');
                     if (mainResultEl) mainResultEl.textContent = 'Error: Degrees of freedom must be positive';
                     return;
                 }
-                
+
                 let result, areaDescription;
-                
+
                 switch(calcType) {
                     case 'probability':
-                        const xValue = parseFloat(document.getElementById('xValue')?.value) || 0;
-                        result = tCDF(xValue, dof);
-                        areaDescription = `P(T ≤ ${xValue})`;
+                        const tValue = parseFloat(document.getElementById('tValue')?.value) || 0;
+                        result = tCDF(tValue, df);
+                        // Validate probability result
+                        if (!isFinite(result) || result < 0 || result > 1) {
+                            console.warn('Invalid probability result:', result, 'for t =', tValue, 'df =', df);
+                            result = Math.min(1.0, Math.max(0.0, result || 0));
+                        }
+                        areaDescription = `P(T ≤ ${tValue})`;
                         break;
-                        
+
                     case 'between':
                         const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || -1;
                         const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 1;
-                        const lowerProb = tCDF(lowerBound, dof);
-                        const upperProb = tCDF(upperBound, dof);
+                        if (lowerBound >= upperBound) {
+                            const mainResultEl = document.getElementById('mainResult');
+                            if (mainResultEl) mainResultEl.textContent = 'Error: Lower bound must be less than upper bound';
+                            return;
+                        }
+                        const lowerProb = tCDF(lowerBound, df);
+                        const upperProb = tCDF(upperBound, df);
                         result = upperProb - lowerProb;
+                        // Validate probability result
+                        if (!isFinite(result) || result < 0 || result > 1) {
+                            console.warn('Invalid probability result:', result, 'for bounds [', lowerBound, ',', upperBound, '] df =', df);
+                            result = Math.min(1.0, Math.max(0.0, result || 0));
+                        }
                         areaDescription = `P(${lowerBound} ≤ T ≤ ${upperBound})`;
                         break;
-                        
+
                     case 'quantile':
                         const probability = parseFloat(document.getElementById('probability')?.value) || 0.5;
                         if (probability < 0 || probability > 1) {
@@ -1594,24 +1613,32 @@
                             if (mainResultEl) mainResultEl.textContent = 'Error: Probability must be between 0 and 1';
                             return;
                         }
-                        result = tQuantile(probability, dof);
-                        areaDescription = `T such that P(T ≤ t) = ${probability}`;
+                        result = tQuantile(probability, df);
+                        // Validate quantile result
+                        if (!isFinite(result)) {
+                            console.warn('Invalid quantile result:', result, 'for p =', probability, 'df =', df);
+                            result = 0;
+                        }
+                        areaDescription = `T such that P(T ≤ t = ${probability}) =`;
                         break;
                 }
-                
+
+                // Add updating visual feedback to area info
                 const areaInfoEl = document.querySelector('.shaded-area-info');
                 if (areaInfoEl) {
                     areaInfoEl.classList.add('updating');
                     setTimeout(() => areaInfoEl.classList.remove('updating'), 1000);
                 }
-                
+
+                // Update elements with animated transitions and staggered timing
                 const mainResultEl = document.getElementById('mainResult');
                 if (mainResultEl) {
                     animateNumber(mainResultEl, mainResultEl.textContent, result, 800);
                 }
-                
+
                 const areaDescEl = document.getElementById('areaDescription');
                 if (areaDescEl) {
+                    // Fade out, change text, fade in
                     areaDescEl.style.opacity = '0.5';
                     areaDescEl.style.transition = 'opacity 0.3s ease';
                     setTimeout(() => {
@@ -1619,24 +1646,45 @@
                         areaDescEl.style.opacity = '1';
                     }, 150);
                 }
-                
+
                 const areaValueEl = document.getElementById('areaValue');
                 if (areaValueEl) {
-                    const displayValue = calcType === 'quantile' ? result : (result * 100);
-                    const suffix = calcType === 'quantile' ? '' : '%';
-                    
-                    animateNumber(areaValueEl, parseFloat(areaValueEl.textContent) || 0, displayValue, 700, false);
-                    
-                    setTimeout(() => {
-                        if (areaValueEl.textContent && !areaValueEl.textContent.includes('%') && suffix) {
-                            areaValueEl.textContent += suffix;
-                        }
-                    }, 750);
+                    if (calcType === 'quantile') {
+                        // For quantile, format the t value properly
+                        const precision = parseInt(document.getElementById('precision')?.value) || 4;
+                        const formattedResult = result.toFixed(precision);
+                        
+                        // Animate the value with proper formatting
+                        animateNumber(areaValueEl, parseFloat(areaValueEl.textContent) || 0, result, 700, false);
+                        
+                        // Set the properly formatted text after animation
+                        setTimeout(() => {
+                            areaValueEl.textContent = formattedResult;
+                        }, 750);
+                    } else {
+                        // For probability calculations, show percentage
+                        const displayValue = result * 100;
+
+                        // Animate the percentage with enhanced feedback
+                        animateNumber(areaValueEl, parseFloat(areaValueEl.textContent) || 0, displayValue, 700, false);
+
+                        // Add suffix after animation
+                        setTimeout(() => {
+                            if (areaValueEl.textContent && !areaValueEl.textContent.includes('%')) {
+                                areaValueEl.textContent += '%';
+                            }
+                        }, 750);
+                    }
                 }
-                
+
                 updateStatistics();
                 updateCharts();
-                
+
+                // After first calculation, mark as no longer initial load
+                if (isInitialLoad) {
+                    isInitialLoad = false;
+                }
+
             } catch (error) {
                 console.error('Calculation error:', error);
                 const mainResultEl = document.getElementById('mainResult');
@@ -1644,37 +1692,43 @@
             }
         }
 
+        // Enhanced animated number counter function with visual feedback
         function animateNumber(element, startValue, endValue, duration = 800, showVisualFeedback = true) {
             if (!element) return;
-            
+
             const start = performance.now();
             const startNum = parseFloat(startValue) || 0;
             const endNum = parseFloat(endValue) || 0;
             const precision = parseInt(document.getElementById('precision')?.value) || 4;
-            
+
+            // Add visual feedback classes
             if (showVisualFeedback) {
+                element.classList.add('animating');
                 const parentItem = element.closest('.embedded-stat-item');
                 if (parentItem) {
                     parentItem.classList.add('updating');
                 }
             }
-            
+
             function updateValue(currentTime) {
                 const elapsed = currentTime - start;
                 const progress = Math.min(elapsed / duration, 1);
-                
+
+                // Use smoother easing function (ease-out-quart)
                 const easedProgress = 1 - Math.pow(1 - progress, 4);
-                
+
                 const currentValue = startNum + (endNum - startNum) * easedProgress;
                 element.textContent = currentValue.toFixed(precision);
-                
+
                 if (progress < 1) {
                     requestAnimationFrame(updateValue);
                 } else {
                     element.textContent = endNum.toFixed(precision);
-                    
+
+                    // Remove visual feedback classes
                     if (showVisualFeedback) {
                         setTimeout(() => {
+                            element.classList.remove('animating');
                             const parentItem = element.closest('.embedded-stat-item');
                             if (parentItem) {
                                 parentItem.classList.remove('updating');
@@ -1683,136 +1737,193 @@
                     }
                 }
             }
-            
+
+            requestAnimationFrame(updateValue);
+        }
+
+        // Number animation with format control (for integer vs decimal formatting)
+        function animateNumberWithFormat(element, startValue, endValue, duration = 800, isInteger = false) {
+            if (!element) return;
+
+            const start = performance.now();
+            const startNum = parseFloat(startValue) || 0;
+            const endNum = parseFloat(endValue) || 0;
+            const precision = isInteger ? 0 : (parseInt(document.getElementById('precision')?.value) || 4);
+
+            // Add visual feedback classes
+            element.classList.add('animating');
+            const parentItem = element.closest('.embedded-stat-item');
+            if (parentItem) {
+                parentItem.classList.add('updating');
+            }
+
+            function updateValue(currentTime) {
+                const elapsed = currentTime - start;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Use smoother easing function (ease-out-quart)
+                const easedProgress = 1 - Math.pow(1 - progress, 4);
+
+                const currentValue = startNum + (endNum - startNum) * easedProgress;
+                
+                if (isInteger) {
+                    element.textContent = Math.round(currentValue).toString();
+                } else {
+                    element.textContent = currentValue.toFixed(precision);
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateValue);
+                } else {
+                    if (isInteger) {
+                        element.textContent = Math.round(endNum).toString();
+                    } else {
+                        element.textContent = endNum.toFixed(precision);
+                    }
+
+                    // Remove visual feedback classes
+                    setTimeout(() => {
+                        element.classList.remove('animating');
+                        const parentItem = element.closest('.embedded-stat-item');
+                        if (parentItem) {
+                            parentItem.classList.remove('updating');
+                        }
+                    }, 200);
+                }
+            }
+
             requestAnimationFrame(updateValue);
         }
 
         function updateStatistics() {
-            const dof = parseFloat(document.getElementById('dof')?.value) || 10;
-            
-            // T-distribution statistics
-            const mean = 0; // T-distribution is centered at 0
-            const variance = dof > 2 ? dof / (dof - 2) : Infinity;
-            const stddev = dof > 2 ? Math.sqrt(variance) : Infinity;
-            const median = 0; // T-distribution is symmetric around 0
-            const mode = 0; // T-distribution is symmetric around 0
-            const skewness = dof > 3 ? 0 : undefined; // T-distribution is symmetric when it exists
-            
+            const df = parseFloat(document.getElementById('degreesOfFreedom')?.value) || 10;
+            const precision = parseInt(document.getElementById('precision')?.value) || 4;
+
+            // t-distribution statistics
+            const mean = (df > 1) ? 0 : NaN;
+            const variance = (df > 2) ? df / (df - 2) : (df > 1) ? Infinity : NaN;
+            const stddev = (df > 2) ? Math.sqrt(variance) : (df > 1) ? Infinity : NaN;
+            const skewness = (df > 3) ? 0 : NaN; // Always 0 for symmetric distribution when defined
+
+            // Get current values for animation start points
             const statsElements = [
-                { el: document.getElementById('dofStat'), value: dof, delay: 0 },
-                { el: document.getElementById('meanStat'), value: mean, delay: 100 },
-                { el: document.getElementById('stddevStat'), value: stddev, delay: 200 },
-                { el: document.getElementById('varianceStat'), value: variance, delay: 300 },
-                { el: document.getElementById('medianStat'), value: median, delay: 400 },
-                { el: document.getElementById('modeStat'), value: mode, delay: 500 },
-                { el: document.getElementById('skewnessStat'), value: skewness !== undefined ? skewness : 'N/A', delay: 600 }
+                { el: document.getElementById('dfStat'), value: df, delay: 0, isInteger: false },
+                { el: document.getElementById('meanStat'), value: isNaN(mean) ? 0 : mean, delay: 100, isInteger: true },
+                { el: document.getElementById('varianceStat'), value: isNaN(variance) || !isFinite(variance) ? 0 : variance, delay: 200, isInteger: false },
+                { el: document.getElementById('stddevStat'), value: isNaN(stddev) || !isFinite(stddev) ? 0 : stddev, delay: 300, isInteger: false },
+                { el: document.getElementById('skewnessStat'), value: isNaN(skewness) ? 0 : skewness, delay: 400, isInteger: true }
             ];
-            
-            statsElements.forEach(({ el, value, delay }) => {
+
+            // Animate the value changes with staggered timing
+            statsElements.forEach(({ el, value, delay, isInteger }) => {
                 if (el) {
                     setTimeout(() => {
-                        if (typeof value === 'string') {
-                            el.textContent = value;
-                        } else if (value === Infinity) {
-                            el.textContent = '∞';
-                        } else {
-                            animateNumber(el, el.textContent, value, 600);
-                        }
+                        animateNumberWithFormat(el, el.textContent, value, 600, isInteger);
                     }, delay);
                 }
             });
         }
 
         function updateCharts() {
-            const dof = parseFloat(document.getElementById('dof').value) || 10;
-            const range = parseFloat(document.getElementById('chartRange').value) || 4;
+            const df = parseFloat(document.getElementById('degreesOfFreedom')?.value) || 10;
+            const range = parseFloat(document.getElementById('chartRange')?.value) || 4;
             const calcType = document.querySelector('input[name="calcType"]:checked').value;
-            
+
+            // Generate data points for smooth curves
+            // For t-distribution, we use a range based on multiples of approximate standard deviation
             const points = 1000;
-            const minX = -range;
-            const maxX = range;
+            const approxStdDev = df > 2 ? Math.sqrt(df / (df - 2)) : 2; // fallback for low df
+            const minX = -range * approxStdDev;
+            const maxX = range * approxStdDev;
             const step = (maxX - minX) / points;
-            
+
             const pdfData = [];
             const cdfData = [];
             const shadedPdfData = [];
-            
-            // Get X values for marking with dashed lines
-            let xMarkers = [];
-                            switch(calcType) {
-                    case 'probability':
-                        const xValue = parseFloat(document.getElementById('xValue')?.value) || 0;
-                        xMarkers = [{ value: xValue, label: `T = ${xValue}`, color: '#ff6b6b' }];
-                        break;
-                    case 'between':
-                        const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || -1;
-                        const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 1;
-                        xMarkers = [
-                            { value: lowerBound, label: `a = ${lowerBound}`, color: '#4ecdc4' },
-                            { value: upperBound, label: `b = ${upperBound}`, color: '#45b7d1' }
-                        ];
-                        break;
-                                    case 'quantile':
-                        const probability = parseFloat(document.getElementById('probability')?.value) || 0.5;
-                        const quantileValue = tQuantile(probability, dof);
-                        xMarkers = [{ value: quantileValue, label: `T = ${quantileValue.toFixed(3)}`, color: '#96ceb4' }];
-                        break;
+
+            // Get t values for marking
+            let tMarkers = [];
+            switch(calcType) {
+                case 'probability':
+                    const tValue = parseFloat(document.getElementById('tValue')?.value) || 0;
+                    tMarkers = [{ value: tValue, label: `t = ${tValue}`, color: '#ff6b6b' }];
+                    break;
+                case 'between':
+                    const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || -1;
+                    const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 1;
+                    tMarkers = [
+                        { value: lowerBound, label: `a = ${lowerBound}`, color: '#4ecdc4' },
+                        { value: upperBound, label: `b = ${upperBound}`, color: '#45b7d1' }
+                    ];
+                    break;
+                case 'quantile':
+                    const probability = parseFloat(document.getElementById('probability')?.value) || 0.5;
+                    const quantileValue = tQuantile(probability, df);
+                    tMarkers = [{ value: quantileValue, label: `t = ${quantileValue.toFixed(3)}`, color: '#96ceb4' }];
+                    break;
             }
-            
+
+            // Generate smooth curve data
             for (let i = 0; i <= points; i++) {
-                const x = minX + i * step;
-                const pdfValue = tPDF(x, dof);
-                const cdfValue = tCDF(x, dof);
-                
-                pdfData.push([x, pdfValue]);
-                cdfData.push([x, cdfValue]);
-                
-                // Only PDF has shaded areas now
-                let inPdfShadedArea = false;
-                
+                const t = minX + i * step;
+                const pdfValue = tPDF(t, df);
+                const cdfValue = tCDF(t, df);
+
+                pdfData.push([t, pdfValue]);
+                cdfData.push([t, cdfValue]);
+
+                // Determine if this point should be in the shaded area
+                let inShadedArea = false;
+
                 switch(calcType) {
                     case 'probability':
-                        const xValue = parseFloat(document.getElementById('xValue')?.value) || 0;
-                        inPdfShadedArea = x <= xValue;
+                        const tValue = parseFloat(document.getElementById('tValue')?.value) || 0;
+                        inShadedArea = t <= tValue;
                         break;
                     case 'between':
                         const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || -1;
                         const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 1;
-                        inPdfShadedArea = x >= lowerBound && x <= upperBound;
+                        inShadedArea = t >= lowerBound && t <= upperBound;
                         break;
                     case 'quantile':
-                        inPdfShadedArea = false;
+                        // No shading for quantile calculations
+                        inShadedArea = false;
                         break;
                 }
-                
-                if (inPdfShadedArea) {
-                    shadedPdfData.push([x, pdfValue]);
+
+                if (inShadedArea) {
+                    shadedPdfData.push([t, pdfValue]);
                 }
             }
-            
+
+            // Store data globally for animations
             chartDataStore.pdfData = [...pdfData];
             chartDataStore.cdfData = [...cdfData];
             chartDataStore.shadedPdfData = [...shadedPdfData];
-            
-            // Update PDF chart with plot lines
+
+            // Update PDF chart
             if (pdfChart && pdfChart.series && pdfChart.series[0]) {
                 try {
                     pdfChart.series[0].setData(pdfData, false);
                     if (pdfChart.series[1]) {
                         pdfChart.series[1].setData(shadedPdfData, false);
                     }
+
+                    // Update X axis range
                     if (pdfChart.xAxis && pdfChart.xAxis[0]) {
                         pdfChart.xAxis[0].setExtremes(minX, maxX, false);
                     }
-                    
-                    // Add dashed plot lines for markers
-                    if (pdfChart.xAxis && pdfChart.xAxis[0]) {
-                        // Remove existing plot lines
+                } catch (error) {
+                    console.warn('Error updating PDF chart data:', error);
+                }
+
+                // Add plot lines for markers
+                try {
+                    if (pdfChart && pdfChart.xAxis && pdfChart.xAxis[0]) {
                         for (let i = 0; i < 5; i++) {
                             pdfChart.xAxis[0].removePlotLine(`marker-${i}`);
                         }
-                        // Add new plot lines
-                        xMarkers.forEach((marker, index) => {
+                        tMarkers.forEach((marker, index) => {
                             pdfChart.xAxis[0].addPlotLine({
                                 id: `marker-${index}`,
                                 value: marker.value,
@@ -1830,29 +1941,37 @@
                             });
                         });
                     }
-                    
+                } catch (error) {
+                    console.warn('Error updating PDF chart plot lines:', error);
+                }
+
+                try {
                     pdfChart.redraw();
                 } catch (error) {
-                    console.warn('Error updating PDF chart:', error);
+                    console.warn('Error redrawing PDF chart:', error);
                 }
             }
-            
-            // Update CDF chart with plot lines (no shading)
+
+            // Update CDF chart
             if (cdfChart && cdfChart.series && cdfChart.series[0]) {
                 try {
                     cdfChart.series[0].setData(cdfData, false);
+
+                    // Update X axis range
                     if (cdfChart.xAxis && cdfChart.xAxis[0]) {
                         cdfChart.xAxis[0].setExtremes(minX, maxX, false);
                     }
-                    
-                    // Add dashed plot lines for markers
-                    if (cdfChart.xAxis && cdfChart.xAxis[0]) {
-                        // Remove existing plot lines
+                } catch (error) {
+                    console.warn('Error updating CDF chart data:', error);
+                }
+
+                // Add plot lines for markers
+                try {
+                    if (cdfChart && cdfChart.xAxis && cdfChart.xAxis[0]) {
                         for (let i = 0; i < 5; i++) {
                             cdfChart.xAxis[0].removePlotLine(`marker-${i}`);
                         }
-                        // Add new plot lines
-                        xMarkers.forEach((marker, index) => {
+                        tMarkers.forEach((marker, index) => {
                             cdfChart.xAxis[0].addPlotLine({
                                 id: `marker-${index}`,
                                 value: marker.value,
@@ -1870,35 +1989,40 @@
                             });
                         });
                     }
-                    
+                } catch (error) {
+                    console.warn('Error updating CDF chart plot lines:', error);
+                }
+
+                try {
                     cdfChart.redraw();
                 } catch (error) {
-                    console.warn('Error updating CDF chart:', error);
+                    console.warn('Error redrawing CDF chart:', error);
                 }
             }
-            
-            // Update Combined chart with plot lines (only PDF shading)
+
+            // Update combined chart
             if (combinedChart && combinedChart.series && combinedChart.series[0]) {
                 try {
                     combinedChart.series[0].setData(pdfData, false);
                     if (combinedChart.series[1]) {
                         combinedChart.series[1].setData(cdfData, false);
                     }
-                    if (combinedChart.series[2]) {
-                        combinedChart.series[2].setData(shadedPdfData, false);
-                    }
+
+                    // Update X axis range
                     if (combinedChart.xAxis && combinedChart.xAxis[0]) {
                         combinedChart.xAxis[0].setExtremes(minX, maxX, false);
                     }
-                    
-                    // Add dashed plot lines for markers
-                    if (combinedChart.xAxis && combinedChart.xAxis[0]) {
-                        // Remove existing plot lines
+                } catch (error) {
+                    console.warn('Error updating Combined chart data:', error);
+                }
+
+                // Add plot lines for markers
+                try {
+                    if (combinedChart && combinedChart.xAxis && combinedChart.xAxis[0]) {
                         for (let i = 0; i < 5; i++) {
                             combinedChart.xAxis[0].removePlotLine(`marker-${i}`);
                         }
-                        // Add new plot lines
-                        xMarkers.forEach((marker, index) => {
+                        tMarkers.forEach((marker, index) => {
                             combinedChart.xAxis[0].addPlotLine({
                                 id: `marker-${index}`,
                                 value: marker.value,
@@ -1916,135 +2040,237 @@
                             });
                         });
                     }
-                    
+                } catch (error) {
+                    console.warn('Error updating Combined chart plot lines:', error);
+                }
+
+                try {
                     combinedChart.redraw();
                 } catch (error) {
-                    console.warn('Error updating Combined chart:', error);
+                    console.warn('Error redrawing Combined chart:', error);
                 }
             }
-            
-            // Add visual indicators below charts
-            updateChartIndicators(xMarkers, calcType);
+
+            // Add visual indicators to chart container
+            updateChartIndicators(tMarkers, calcType);
+        }
+
+        function updateChartIndicators(tMarkers, calcType) {
+            // Remove existing indicators
+            document.querySelectorAll('.chart-indicator').forEach(el => el.remove());
+
+            // Create visual indicators below charts
+            const chartContainers = document.querySelectorAll('.chart-container');
+            chartContainers.forEach(container => {
+                const indicator = document.createElement('div');
+                indicator.className = 'chart-indicator';
+                indicator.style.cssText = `
+                    margin-top: 15px;
+                    padding: 15px;
+                    background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(20,20,30,0.4) 100%);
+                    border-radius: 8px;
+                    display: flex;
+                    gap: 20px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 14px;
+                    border: 1px solid rgba(255,255,255,0.1);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                `;
+
+                // Add t value markers
+                tMarkers.forEach((marker, index) => {
+                    const markerEl = document.createElement('div');
+                    markerEl.className = 'x-marker';
+                    markerEl.style.cssText = `
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        padding: 8px 15px;
+                        background: linear-gradient(135deg, ${marker.color}30 0%, ${marker.color}20 100%);
+                        border: 2px solid ${marker.color};
+                        border-radius: 6px;
+                        color: white;
+                        font-weight: bold;
+                        box-shadow: 0 2px 8px ${marker.color}40;
+                        transition: all 0.3s ease;
+                    `;
+
+                    // Add vertical line indicator
+                    const lineEl = document.createElement('div');
+                    lineEl.style.cssText = `
+                        width: 4px;
+                        height: 20px;
+                        background: linear-gradient(to bottom, ${marker.color} 0%, ${marker.color}80 100%);
+                        border-radius: 2px;
+                        box-shadow: 0 0 4px ${marker.color}60;
+                    `;
+
+                    // Add label
+                    const labelEl = document.createElement('span');
+                    labelEl.textContent = marker.label;
+                    labelEl.style.fontSize = '13px';
+
+                    markerEl.appendChild(lineEl);
+                    markerEl.appendChild(labelEl);
+
+                    // Add hover effect
+                    markerEl.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-2px)';
+                        this.style.boxShadow = `0 4px 16px ${marker.color}60`;
+                    });
+
+                    markerEl.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = `0 2px 8px ${marker.color}40`;
+                    });
+
+                    indicator.appendChild(markerEl);
+                });
+
+                // Add separator if we have both markers and result
+                if (tMarkers.length > 0 && calcType !== 'quantile') {
+                    const separator = document.createElement('div');
+                    separator.style.cssText = `
+                        width: 2px;
+                        height: 30px;
+                        background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+                        border-radius: 1px;
+                    `;
+                    indicator.appendChild(separator);
+                }
+
+                // Add calculation result
+                if (calcType !== 'quantile') {
+                    const resultEl = document.createElement('div');
+                    resultEl.className = 'probability-result';
+                    resultEl.style.cssText = `
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 5px;
+                        padding: 12px 20px;
+                        background: linear-gradient(135deg, rgba(120,255,165,0.25) 0%, rgba(100,255,140,0.15) 100%);
+                        border: 2px solid rgba(120,255,165,0.7);
+                        border-radius: 8px;
+                        color: rgb(120,255,165);
+                        font-weight: bold;
+                        text-align: center;
+                        min-width: 140px;
+                        box-shadow: 0 4px 12px rgba(120,255,165,0.3);
+                    `;
+
+                    const mainResult = document.getElementById('mainResult').textContent;
+                    if (!isNaN(parseFloat(mainResult))) {
+                        const percentage = parseFloat(mainResult) * 100;
+
+                        const probabilityLabel = document.createElement('div');
+                        probabilityLabel.textContent = 'Probability';
+                        probabilityLabel.style.cssText = 'font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px;';
+
+                        const probabilityValue = document.createElement('div');
+                        probabilityValue.textContent = `${percentage.toFixed(2)}%`;
+                        probabilityValue.style.cssText = 'font-size: 16px; font-weight: bold;';
+
+                        const decimalValue = document.createElement('div');
+                        decimalValue.textContent = `(${parseFloat(mainResult).toFixed(4)})`;
+                        decimalValue.style.cssText = 'font-size: 10px; opacity: 0.7;';
+
+                        resultEl.appendChild(probabilityLabel);
+                        resultEl.appendChild(probabilityValue);
+                        resultEl.appendChild(decimalValue);
+                    } else {
+                        resultEl.textContent = mainResult;
+                    }
+
+                    indicator.appendChild(resultEl);
+                }
+
+                container.appendChild(indicator);
+            });
         }
 
         function switchTab(tabName, clickedElement) {
+            // Get the clicked element - either from parameter or event
             const tabElement = clickedElement || event?.target || document.querySelector(`.tab[onclick*="${tabName}"]`);
-            
+
             if (!tabElement) {
                 console.error('Tab element not found for:', tabName);
                 return;
             }
-            
+
+            // Add switching animation to the clicked tab
             tabElement.classList.add('switching');
             setTimeout(() => {
                 tabElement.classList.remove('switching');
             }, 800);
-            
-            const activeContent = document.querySelector('.tab-content.active');
-            if (activeContent) {
-                activeContent.style.opacity = '0';
-                activeContent.style.transform = 'translateX(-20px)';
-                activeContent.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            }
-            
+
+            // Hide all tab contents with fade out
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content with delay for smooth transition
             setTimeout(() => {
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                    content.style.opacity = '';
-                    content.style.transform = '';
-                });
-                
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                
-                const newContent = document.getElementById(tabName + 'Tab');
-                if (newContent) {
-                    newContent.classList.add('active');
-                    tabElement.classList.add('active');
-                    
-                    clearTargetChart(tabName);
-                    
+                document.getElementById(tabName + 'Tab').classList.add('active');
+
+                // Add active class to selected tab
+                tabElement.classList.add('active');
+
+                // Trigger chart animations when switching tabs (but not on initial load)
+                if (!isInitialLoad) {
                     setTimeout(() => {
                         triggerChartAnimations(tabName);
-                    }, 100);
+                    }, 300); // Delay to ensure tab content is visible
                 }
-            }, 200);
-        }
-
-        function clearTargetChart(tabName) {
-            try {
-                // First update charts normally to ensure plot lines are set
-                updateCharts();
-                
-                // Then clear only the series data, keeping plot lines
-                switch(tabName) {
-                    case 'pdf':
-                        if (pdfChart && pdfChart.series) {
-                            pdfChart.series.forEach(series => {
-                                if (series && series.setData) {
-                                    series.setData([], false);
-                                }
-                            });
-                            pdfChart.redraw(false);
-                        }
-                        break;
-                    case 'cdf':
-                        if (cdfChart && cdfChart.series) {
-                            cdfChart.series.forEach(series => {
-                                if (series && series.setData) {
-                                    series.setData([], false);
-                                }
-                            });
-                            cdfChart.redraw(false);
-                        }
-                        break;
-                    case 'both':
-                        if (combinedChart && combinedChart.series) {
-                            combinedChart.series.forEach(series => {
-                                if (series && series.setData) {
-                                    series.setData([], false);
-                                }
-                            });
-                            combinedChart.redraw(false);
-                        }
-                        break;
-                }
-            } catch (error) {
-                console.warn('Error clearing target chart:', error);
-            }
+            }, 100);
         }
 
         function triggerChartAnimations(tabName) {
-            const chartContainer = document.querySelector('.chart-container');
-            if (chartContainer) {
-                chartContainer.style.transform = 'scale(0.98)';
-                chartContainer.style.opacity = '0.6';
-                chartContainer.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-                
-                setTimeout(() => {
-                    chartContainer.style.transform = 'scale(1)';
-                    chartContainer.style.opacity = '1';
-                }, 100);
-            }
-            
+            // Force chart animations by temporarily hiding and showing series
             switch(tabName) {
                 case 'pdf':
                     if (pdfChart) {
                         animateChartSeries(pdfChart, 'pdf');
+                        animateChartIndicators();
                     }
                     break;
                 case 'cdf':
                     if (cdfChart) {
                         animateChartSeries(cdfChart, 'cdf');
+                        animateChartIndicators();
                     }
                     break;
                 case 'both':
                     if (combinedChart) {
                         animateChartSeries(combinedChart, 'combined');
+                        animateChartIndicators();
                     }
                     break;
             }
+        }
+
+        function animateChartIndicators() {
+            // Add glow effect to chart indicators
+            const indicators = document.querySelectorAll('.chart-indicator');
+            indicators.forEach((indicator, index) => {
+                setTimeout(() => {
+                    indicator.style.transform = 'scale(1.05)';
+                    indicator.style.boxShadow = '0 8px 32px rgba(52, 152, 219, 0.4)';
+                    indicator.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+
+                    setTimeout(() => {
+                        indicator.style.transform = 'scale(1)';
+                        indicator.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+                    }, 600);
+                }, index * 100);
+            });
         }
 
         function animateChartSeries(chart, chartType) {
@@ -2053,7 +2279,8 @@
                     console.warn('Chart not properly initialized for animation');
                     return;
                 }
-                
+
+                // Get the stored data based on chart type
                 let originalData = [];
                 switch(chartType) {
                     case 'pdf':
@@ -2070,149 +2297,197 @@
                     case 'combined':
                         originalData = [
                             [...chartDataStore.pdfData],
-                            [...chartDataStore.cdfData],
-                            [...chartDataStore.shadedPdfData]
+                            [...chartDataStore.cdfData]
                         ];
                         break;
                     default:
                         console.warn('Unknown chart type for animation:', chartType);
                         return;
                 }
-                
+
+                // Add animating class to chart container
                 const chartContainer = chart.container.parentElement;
                 if (chartContainer) {
                     chartContainer.classList.add('animating', 'drawing-curves');
                 }
-                
-                const animationDuration = 1500;
-                const frameRate = 60;
-                const totalFrames = Math.floor((animationDuration / 1000) * frameRate);
-                let currentFrame = 0;
-                
-                const animateFrame = () => {
-                    if (currentFrame >= totalFrames) {
-                        // Final step - restore full data
-                        originalData.forEach((seriesData, seriesIndex) => {
-                            if (chart.series[seriesIndex] && seriesData && seriesData.length > 0) {
+
+                // Animate each series with progressive drawing
+                chart.series.forEach((series, seriesIndex) => {
+                    if (series && typeof series.setData === 'function' && originalData[seriesIndex] && originalData[seriesIndex].length > 0) {
+                        const fullData = originalData[seriesIndex];
+
+                        // Start the progressive drawing animation
+                        let pointIndex = 0;
+                        const totalPoints = fullData.length;
+                        const pointsPerFrame = Math.max(1, Math.floor(totalPoints / 40)); // ~40 frames for smooth animation
+
+                        const drawNextPoints = () => {
+                            if (pointIndex >= totalPoints) {
+                                // Animation complete - ensure all data is set
                                 try {
-                                    chart.series[seriesIndex].setData(seriesData, false);
-                                } catch (error) {
-                                    console.warn('Error in final frame:', error);
+                                    series.setData(fullData, false);
+                                    chart.redraw(false);
+                                } catch (finalError) {
+                                    console.warn('Error in final step:', finalError);
                                 }
+                                return;
                             }
-                        });
-                        chart.redraw();
-                        
-                        return;
-                    }
-                    
-                    const animationProgress = currentFrame / totalFrames;
-                    const easedProgress = 1 - Math.pow(1 - animationProgress, 2);
-                    
-                    originalData.forEach((seriesData, seriesIndex) => {
-                        if (chart.series[seriesIndex] && seriesData && seriesData.length > 0) {
-                            const targetLength = Math.floor(easedProgress * seriesData.length);
-                            const partialData = seriesData.slice(0, Math.max(1, targetLength));
-                            
+
+                            // Calculate next chunk of points to add
+                            const nextIndex = Math.min(pointIndex + pointsPerFrame, totalPoints);
+                            const currentData = fullData.slice(0, nextIndex);
+
                             try {
-                                chart.series[seriesIndex].setData(partialData, false);
-                            } catch (error) {
-                                console.warn('Error updating series during animation:', error);
+                                // Update series without internal animation to avoid conflicts
+                                series.setData(currentData, false);
+                                chart.redraw(false);
+
+                                pointIndex = nextIndex;
+
+                                // Schedule next frame
+                                requestAnimationFrame(drawNextPoints);
+
+                            } catch (animError) {
+                                console.warn('Error during progressive drawing:', animError);
+                                // Try to continue with next frame
+                                pointIndex = nextIndex;
+                                requestAnimationFrame(drawNextPoints);
                             }
-                        }
-                    });
-                    
-                    try {
-                        chart.redraw();
-                    } catch (error) {
-                        console.warn('Error redrawing during animation:', error);
+                        };
+
+                        // Start animation with staggered delay for multiple series
+                        setTimeout(() => {
+                            // Ensure series is empty before starting
+                            try {
+                                series.setData([], false);
+                                chart.redraw(false);
+                                // Start progressive drawing
+                                requestAnimationFrame(drawNextPoints);
+                            } catch (startError) {
+                                console.warn('Error starting animation:', startError);
+                            }
+                        }, seriesIndex * 150);
                     }
-                    
-                    currentFrame++;
-                    requestAnimationFrame(animateFrame);
-                };
-                
-                requestAnimationFrame(animateFrame);
-                
+                });
+
+                // Remove animating classes after animation completes
                 setTimeout(() => {
                     if (chartContainer) {
                         chartContainer.classList.remove('animating', 'drawing-curves');
                     }
-                }, animationDuration + 200);
-                
+                }, 1200);
+
             } catch (error) {
                 console.warn('Error in animateChartSeries:', error);
             }
         }
 
-
-
         function reloadCalculator() {
+            // Add visual feedback to all statistics boxes
             document.querySelectorAll('.embedded-stat-item').forEach(item => {
-                item.classList.add('updating');
-                setTimeout(() => item.classList.remove('updating'), 800);
+                item.classList.add('resetting');
+                setTimeout(() => item.classList.remove('resetting'), 800);
             });
-            
+
+            // Show loading state
             const mainResultEl = document.getElementById('mainResult');
             if (mainResultEl) {
+                mainResultEl.classList.add('calculating');
                 mainResultEl.textContent = 'Resetting...';
             }
-            
+
+            // Reset all input values to defaults with animation
             const inputs = [
-                { el: document.getElementById('dof'), value: '10' },
-                { el: document.getElementById('xValue'), value: '0' },
+                { el: document.getElementById('degreesOfFreedom'), value: '10' },
+                { el: document.getElementById('tValue'), value: '0' },
                 { el: document.getElementById('precision'), value: '4' },
                 { el: document.getElementById('chartRange'), value: '4' }
             ];
-            
+
             inputs.forEach(({ el, value }, index) => {
                 if (el) {
                     setTimeout(() => {
+                        el.style.transition = 'all 0.3s ease';
+                        el.style.transform = 'scale(1.05)';
                         el.value = value;
+
+                        setTimeout(() => {
+                            el.style.transform = 'scale(1)';
+                        }, 150);
                     }, index * 100);
                 }
             });
-            
+
+            // Reset radio button to default (probability)
             const probabilityRadio = document.querySelector('input[value="probability"]');
             if (probabilityRadio) {
                 probabilityRadio.checked = true;
                 currentCalcType = 'probability';
             }
-            
-            // Reset sliders to default values
-            setTimeout(() => {
-                updateSliderValue('precision', 'precisionValue', '');
-                updateSliderValue('chartRange', 'chartRangeValue', '');
-            }, 600);
-            
+
+            // Reset chart options dropdowns
+            const precisionDropdown = document.getElementById('precision');
+            const chartRangeDropdown = document.getElementById('chartRange');
+            if (precisionDropdown) precisionDropdown.value = '4';
+            if (chartRangeDropdown) chartRangeDropdown.value = '4';
+
+            // Reset tab to PDF view with animation
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
+
             setTimeout(() => {
                 const pdfTab = document.querySelector('.tab');
                 const pdfTabContent = document.getElementById('pdfTab');
                 if (pdfTab) pdfTab.classList.add('active');
                 if (pdfTabContent) pdfTabContent.classList.add('active');
             }, 200);
-            
+
+            // Clear any dynamic input sections and recreate default
             updateInputSection();
             updateRadioSelection();
-            
+
+            // Animate reset with delay for better UX
             setTimeout(() => {
+                if (mainResultEl) {
+                    mainResultEl.classList.remove('calculating');
+                }
+
+                // Recalculate with default values
                 updateStatistics();
                 calculate();
-                
+
+                // Show success message briefly
                 if (mainResultEl) {
+                    const originalText = mainResultEl.textContent;
                     mainResultEl.textContent = '✓ Reset Complete!';
                     mainResultEl.style.color = '#27ae60';
-                    
+                    mainResultEl.style.fontWeight = 'bold';
+
                     setTimeout(() => {
                         mainResultEl.style.color = '';
-                        calculate();
+                        mainResultEl.style.fontWeight = '';
+                        mainResultEl.textContent = originalText;
                     }, 1500);
                 }
+
+                // Add celebration effect
+                createCelebrationEffect();
+
             }, 1000);
+        }
+
+        function createCelebrationEffect() {
+            // Create a subtle celebration effect
+            const header = document.querySelector('.header');
+            if (header) {
+                header.style.transform = 'scale(1.02)';
+                header.style.transition = 'transform 0.3s ease';
+
+                setTimeout(() => {
+                    header.style.transform = 'scale(1)';
+                }, 300);
+            }
         }
     </script>
 </body>
-</html>
+</html> 
