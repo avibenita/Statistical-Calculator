@@ -896,9 +896,9 @@
                                             </div>
                                         </div>
                                         <select class="mini-dropdown" id="precision">
-                                            <option value="2">2</option>
+                                            <option selected value="2">2</option>
                                             <option value="3">3</option>
-                                            <option selected value="4">4</option>
+                                            <option value="4">4</option>
                                             <option value="5">5</option>
                                             <option value="6">6</option>
                                         </select>
@@ -950,7 +950,7 @@
                                         <i class="fas fa-area-chart"></i>
                                         Shaded Area Representation
                                     </h4>
-                                    <div class="shaded-area-info">
+                                    <div class="shaded-area-info" style="display: flex; justify-content: space-between; align-items: center;">
                                         <span id="equationText" style="font-weight: bold; color: var(--header-color);">
                                             Select calculation type to see shaded area
                                         </span>
@@ -962,52 +962,36 @@
                                 <!-- Embedded Results & Statistics Panel -->
                                 <div class="embedded-results-panel">
                                     <h4 class="embedded-panel-title">
-                                        <i class="fas fa-chart-bar"></i>
                                         Distribution Statistics
                                     </h4>
                                     <div class="embedded-stats-grid">
                                         <div class="embedded-stat-item clean-stat">
                                             <div class="stat-header">
                                                 <div class="embedded-stat-label">α (Alpha)</div>
-                                                <button class="copy-btn-small" onclick="copyToClipboard('alphaStat')" title="Copy value">
-                                                    <i class="fas fa-copy"></i>
-                                                </button>
                                             </div>
                                             <div class="embedded-stat-value" id="alphaStat">2</div>
                                         </div>
                                         <div class="embedded-stat-item clean-stat">
                                             <div class="stat-header">
                                                 <div class="embedded-stat-label">β (Beta)</div>
-                                                <button class="copy-btn-small" onclick="copyToClipboard('betaStat')" title="Copy value">
-                                                    <i class="fas fa-copy"></i>
-                                                </button>
                                             </div>
                                             <div class="embedded-stat-value" id="betaStat">3</div>
                                         </div>
                                         <div class="embedded-stat-item clean-stat">
                                             <div class="stat-header">
                                                 <div class="embedded-stat-label">Mean</div>
-                                                <button class="copy-btn-small" onclick="copyToClipboard('meanStat')" title="Copy value">
-                                                    <i class="fas fa-copy"></i>
-                                                </button>
                                             </div>
                                             <div class="embedded-stat-value" id="meanStat">0.4</div>
                                         </div>
                                         <div class="embedded-stat-item clean-stat">
                                             <div class="stat-header">
                                                 <div class="embedded-stat-label">Variance</div>
-                                                <button class="copy-btn-small" onclick="copyToClipboard('varianceStat')" title="Copy value">
-                                                    <i class="fas fa-copy"></i>
-                                                </button>
                                             </div>
                                             <div class="embedded-stat-value" id="varianceStat">0.04</div>
                                         </div>
                                         <div class="embedded-stat-item clean-stat">
                                             <div class="stat-header">
                                                 <div class="embedded-stat-label">Mode</div>
-                                                <button class="copy-btn-small" onclick="copyToClipboard('modeStat')" title="Copy value">
-                                                    <i class="fas fa-copy"></i>
-                                                </button>
                                             </div>
                                             <div class="embedded-stat-value" id="modeStat">0.25</div>
                                         </div>
@@ -1308,9 +1292,9 @@
                         name: 'Shaded Area',
                         data: [],
                         type: 'area',
-                        color: 'rgba(233, 30, 99, 0.4)',
+                        color: 'rgba(233, 30, 99, 0.8)',
                         lineWidth: 2,
-                        fillOpacity: 0.3
+                        fillOpacity: 0.6
                     }],
                     tooltip: {
                         shared: true,
@@ -1319,7 +1303,7 @@
                             color: 'white'
                         },
                         formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
+                            const precision = parseInt(document.getElementById('precision')?.value) || 2;
                             let tooltipContent = `<b>X = ${this.x.toFixed(precision)}</b><br/>`;
                             
                             this.points.forEach(point => {
@@ -1379,7 +1363,7 @@
                             color: 'white'
                         },
                         formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
+                            const precision = parseInt(document.getElementById('precision')?.value) || 2;
                             return `<b>X = ${this.x.toFixed(precision)}</b><br/>CDF: ${this.y.toFixed(precision)}`;
                         }
                     },
@@ -1450,9 +1434,9 @@
                         name: 'Shaded Area',
                         data: [],
                         type: 'area',
-                        color: 'rgba(233, 30, 99, 0.4)',
+                        color: 'rgba(233, 30, 99, 0.8)',
                         lineWidth: 2,
-                        fillOpacity: 0.3,
+                        fillOpacity: 0.6,
                         yAxis: 0
                     }, {
                         name: 'CDF',
@@ -1469,7 +1453,7 @@
                             color: 'white'
                         },
                         formatter: function() {
-                            const precision = parseInt(document.getElementById('precision')?.value) || 4;
+                            const precision = parseInt(document.getElementById('precision')?.value) || 2;
                             let tooltipContent = `<b>X = ${this.x.toFixed(precision)}</b><br/>`;
                             
                             this.points.forEach(point => {
@@ -1527,7 +1511,7 @@
                 switch(calcType) {
                     case 'probability':
                         const xValue = parseFloat(document.getElementById('xValue').value);
-                        const precision = parseInt(document.getElementById('precision')?.value) || 4;
+                        const precision = parseInt(document.getElementById('precision')?.value) || 2;
                         if (xValue >= 0 && xValue <= 1) {
                             probability = jStat.beta.cdf(xValue, alpha, beta);
                             const percentage = (probability * 100).toFixed(Math.max(2, precision-2));
@@ -1539,7 +1523,7 @@
                     case 'between':
                         const lowerBound = parseFloat(document.getElementById('lowerBound').value);
                         const upperBound = parseFloat(document.getElementById('upperBound').value);
-                        const precision2 = parseInt(document.getElementById('precision')?.value) || 4;
+                        const precision2 = parseInt(document.getElementById('precision')?.value) || 2;
                         if (lowerBound >= 0 && upperBound <= 1 && lowerBound < upperBound) {
                             const probLower = jStat.beta.cdf(lowerBound, alpha, beta);
                             const probUpper = jStat.beta.cdf(upperBound, alpha, beta);
@@ -1552,7 +1536,7 @@
                         break;
                     case 'quantile':
                         const prob = parseFloat(document.getElementById('probability').value);
-                        const precision3 = parseInt(document.getElementById('precision')?.value) || 4;
+                        const precision3 = parseInt(document.getElementById('precision')?.value) || 2;
                         if (prob >= 0 && prob <= 1) {
                             const quantile = jStat.beta.inv(prob, alpha, beta);
                             equationTextEl.textContent = `X = ${quantile.toFixed(precision3)}`;
@@ -1642,10 +1626,10 @@
                     pdfChart.series[0].setData(pdfData, false);
                     if (pdfChart.series[1]) {
                         pdfChart.series[1].setData(shadedPdfData, false);
-                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.4)' : 'rgba(233, 30, 99, 0.4)';
+                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.8)' : 'rgba(233, 30, 99, 0.8)';
                         pdfChart.series[1].update({
                             color: shadedColor,
-                            fillOpacity: 0.3
+                            fillOpacity: 0.6
                         }, false);
                     }
                     pdfChart.xAxis[0].setExtremes(minX, maxX, false);
@@ -1672,10 +1656,10 @@
                     combinedChart.series[0].setData(pdfData, false);
                     if (combinedChart.series[1]) {
                         combinedChart.series[1].setData(shadedPdfData, false);
-                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.4)' : 'rgba(233, 30, 99, 0.4)';
+                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.8)' : 'rgba(233, 30, 99, 0.8)';
                         combinedChart.series[1].update({
                             color: shadedColor,
-                            fillOpacity: 0.3
+                            fillOpacity: 0.6
                         }, false);
                     }
                     if (combinedChart.series[2]) {
@@ -1692,7 +1676,7 @@
         function updateStatistics() {
             const alpha = parseFloat(document.getElementById('alpha').value);
             const beta = parseFloat(document.getElementById('beta').value);
-            const precision = parseInt(document.getElementById('precision')?.value) || 4;
+            const precision = parseInt(document.getElementById('precision')?.value) || 2;
 
             if (alpha <= 0 || beta <= 0) return;
 
