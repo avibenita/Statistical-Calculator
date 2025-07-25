@@ -23,10 +23,10 @@
       box-sizing: border-box;
     }
 
-    /* Wix-optimized container sizing */
+    /* Enhanced Wix-optimized container sizing */
     body, html {
       height: 100%;
-      min-height: 600px; /* Minimum height for Wix containers */
+      min-height: 100vh;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       overflow: hidden;
       background: #f8f9fa;
@@ -35,22 +35,30 @@
     .hub {
       display: flex;
       height: 100vh;
-      min-height: 600px; /* Ensure minimum usable height */
+      min-height: 100vh;
       max-height: 100vh;
+      position: relative;
     }
 
-    /* Auto-adjust for Wix container height */
-    @media (max-height: 700px) {
+    /* Dynamic height adjustment for Wix containers */
+    @media (max-height: 800px) {
       .hub {
-        height: 100%;
+        height: 100vh;
+        min-height: 100vh;
+      }
+    }
+
+    @media (max-height: 600px) {
+      .hub {
+        height: 100vh;
         min-height: 500px;
       }
     }
 
-    /* Sidebar Styles */
+    /* Enhanced sidebar responsiveness */
     aside {
       width: var(--sidebar-width);
-      min-width: 250px; /* Prevent sidebar from getting too narrow */
+      min-width: 250px;
       background: var(--sidebar-bg);
       color: white;
       padding: 1.2rem;
@@ -58,8 +66,10 @@
       box-shadow: var(--shadow);
       z-index: 10;
       flex-shrink: 0;
+      transition: transform 0.3s ease;
     }
 
+    /* Better scrollbar styling */
     aside::-webkit-scrollbar {
       width: 6px;
     }
@@ -183,13 +193,15 @@
       font-weight: 600;
     }
 
-    /* Main content area - Wix optimized */
+    /* Enhanced main content area - Wix optimized */
     main {
       flex: 1;
       background: var(--main-bg);
       position: relative;
       overflow: hidden;
-      min-width: 300px; /* Prevent content area from getting too narrow */
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
     }
 
     /* Loading indicator */
@@ -229,23 +241,24 @@
       font-weight: 500;
     }
 
-    /* Iframe styles - Wix optimized */
+    /* Enhanced iframe styles - Wix optimized with dynamic sizing */
     iframe {
       width: 100%;
       height: 100%;
       border: none;
       background: white;
       transition: opacity 0.3s ease;
+      flex: 1;
     }
 
     iframe.loading {
       opacity: 0.7;
     }
 
-    /* Mobile toggle button */
+    /* Improved mobile responsiveness */
     .mobile-toggle {
       display: none;
-      position: absolute; /* Changed from fixed for better Wix compatibility */
+      position: fixed;
       top: 1rem;
       left: 1rem;
       z-index: 1000;
@@ -265,7 +278,7 @@
       transform: scale(1.05);
     }
 
-    /* Calculator info bar */
+    /* Enhanced calculator info bar */
     .calc-info {
       position: absolute;
       top: 0;
@@ -287,14 +300,14 @@
       transform: translateY(0);
     }
 
-    /* Wix container adaptations */
+    /* Responsive breakpoints - Enhanced for Wix */
     @media (max-width: 1200px) {
       :root {
         --sidebar-width: 240px;
       }
     }
 
-    /* Tablet optimizations for Wix */
+    /* Enhanced tablet optimizations */
     @media (max-width: 1024px) {
       :root {
         --sidebar-width: 220px;
@@ -315,21 +328,24 @@
       }
     }
 
-    /* Mobile responsive - Wix optimized */
+    /* Enhanced mobile responsive - Wix optimized */
     @media (max-width: 768px) {
       .mobile-toggle {
         display: block;
+        position: fixed;
       }
 
       .hub {
         position: relative;
+        height: 100vh;
+        min-height: 100vh;
       }
 
       aside {
-        position: absolute; /* Changed from fixed for better Wix compatibility */
+        position: fixed;
         top: 0;
         left: 0;
-        height: 100%;
+        height: 100vh;
         width: var(--sidebar-width);
         transform: translateX(-100%);
         transition: transform 0.3s ease;
@@ -343,15 +359,16 @@
       main {
         width: 100%;
         margin-left: 0;
+        height: 100vh;
       }
 
       .calc-info {
         top: 4rem;
       }
 
-      /* Mobile overlay */
+      /* Enhanced mobile overlay */
       .mobile-overlay {
-        position: absolute; /* Changed from fixed for better Wix compatibility */
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
@@ -369,10 +386,10 @@
       }
     }
 
-    /* Small mobile devices */
+    /* Enhanced small mobile devices */
     @media (max-width: 480px) {
       :root {
-        --sidebar-width: 280px;
+        --sidebar-width: 100vw;
       }
 
       .mobile-toggle {
@@ -383,37 +400,12 @@
       }
 
       aside {
-        width: 100%;
-        max-width: var(--sidebar-width);
+        width: 100vw;
       }
 
       .calc-info {
         top: 3.5rem;
         font-size: 0.8rem;
-      }
-    }
-
-    /* Wix-specific height adjustments */
-    .wix-container {
-      height: 100%;
-      min-height: 600px;
-    }
-
-    /* Handle Wix's responsive breakpoints */
-    @media (max-width: 980px) {
-      .hub {
-        min-height: 500px;
-      }
-
-      :root {
-        --sidebar-width: 200px;
-      }
-    }
-
-    /* Extra small screens in Wix */
-    @media (max-width: 640px) {
-      .hub {
-        min-height: 400px;
       }
 
       aside h2 {
@@ -432,10 +424,92 @@
       }
     }
 
-    /* Ensure compatibility with Wix's iframe sandboxing */
-    .wix-safe {
-      pointer-events: auto;
-      -webkit-overflow-scrolling: touch;
+    /* Enhanced Wix-specific optimizations */
+    .wix-container {
+      height: 100%;
+      min-height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Handle dynamic Wix container heights */
+    @media (max-height: 500px) {
+      .hub {
+        height: 100vh;
+        min-height: 400px;
+      }
+      
+      .mobile-toggle {
+        top: 0.25rem;
+        left: 0.25rem;
+        padding: 0.4rem;
+      }
+    }
+
+    /* Ultra-wide screen support */
+    @media (min-width: 1600px) {
+      :root {
+        --sidebar-width: 320px;
+      }
+    }
+
+    /* High DPI / Retina display optimizations */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      .mobile-toggle {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      aside {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    /* Landscape mobile optimizations */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .hub {
+        height: 100vh;
+      }
+      
+      aside {
+        padding: 0.8rem;
+      }
+      
+      aside h2 {
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+      }
+      
+      summary {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.8rem;
+      }
+      
+      a {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+      }
+    }
+
+    /* Accessibility improvements */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .mobile-toggle,
+      aside,
+      .calc-info {
+        display: none !important;
+      }
+      
+      main {
+        width: 100% !important;
+      }
     }
   </style>
 </head>
@@ -764,20 +838,132 @@
       });
     });
 
-    // Wix-specific optimizations
+    // Enhanced Wix-specific optimizations with dynamic height management
     function adjustForWixContainer() {
       const hub = document.querySelector('.hub');
       const container = document.querySelector('.wix-container');
+      const iframe = document.getElementById('calcFrame');
 
       // Auto-adjust height based on container
       if (container && container.offsetHeight > 0) {
-        hub.style.height = container.offsetHeight + 'px';
+        const containerHeight = container.offsetHeight;
+        hub.style.height = containerHeight + 'px';
+        
+        // Ensure minimum usable height
+        if (containerHeight < 500) {
+          hub.style.minHeight = '500px';
+        }
+      }
+
+      // Optimize iframe for current viewport
+      if (iframe) {
+        // Add message listener for iframe content height
+        window.addEventListener('message', function(event) {
+          if (event.data && event.data.type === 'resize' && event.data.height) {
+            const minHeight = Math.max(500, event.data.height);
+            hub.style.minHeight = minHeight + 'px';
+          }
+        });
       }
     }
 
-    // Run Wix adjustments on load and resize
-    window.addEventListener('load', adjustForWixContainer);
-    window.addEventListener('resize', adjustForWixContainer);
+    // Enhanced responsive behavior monitoring
+    function setupResponsiveMonitoring() {
+      let resizeTimeout;
+      
+      const handleResize = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          adjustForWixContainer();
+          optimizeForCurrentViewport();
+        }, 150);
+      };
+
+      window.addEventListener('resize', handleResize);
+      window.addEventListener('orientationchange', () => {
+        setTimeout(handleResize, 300); // Delay for orientation change completion
+      });
+    }
+
+    // Optimize interface for current viewport
+    function optimizeForCurrentViewport() {
+      const hub = document.querySelector('.hub');
+      const sidebar = document.getElementById('sidebar');
+      const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight
+      };
+
+      // Add viewport-specific classes for fine-tuned styling
+      hub.classList.remove('viewport-mobile', 'viewport-tablet', 'viewport-desktop', 'viewport-landscape');
+      
+      if (viewport.width <= 768) {
+        hub.classList.add('viewport-mobile');
+        if (viewport.width > viewport.height) {
+          hub.classList.add('viewport-landscape');
+        }
+      } else if (viewport.width <= 1024) {
+        hub.classList.add('viewport-tablet');
+      } else {
+        hub.classList.add('viewport-desktop');
+      }
+
+      // Auto-close sidebar on small viewports
+      if (viewport.width <= 768 && sidebar && sidebar.classList.contains('open')) {
+        closeSidebar();
+      }
+    }
+
+    // Enhanced iframe loading with height communication
+    function enhanceIframeLoading() {
+      const iframe = document.getElementById('calcFrame');
+      if (!iframe) return;
+
+      iframe.addEventListener('load', function() {
+        // Try to establish communication with iframe content
+        try {
+          const iframeContent = iframe.contentWindow || iframe.contentDocument;
+          if (iframeContent) {
+            // Send viewport info to iframe
+            iframeContent.postMessage({
+              type: 'viewport',
+              width: window.innerWidth,
+              height: window.innerHeight,
+              isInWix: true
+            }, '*');
+          }
+        } catch (e) {
+          console.log('Cross-origin iframe - cannot communicate directly');
+        }
+
+        hideLoading();
+      });
+    }
+
+    // Run enhanced Wix adjustments on load and resize
+    window.addEventListener('load', () => {
+      adjustForWixContainer();
+      setupResponsiveMonitoring();
+      enhanceIframeLoading();
+      optimizeForCurrentViewport();
+    });
+
+    // Intersection Observer for better performance
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // Hub is visible, ensure optimal display
+            optimizeForCurrentViewport();
+          }
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const hub = document.querySelector('.hub');
+        if (hub) observer.observe(hub);
+      });
+    }
   </script>
 </body>
 </html>
