@@ -478,6 +478,71 @@
       overflow: visible;
     }
 
+    /* Wix Live site specific optimizations */
+    body.wix-live {
+      overflow: hidden;
+    }
+
+    body.wix-live .hub {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Force mobile layout for Wix live sites */
+    body.force-wix-mobile .mobile-toggle {
+      display: block !important;
+      position: fixed !important;
+      z-index: 1000 !important;
+    }
+
+    body.force-wix-mobile aside {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      height: 100% !important;
+      width: var(--sidebar-width) !important;
+      transform: translateX(-100%) !important;
+      transition: transform 0.3s ease !important;
+      z-index: 100 !important;
+    }
+
+    body.force-wix-mobile aside.open {
+      transform: translateX(0) !important;
+    }
+
+    body.force-wix-mobile main {
+      width: 100% !important;
+      margin-left: 0 !important;
+    }
+
+    body.force-wix-mobile .mobile-overlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      z-index: 50 !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      transition: all 0.3s ease !important;
+    }
+
+    body.force-wix-mobile .mobile-overlay.show {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    /* Force mobile layout regardless of screen size in Wix live */
+    .hub.force-mobile-layout {
+      position: relative !important;
+    }
+
+    .hub.force-mobile-layout aside {
+      position: fixed !important;
+      transform: translateX(-100%) !important;
+    }
+
     /* Ensure iframe content fits properly */
     @media (max-width: 768px) {
       .hub.in-iframe {
@@ -504,6 +569,36 @@
 
       .hub.in-iframe main {
         min-height: 600px;
+      }
+
+      /* Force mobile behavior on very small screens in Wix live */
+      body.wix-live {
+        overflow: hidden !important;
+      }
+
+      body.wix-live .mobile-toggle {
+        display: block !important;
+      }
+
+      body.wix-live aside {
+        position: fixed !important;
+        transform: translateX(-100%) !important;
+      }
+    }
+
+    /* Additional Wix live mobile optimizations for any screen size */
+    @media (max-width: 800px) {
+      body.wix-live .mobile-toggle {
+        display: block !important;
+        position: fixed !important;
+        z-index: 1000 !important;
+      }
+
+      body.wix-live.force-wix-mobile aside {
+        position: fixed !important;
+        transform: translateX(-100%) !important;
+        width: 100vw !important;
+        max-width: 320px !important;
       }
     }
 
@@ -767,14 +862,57 @@
 
     // Initialize with Normal Distribution and iframe detection
     document.addEventListener('DOMContentLoaded', function() {
-      // Detect if we're in an iframe and apply appropriate styling
+      // Enhanced detection for Wix environment (editor vs live)
       const isInIframe = window.self !== window.top;
+      
+      // More robust Wix detection
+      let isWixEditor = false;
+      let isWixLive = false;
+      
+      if (isInIframe) {
+        try {
+          // Try to detect Wix editor
+          const parentUrl = window.parent.location.href || '';
+          const referrer = document.referrer || '';
+          
+          isWixEditor = parentUrl.includes('wix.com') || 
+                       parentUrl.includes('editorx.com') ||
+                       referrer.includes('wix.com') ||
+                       referrer.includes('editor.wix.com');
+          
+          // If we're in an iframe but not detected as editor, likely live site
+          isWixLive = !isWixEditor;
+          
+        } catch (e) {
+          // Cross-origin restrictions - likely a live site
+          isWixLive = true;
+          
+          // Additional detection through user agent or other indicators
+          const userAgent = navigator.userAgent || '';
+          const hasWixIndicators = document.referrer.includes('.wixsite.com') ||
+                                  document.referrer.includes('.wix.com') ||
+                                  window.location.ancestorOrigins?.[0]?.includes('wix');
+          
+          if (hasWixIndicators) {
+            isWixLive = true;
+          }
+        }
+      }
+
       if (isInIframe) {
         document.body.classList.add('in-wix-iframe');
         document.querySelector('.hub').classList.add('in-iframe');
         
-        // Optimize for iframe embedding
-        optimizeForIframeEmbedding();
+        // Add specific classes for different Wix environments
+        if (isWixEditor) {
+          document.body.classList.add('wix-editor');
+        }
+        if (isWixLive) {
+          document.body.classList.add('wix-live');
+        }
+        
+        // Optimize for iframe embedding with environment-specific adjustments
+        optimizeForIframeEmbedding(isWixEditor, isWixLive);
       }
 
       const normalLink = document.querySelector('[data-name="Normal Distribution"]');
@@ -784,28 +922,85 @@
       }
     });
 
-    // Optimize interface for iframe embedding
-    function optimizeForIframeEmbedding() {
-      // Auto-close sidebar on mobile when in iframe
-      if (window.innerWidth <= 768) {
+    // Optimize interface for iframe embedding with Wix-specific handling
+    function optimizeForIframeEmbedding(isWixEditor = false, isWixLive = false) {
+      const hub = document.querySelector('.hub');
+      const sidebar = document.getElementById('sidebar');
+      const isMobile = window.innerWidth <= 768;
+      
+      // Wix Live sites need more aggressive mobile detection
+      if (isWixLive) {
+        // Force mobile behavior on Wix live sites for better compatibility
+        const forceWixMobile = window.innerWidth <= 800; // Slightly larger threshold for Wix
+        
+        if (forceWixMobile) {
+          document.body.classList.add('force-wix-mobile');
+          hub.classList.add('force-mobile-layout');
+          closeSidebar();
+          
+          // Ensure mobile layout is applied immediately
+          if (sidebar) {
+            sidebar.style.transform = 'translateX(-100%)';
+          }
+        }
+        
+        // Add Wix live-specific optimizations
+        if (hub) {
+          hub.style.position = 'relative';
+          hub.style.overflow = 'hidden';
+        }
+      }
+      
+      // Standard mobile behavior for editor and direct access
+      if (isMobile && !isWixLive) {
         closeSidebar();
       }
 
       // Adjust heights for iframe constraints
-      const hub = document.querySelector('.hub');
-      const sidebar = document.getElementById('sidebar');
-      
       if (hub && sidebar) {
         // Ensure sidebar scrolling works in iframe
         sidebar.style.maxHeight = '100%';
         sidebar.style.overflowY = 'auto';
+        
+        // Wix live needs additional height management
+        if (isWixLive) {
+          hub.style.minHeight = '950px';
+          sidebar.style.height = '950px';
+        }
+      }
+
+      // Enhanced resize monitoring for Wix live
+      if (isWixLive) {
+        let wixResizeTimeout;
+        const handleWixResize = () => {
+          clearTimeout(wixResizeTimeout);
+          wixResizeTimeout = setTimeout(() => {
+            const currentWidth = window.innerWidth;
+            const shouldBeMobile = currentWidth <= 800;
+            
+            if (shouldBeMobile) {
+              document.body.classList.add('force-wix-mobile');
+              hub.classList.add('force-mobile-layout');
+              closeSidebar();
+            } else {
+              document.body.classList.remove('force-wix-mobile');
+              hub.classList.remove('force-mobile-layout');
+            }
+          }, 100);
+        };
+        
+        window.addEventListener('resize', handleWixResize);
+        window.addEventListener('orientationchange', () => {
+          setTimeout(handleWixResize, 300);
+        });
       }
 
       // Send ready signal to parent if possible
       try {
         window.parent.postMessage({
           type: 'iframe-ready',
-          height: document.body.scrollHeight
+          height: document.body.scrollHeight,
+          environment: isWixEditor ? 'wix-editor' : (isWixLive ? 'wix-live' : 'iframe')
         }, '*');
       } catch (e) {
         // Cross-origin restrictions, silently ignore
@@ -979,16 +1174,33 @@
     function setupResponsiveMonitoring() {
       let resizeTimeout;
       const isInIframe = window.self !== window.top;
+      const isWixLive = document.body.classList.contains('wix-live');
+      const isWixEditor = document.body.classList.contains('wix-editor');
       
       const handleResize = () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
           if (isInIframe) {
-            optimizeForIframeEmbedding();
+            optimizeForIframeEmbedding(isWixEditor, isWixLive);
           } else {
             adjustForWixContainer();
           }
           optimizeForCurrentViewport();
+          
+          // Additional Wix live site handling
+          if (isWixLive) {
+            const shouldBeMobile = window.innerWidth <= 800;
+            const hub = document.querySelector('.hub');
+            
+            if (shouldBeMobile) {
+              document.body.classList.add('force-wix-mobile');
+              hub.classList.add('force-mobile-layout');
+              closeSidebar();
+            } else {
+              document.body.classList.remove('force-wix-mobile');
+              hub.classList.remove('force-mobile-layout');
+            }
+          }
         }, 150);
       };
 
@@ -996,6 +1208,22 @@
       window.addEventListener('orientationchange', () => {
         setTimeout(handleResize, 300); // Delay for orientation change completion
       });
+      
+      // Additional listener for Wix live sites
+      if (isWixLive) {
+        // Monitor viewport changes more aggressively for Wix live
+        let wixViewportTimeout;
+        const monitorWixViewport = () => {
+          clearTimeout(wixViewportTimeout);
+          wixViewportTimeout = setTimeout(() => {
+            handleResize();
+          }, 100);
+        };
+        
+        // Use multiple event listeners for better Wix live detection
+        window.addEventListener('scroll', monitorWixViewport);
+        document.addEventListener('visibilitychange', monitorWixViewport);
+      }
     }
 
     // Optimize interface for current viewport
