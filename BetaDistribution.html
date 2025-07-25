@@ -1274,7 +1274,8 @@
                             text: 'X'
                         },
                         min: 0,
-                        max: 1
+                        max: 1,
+                        plotLines: []
                     },
                     yAxis: {
                         title: {
@@ -1341,7 +1342,8 @@
                             text: 'X'
                         },
                         min: 0,
-                        max: 1
+                        max: 1,
+                        plotLines: []
                     },
                     yAxis: {
                         title: {
@@ -1392,7 +1394,8 @@
                             text: 'X'
                         },
                         min: 0,
-                        max: 1
+                        max: 1,
+                        plotLines: []
                     },
                     yAxis: [{
                         title: {
@@ -1620,6 +1623,96 @@
                 }
             }
 
+            // Create plotLines based on calculation type
+            const plotLines = [];
+            const precision = parseInt(document.getElementById('precision')?.value) || 2;
+            
+            switch(calcType) {
+                case 'probability':
+                    const xValue = parseFloat(document.getElementById('xValue')?.value) || 0.5;
+                    plotLines.push({
+                        value: xValue,
+                        color: '#ff6b6b',
+                        dashStyle: 'Dash',
+                        width: 2,
+                        label: {
+                            text: `X = ${xValue.toFixed(precision)}`,
+                            style: {
+                                color: '#ff6b6b',
+                                fontWeight: 'bold',
+                                fontSize: '11px'
+                            },
+                            align: 'center',
+                            rotation: 0,
+                            y: -5
+                        },
+                        zIndex: 5
+                    });
+                    break;
+                case 'between':
+                    const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || 0.2;
+                    const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 0.8;
+                    plotLines.push({
+                        value: lowerBound,
+                        color: '#4ecdc4',
+                        dashStyle: 'Dash',
+                        width: 2,
+                        label: {
+                            text: `L = ${lowerBound.toFixed(precision)}`,
+                            style: {
+                                color: '#4ecdc4',
+                                fontWeight: 'bold',
+                                fontSize: '11px'
+                            },
+                            align: 'center',
+                            rotation: 0,
+                            y: -5
+                        },
+                        zIndex: 5
+                    });
+                    plotLines.push({
+                        value: upperBound,
+                        color: '#4ecdc4',
+                        dashStyle: 'Dash',
+                        width: 2,
+                        label: {
+                            text: `U = ${upperBound.toFixed(precision)}`,
+                            style: {
+                                color: '#4ecdc4',
+                                fontWeight: 'bold',
+                                fontSize: '11px'
+                            },
+                            align: 'center',
+                            rotation: 0,
+                            y: -5
+                        },
+                        zIndex: 5
+                    });
+                    break;
+                case 'quantile':
+                    const probability = parseFloat(document.getElementById('probability')?.value) || 0.5;
+                    const quantileValue = jStat.beta.inv(probability, alpha, beta);
+                    plotLines.push({
+                        value: quantileValue,
+                        color: '#9b59b6',
+                        dashStyle: 'Dash',
+                        width: 2,
+                        label: {
+                            text: `Q = ${quantileValue.toFixed(precision)}`,
+                            style: {
+                                color: '#9b59b6',
+                                fontWeight: 'bold',
+                                fontSize: '11px'
+                            },
+                            align: 'center',
+                            rotation: 0,
+                            y: -5
+                        },
+                        zIndex: 5
+                    });
+                    break;
+            }
+
             // Update PDF chart
             if (pdfChart && pdfChart.series) {
                 try {
@@ -1633,6 +1726,9 @@
                         }, false);
                     }
                     pdfChart.xAxis[0].setExtremes(minX, maxX, false);
+                    pdfChart.xAxis[0].update({
+                        plotLines: plotLines
+                    }, false);
                     pdfChart.redraw();
                 } catch (error) {
                     console.warn('Error updating PDF chart:', error);
@@ -1644,6 +1740,9 @@
                 try {
                     cdfChart.series[0].setData(cdfData, false);
                     cdfChart.xAxis[0].setExtremes(minX, maxX, false);
+                    cdfChart.xAxis[0].update({
+                        plotLines: plotLines
+                    }, false);
                     cdfChart.redraw();
                 } catch (error) {
                     console.warn('Error updating CDF chart:', error);
@@ -1666,6 +1765,9 @@
                         combinedChart.series[2].setData(cdfData, false);
                     }
                     combinedChart.xAxis[0].setExtremes(minX, maxX, false);
+                    combinedChart.xAxis[0].update({
+                        plotLines: plotLines
+                    }, false);
                     combinedChart.redraw();
                 } catch (error) {
                     console.warn('Error updating Combined chart:', error);
