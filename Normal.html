@@ -6,14 +6,14 @@
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;            /* no browser scrollbars */
+  overflow: hidden;
 }
 
         #main-wrapper {
-            width: 75vw;
-            max-width: 1000px;
+            width: 90%;
+            max-width: 1200px;
             margin: 0 auto;
-            height: 95vh;
+            height: 100%;
             overflow-y: auto;
             box-sizing: border-box;
             padding: 1rem;
@@ -26,26 +26,26 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow-x: hidden; /* Prevent horizontal scrollbars only */
+            overflow-x: hidden;
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Main container optimized for full viewport */
+        /* Main container optimized for iframe embedding */
         .main-container {
-            width: 100vw;
-            min-height: 100vh;
+            width: 100%;
+            min-height: 100%;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: 20px;
+            padding: 10px;
             box-sizing: border-box;
         }
 
         .content-wrapper {
             width: 100%;
             max-width: 1400px;
-            min-height: calc(100vh - 40px);
+            min-height: calc(100% - 20px);
             display: flex;
             flex-direction: column;
         }
@@ -87,7 +87,7 @@
             background: linear-gradient(135deg, #282c39 0%, #1e2329 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
-            min-height: 100vh;
+            min-height: 100%;
             overflow-x: hidden;
         }
 
@@ -98,6 +98,7 @@
             flex-direction: column;
             padding: 15px;
             box-sizing: border-box;
+            min-height: 100%;
         }
 
         .header {
@@ -671,8 +672,10 @@
 
 .chart-container {
     flex: 1 1 auto;
-    min-height: 200px;
-    max-height: 60vh;
+    min-height: 300px;
+    max-height: 600px;
+    width: 100%;
+    position: relative;
 }
 
 
@@ -1221,15 +1224,27 @@
             box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
         }
 
-        /* Mobile responsiveness */
+        /* Enhanced mobile responsiveness for iframe embedding */
         @media (max-width: 1024px) {
+            .main-container {
+                padding: 8px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
             .main-content {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
 
             .header h1 {
-                font-size: 0.8rem;
+                font-size: 1.5rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
             }
 
             .input-row {
@@ -1237,13 +1252,12 @@
                 gap: 8px;
             }
 
-
-.chart-container {
-    flex: 1 1 auto;
-    min-height: 200px;
-    max-height: 60vh;
-}
-
+            .chart-container {
+                flex: 1 1 auto;
+                min-height: 350px;
+                max-height: 500px;
+                width: 100%;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1251,13 +1265,14 @@
                 overflow-x: hidden;
                 overflow-y: auto;
                 height: auto;
-                min-height: 100vh;
+                min-height: 100%;
             }
 
             .main-container {
                 height: auto;
-                min-height: 100vh;
+                min-height: 100%;
                 align-items: flex-start;
+                padding: 5px;
             }
 
             .content-wrapper {
@@ -1266,10 +1281,24 @@
             }
 
             .container {
-                padding: 10px;
+                padding: 8px;
                 height: auto;
-                min-height: 100vh;
+                min-height: 100%;
                 overflow: visible;
+            }
+
+            .header {
+                margin-bottom: 10px;
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+                margin-bottom: 6px;
+            }
+
+            .header p {
+                font-size: 0.85rem;
             }
 
             .main-content {
@@ -1277,21 +1306,25 @@
                 flex-direction: column;
                 height: auto;
                 min-height: 0;
-                gap: 15px;
+                gap: 12px;
+            }
+
+            .control-panel, .visualization-panel {
+                padding: 15px;
             }
 
             .visualization-panel {
                 overflow-y: auto;
                 max-height: none;
                 height: auto;
-                min-height: 600px;
+                min-height: 500px;
             }
 
             .chart-container {
                 width: 100%;
-                height: 400px !important;
-                min-height: 400px !important;
-                max-height: none;
+                height: 380px !important;
+                min-height: 380px !important;
+                max-height: 450px;
                 overflow: visible;
                 position: relative;
             }
@@ -1312,45 +1345,153 @@
 
             .tabs-and-options-row {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
                 align-items: stretch;
             }
 
             .tabs {
                 flex-wrap: wrap;
                 justify-content: center;
+                gap: 4px;
+            }
+
+            .tab {
+                padding: 6px 10px;
+                font-size: 0.8rem;
             }
 
             .chart-options-toolbar {
                 justify-content: center;
-                gap: 10px;
+                gap: 8px;
                 flex-wrap: wrap;
+            }
+
+            .option-label {
+                font-size: 0.75rem;
+            }
+
+            .mini-dropdown {
+                font-size: 0.7rem;
+                padding: 2px 4px;
+                min-width: 40px;
             }
 
             .results-row {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
+            }
+
+            .embedded-stats-grid {
+                gap: 2px;
+                justify-content: space-between;
+            }
+
+            .embedded-stat-item {
+                min-width: 45px;
+                padding: 2px 4px;
+            }
+
+            .embedded-stat-value {
+                font-size: 0.7rem;
+            }
+
+            .embedded-stat-label {
+                font-size: 0.55rem;
             }
 
             .about-content {
-                margin: 15px;
-                padding: 15px;
-                max-width: calc(100% - 30px);
-                max-height: 90vh;
+                margin: 10px;
+                padding: 12px;
+                max-width: calc(100% - 20px);
+                max-height: 90%;
             }
 
             .about-title {
-                font-size: 1.3rem;
+                font-size: 1.2rem;
             }
 
             .applications-grid {
                 grid-template-columns: 1fr;
+                gap: 8px;
             }
 
             .tooltip {
-                max-width: 200px;
-                font-size: 0.75rem;
-                padding: 8px 10px;
+                max-width: 180px;
+                font-size: 0.7rem;
+                padding: 6px 8px;
+            }
+
+            /* Input improvements for mobile */
+            .input-field {
+                font-size: 16px; /* Prevent zoom on iOS */
+                padding: 12px;
+            }
+
+            .btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .panel-title {
+                font-size: 1.1rem;
+            }
+
+            .radio-option {
+                padding: 8px;
+            }
+        }
+
+        /* Iframe-specific styles for better embedding */
+        body.in-iframe {
+            overflow-y: auto;
+        }
+
+        body.in-iframe .container {
+            height: auto;
+            min-height: auto;
+        }
+
+        body.in-iframe .main-container {
+            min-height: auto;
+        }
+
+        .container.small-viewport {
+            padding: 5px;
+        }
+
+        .container.small-viewport .header {
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .container.small-viewport .main-content {
+            gap: 8px;
+        }
+
+        .container.small-viewport .control-panel,
+        .container.small-viewport .visualization-panel {
+            padding: 10px;
+        }
+
+        /* Very small viewport optimizations */
+        @media (max-width: 480px) {
+            .container.small-viewport {
+                padding: 3px;
+            }
+
+            .container.small-viewport .header {
+                padding: 6px;
+                margin-bottom: 6px;
+            }
+
+            .container.small-viewport .control-panel,
+            .container.small-viewport .visualization-panel {
+                padding: 8px;
+            }
+
+            .container.small-viewport .chart-container {
+                min-height: 320px !important;
+                height: 320px !important;
             }
         }
     </style>
@@ -1365,7 +1506,7 @@
                         <i class="fas fa-chart-line"></i>
                         Normal Distribution Calculator
                     </h1>
-                   
+
                 </div>
                 <div class="main-content">
                     <div class="control-panel">
@@ -1807,6 +1948,9 @@
 
         function initializeApp() {
             try {
+                // Initialize iframe communication for responsive behavior
+                initializeIframeCommunication();
+
                 initializeCharts();
                 updateInputSection();
                 updateRadioSelection();
@@ -2749,7 +2893,7 @@
         function updateChartIndicators(xMarkers, calcType) {
             // Remove existing indicators
             document.querySelectorAll('.chart-indicator').forEach(el => el.remove());
-            
+
             // Chart indicators are no longer needed since information is shown in shaded area and plot lines
             // This function is kept for compatibility but does not create new indicators
         }
@@ -3064,6 +3208,169 @@
                 }
             });
         });
+
+        // Iframe communication and responsive behavior
+        function initializeIframeCommunication() {
+            // Check if we're in an iframe
+            const isInIframe = window.self !== window.top;
+
+            if (isInIframe) {
+                // Add iframe-specific class for styling
+                document.body.classList.add('in-iframe');
+
+                // Listen for messages from parent window
+                window.addEventListener('message', function(event) {
+                    if (event.data && event.data.type === 'viewport') {
+                        optimizeForViewport(event.data);
+                    }
+                });
+
+                // Send height updates to parent
+                const sendHeightUpdate = () => {
+                    const height = Math.max(
+                        document.body.scrollHeight,
+                        document.body.offsetHeight,
+                        document.documentElement.clientHeight,
+                        document.documentElement.scrollHeight,
+                        document.documentElement.offsetHeight
+                    );
+
+                    try {
+                        window.parent.postMessage({
+                            type: 'resize',
+                            height: height
+                        }, '*');
+                    } catch (e) {
+                        // Cross-origin restrictions, silently ignore
+                    }
+                };
+
+                // Send initial height
+                setTimeout(sendHeightUpdate, 100);
+
+                // Send height updates when content changes
+                const observer = new ResizeObserver(debounce(sendHeightUpdate, 250));
+                observer.observe(document.body);
+
+                // Also monitor DOM changes
+                const mutationObserver = new MutationObserver(debounce(sendHeightUpdate, 250));
+                mutationObserver.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true
+                });
+            }
+
+            // Enhanced responsive behavior
+            setupResponsiveOptimizations();
+        }
+
+        function optimizeForViewport(viewportData) {
+            const container = document.querySelector('.container');
+            const isSmallViewport = viewportData.width <= 768;
+
+            if (isSmallViewport) {
+                container.classList.add('small-viewport');
+                // Optimize for mobile in iframe
+                optimizeChartsForMobile();
+            } else {
+                container.classList.remove('small-viewport');
+            }
+        }
+
+        function setupResponsiveOptimizations() {
+            let resizeTimeout;
+
+            const handleResize = () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    optimizeChartsForCurrentViewport();
+                    updateChartSizing();
+                }, 150);
+            };
+
+            window.addEventListener('resize', handleResize);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(handleResize, 300);
+            });
+        }
+
+        function optimizeChartsForMobile() {
+            // Reduce chart complexity on mobile
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile && pdfChart) {
+                try {
+                    pdfChart.update({
+                        plotOptions: {
+                            line: {
+                                enableMouseTracking: false,
+                                marker: { enabled: false }
+                            },
+                            area: {
+                                enableMouseTracking: false,
+                                marker: { enabled: false }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            hideDelay: 0
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Error optimizing PDF chart for mobile:', e);
+                }
+            }
+        }
+
+        function optimizeChartsForCurrentViewport() {
+            const viewport = {
+                width: window.innerWidth,
+                height: window.innerHeight
+            };
+
+            // Adjust chart options based on viewport
+            const chartOptions = {
+                chart: {
+                    animation: viewport.width > 768,
+                    height: viewport.width <= 768 ? 350 : null
+                },
+                legend: {
+                    enabled: viewport.width > 480
+                },
+                tooltip: {
+                    enabled: true,
+                    hideDelay: viewport.width <= 768 ? 0 : 500
+                }
+            };
+
+            // Apply to all charts
+            [pdfChart, cdfChart, combinedChart].forEach(chart => {
+                if (chart && typeof chart.update === 'function') {
+                    try {
+                        chart.update(chartOptions, false);
+                        chart.reflow();
+                    } catch (e) {
+                        console.warn('Error updating chart for viewport:', e);
+                    }
+                }
+            });
+        }
+
+        function updateChartSizing() {
+            // Ensure charts properly reflow after container size changes
+            setTimeout(() => {
+                [pdfChart, cdfChart, combinedChart].forEach(chart => {
+                    if (chart && typeof chart.reflow === 'function') {
+                        try {
+                            chart.reflow();
+                        } catch (e) {
+                            console.warn('Error reflowing chart:', e);
+                        }
+                    }
+                });
+            }, 100);
+        }
     </script>
 </body>
 </html>
