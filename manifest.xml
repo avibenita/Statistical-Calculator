@@ -6,7 +6,7 @@
   <Version>1.0.0.0</Version>
   <ProviderName>YourName</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Normal Distribution Calculator"/>
+  <DisplayName DefaultValue="Normal Distribution Calculator GH"/>
   <Description DefaultValue="An interactive normal distribution calculator"/>
   <IconUrl DefaultValue="https://avibenita.github.io/Statistical-Calculator/icon-32.png"/>
   <SupportUrl DefaultValue="https://avibenita.github.io/Statistical-Calculator/support.html"/>
