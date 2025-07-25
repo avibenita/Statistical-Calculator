@@ -1634,52 +1634,52 @@
 
                             <!-- Chart Options on the Right -->
                             <div class="chart-options-toolbar">
-                                <div class="chart-option">
-                                    <div class="tooltip-container with-icon">
-                                        <label for="precision" class="option-label">
-                                            <i class="fas fa-decimal"></i>
-                                            Precision
-                                        </label>
-                                        <span class="tooltip-icon">
-                                            <i class="fas fa-info"></i>
-                                        </span>
-                                        <div class="tooltip bottom">
-                                            <strong>Decimal Precision</strong>
-                                            Controls how many decimal places are shown in calculations and results.
-                                            <div class="tooltip-example">Higher precision = more accurate results, especially for small probabilities</div>
-                                        </div>
+                                                            <div class="chart-option">
+                                <div class="tooltip-container with-icon">
+                                    <label for="precision" class="option-label">
+                                        <i class="fas fa-decimal"></i>
+                                        Precision
+                                    </label>
+                                    <span class="tooltip-icon">
+                                        <i class="fas fa-info"></i>
+                                    </span>
+                                    <div class="tooltip bottom">
+                                        <strong>Decimal Precision</strong>
+                                        Controls how many decimal places are shown in calculations, results, and chart tooltips.
+                                        <div class="tooltip-example">2 = 0.12, 4 = 0.1234, 6 = 0.123456. Affects all numerical displays.</div>
                                     </div>
-                                    <select class="mini-dropdown" id="precision">
-                                        <option selected value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                    </select>
                                 </div>
-                                <div class="chart-option">
-                                    <div class="tooltip-container with-icon">
-                                        <label for="chartRange" class="option-label">
-                                            <i class="fas fa-expand-arrows-alt"></i>
-                                            Range
-                                        </label>
-                                        <span class="tooltip-icon">
-                                            <i class="fas fa-info"></i>
-                                        </span>
-                                        <div class="tooltip bottom">
-                                            <strong>Chart Range (in σ units)</strong>
-                                            Shows how many standard deviations from the mean to display on the chart.
-                                            <div class="tooltip-example">3σ covers 99.7%, 4σ covers 99.99%, 6σ covers virtually all data</div>
-                                        </div>
+                                <select class="mini-dropdown" id="precision">
+                                    <option selected value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                            <div class="chart-option">
+                                <div class="tooltip-container with-icon">
+                                    <label for="chartRange" class="option-label">
+                                        <i class="fas fa-expand-arrows-alt"></i>
+                                        Range
+                                    </label>
+                                    <span class="tooltip-icon">
+                                        <i class="fas fa-info"></i>
+                                    </span>
+                                    <div class="tooltip bottom">
+                                        <strong>Chart Range (in σ units)</strong>
+                                        Shows how many standard deviations from the mean to display on charts.
+                                        <div class="tooltip-example">2σ = 95.4%, 3σ = 99.7%, 4σ = 99.99%, 6σ = virtually all data</div>
                                     </div>
-                                    <select class="mini-dropdown" id="chartRange">
-                                        <option value="2">2σ</option>
-                                        <option value="3">3σ</option>
-                                        <option selected value="4">4σ</option>
-                                        <option value="5">5σ</option>
-                                        <option value="6">6σ</option>
-                                    </select>
                                 </div>
+                                <select class="mini-dropdown" id="chartRange">
+                                    <option value="2">2σ</option>
+                                    <option value="3">3σ</option>
+                                    <option selected value="4">4σ</option>
+                                    <option value="5">5σ</option>
+                                    <option value="6">6σ</option>
+                                </select>
+                            </div>
                             </div>
                         </div>
                         <div class="tab-content active" id="pdfTab">
@@ -1967,8 +1967,8 @@
                 // Add event listeners with visual feedback
                 document.getElementById('mean').addEventListener('input', debounce(calculateWithFeedback, 250));
                 document.getElementById('stddev').addEventListener('input', debounce(calculateWithFeedback, 250));
-                document.getElementById('chartRange').addEventListener('change', debounce(calculateWithFeedback, 250));
-                document.getElementById('precision').addEventListener('change', debounce(calculateWithFeedback, 250));
+                document.getElementById('chartRange').addEventListener('change', debounce(calculateWithFeedback, 150));
+                document.getElementById('precision').addEventListener('change', debounce(calculateWithFeedback, 150));
 
                 // Add event listener to initial X value input
                 const initialXValue = document.getElementById('xValue');
@@ -2206,6 +2206,19 @@
                         backgroundColor: 'rgba(0,0,0,0.8)',
                         style: {
                             color: 'white'
+                        },
+                        formatter: function() {
+                            const precision = parseInt(document.getElementById('precision')?.value) || 2;
+                            let tooltipContent = `<b>X = ${this.x.toFixed(precision)}</b><br/>`;
+                            
+                            this.points.forEach(point => {
+                                if (point.series.name === 'Probability Density') {
+                                    tooltipContent += `PDF: ${point.y.toFixed(precision)}<br/>`;
+                                } else if (point.series.name === 'Shaded Area') {
+                                    tooltipContent += `<span style="color: ${point.color}">Shaded: ${point.y.toFixed(precision)}</span><br/>`;
+                                }
+                            });
+                            return tooltipContent;
                         }
                     },
                     credits: {
@@ -2251,6 +2264,10 @@
                         backgroundColor: 'rgba(0,0,0,0.8)',
                         style: {
                             color: 'white'
+                        },
+                        formatter: function() {
+                            const precision = parseInt(document.getElementById('precision')?.value) || 2;
+                            return `<b>X = ${this.x.toFixed(precision)}</b><br/>CDF: ${this.y.toFixed(precision)}`;
                         }
                     },
                     credits: {
@@ -2335,6 +2352,21 @@
                         backgroundColor: 'rgba(0,0,0,0.8)',
                         style: {
                             color: 'white'
+                        },
+                        formatter: function() {
+                            const precision = parseInt(document.getElementById('precision')?.value) || 2;
+                            let tooltipContent = `<b>X = ${this.x.toFixed(precision)}</b><br/>`;
+                            
+                            this.points.forEach(point => {
+                                if (point.series.name === 'PDF') {
+                                    tooltipContent += `PDF: ${point.y.toFixed(precision)}<br/>`;
+                                } else if (point.series.name === 'Shaded Area') {
+                                    tooltipContent += `<span style="color: ${point.color}">Shaded: ${point.y.toFixed(precision)}</span><br/>`;
+                                } else if (point.series.name === 'CDF') {
+                                    tooltipContent += `CDF: ${point.y.toFixed(precision)}<br/>`;
+                                }
+                            });
+                            return tooltipContent;
                         }
                     },
                     credits: {
@@ -2464,14 +2496,14 @@
                     switch(calcType) {
                         case 'probability':
                             const xValue = parseFloat(document.getElementById('xValue')?.value) || 0;
-                            const percentage = (result * 100).toFixed(precision);
+                            const percentage = (result * 100).toFixed(Math.max(2, precision-2));
                             equationText = `P(X ≤ ${xValue}) = ${result.toFixed(precision)}`;
                             percentageText = `(${percentage}%)`;
                             break;
                         case 'between':
                             const lowerBound = parseFloat(document.getElementById('lowerBound')?.value) || -1;
                             const upperBound = parseFloat(document.getElementById('upperBound')?.value) || 1;
-                            const betweenPercentage = (result * 100).toFixed(precision);
+                            const betweenPercentage = (result * 100).toFixed(Math.max(2, precision-2));
                             equationText = `P(${lowerBound} ≤ X ≤ ${upperBound}) = ${result.toFixed(precision)}`;
                             percentageText = `(${betweenPercentage}%)`;
                             break;
@@ -2561,13 +2593,13 @@
         }
 
         // Number animation with format control (for integer vs decimal formatting)
-        function animateNumberWithFormat(element, startValue, endValue, duration = 800, isInteger = false) {
+        function animateNumberWithFormat(element, startValue, endValue, duration = 800, isInteger = false, customPrecision = null) {
             if (!element) return;
 
             const start = performance.now();
             const startNum = parseFloat(startValue) || 0;
             const endNum = parseFloat(endValue) || 0;
-            const precision = isInteger ? 0 : (parseInt(document.getElementById('precision')?.value) || 2);
+            const precision = isInteger ? 0 : (customPrecision || parseInt(document.getElementById('precision')?.value) || 2);
 
             // Add visual feedback classes
             element.classList.add('animating');
@@ -2633,11 +2665,11 @@
                 { el: document.getElementById('kurtosisStat'), value: kurtosis, delay: 400, isInteger: true }
             ];
 
-            // Animate the value changes with staggered timing
+            // Animate the value changes with staggered timing and proper precision
             statsElements.forEach(({ el, value, delay, isInteger }) => {
                 if (el) {
                     setTimeout(() => {
-                        animateNumberWithFormat(el, el.textContent, value, 600, isInteger);
+                        animateNumberWithFormat(el, el.textContent, value, 600, isInteger, precision);
                     }, delay);
                 }
             });
@@ -2647,6 +2679,7 @@
             const mean = parseFloat(document.getElementById('mean')?.value) || 0;
             const stddev = parseFloat(document.getElementById('stddev')?.value) || 1;
             const range = parseFloat(document.getElementById('chartRange')?.value) || 4;
+            const precision = parseInt(document.getElementById('precision')?.value) || 2;
             const calcType = document.querySelector('input[name="calcType"]:checked').value;
 
             // Generate data points for smooth curves
