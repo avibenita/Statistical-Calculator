@@ -530,6 +530,56 @@
             gap: 2px;
         }
 
+        /* Quantile Result Highlighting */
+        .quantile-highlight {
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.3)) !important;
+            border: 2px solid rgba(155, 89, 182, 0.6) !important;
+            border-radius: 8px !important;
+            padding: 12px 16px !important;
+            margin: 4px 0 !important;
+            box-shadow: 0 4px 20px rgba(155, 89, 182, 0.3) !important;
+            animation: quantileGlow 2s ease-in-out infinite alternate !important;
+        }
+
+        .quantile-highlight #equationText {
+            font-size: 1.3em !important;
+            font-weight: 900 !important;
+            color: #9b59b6 !important;
+            text-shadow: 0 2px 4px rgba(155, 89, 182, 0.4) !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        .quantile-highlight #percentageText {
+            font-size: 1.1em !important;
+            color: #8e44ad !important;
+            font-weight: 700 !important;
+        }
+
+        @keyframes quantileGlow {
+            0% {
+                box-shadow: 0 4px 20px rgba(155, 89, 182, 0.3);
+                border-color: rgba(155, 89, 182, 0.6);
+            }
+            100% {
+                box-shadow: 0 6px 30px rgba(155, 89, 182, 0.5);
+                border-color: rgba(155, 89, 182, 0.8);
+            }
+        }
+
+        /* Quantile result badge */
+        .quantile-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 8px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(155, 89, 182, 0.4);
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 1024px) {
             .main-content {
@@ -1510,6 +1560,12 @@
 
                 const equationTextEl = document.getElementById('equationText');
                 const percentageTextEl = document.getElementById('percentageText');
+                const shadedAreaInfo = document.querySelector('.shaded-area-info');
+
+                // Remove previous highlighting
+                if (shadedAreaInfo) {
+                    shadedAreaInfo.classList.remove('quantile-highlight');
+                }
 
                 switch(calcType) {
                     case 'probability':
@@ -1518,7 +1574,7 @@
                         if (xValue >= 0 && xValue <= 1) {
                             probability = jStat.beta.cdf(xValue, alpha, beta);
                             const percentage = (probability * 100).toFixed(Math.max(2, precision-2));
-                            equationTextEl.textContent = `P(X ≤ ${xValue}) = ${probability.toFixed(precision)}`;
+                            equationTextEl.innerHTML = `P(X ≤ ${xValue}) = ${probability.toFixed(precision)}`;
                             percentageTextEl.textContent = `(${percentage}%)`;
                             percentageTextEl.style.display = 'inline';
                         }
@@ -1532,7 +1588,7 @@
                             const probUpper = jStat.beta.cdf(upperBound, alpha, beta);
                             probability = probUpper - probLower;
                             const betweenPercentage = (probability * 100).toFixed(Math.max(2, precision2-2));
-                            equationTextEl.textContent = `P(${lowerBound} ≤ X ≤ ${upperBound}) = ${probability.toFixed(precision2)}`;
+                            equationTextEl.innerHTML = `P(${lowerBound} ≤ X ≤ ${upperBound}) = ${probability.toFixed(precision2)}`;
                             percentageTextEl.textContent = `(${betweenPercentage}%)`;
                             percentageTextEl.style.display = 'inline';
                         }
@@ -1542,7 +1598,14 @@
                         const precision3 = parseInt(document.getElementById('precision')?.value) || 2;
                         if (prob >= 0 && prob <= 1) {
                             const quantile = jStat.beta.inv(prob, alpha, beta);
-                            equationTextEl.textContent = `X = ${quantile.toFixed(precision3)}`;
+                            
+                            // Add special highlighting for quantile result
+                            if (shadedAreaInfo) {
+                                shadedAreaInfo.classList.add('quantile-highlight');
+                            }
+                            
+                            // Enhanced result display with badge
+                            equationTextEl.innerHTML = `<span class="quantile-badge">RESULT</span>X = ${quantile.toFixed(precision3)}`;
                             percentageTextEl.textContent = `P(X ≤ ${quantile.toFixed(precision3)}) = ${prob.toFixed(precision3)}`;
                             percentageTextEl.style.display = 'inline';
                         }
@@ -1702,21 +1765,21 @@
                         value: quantileValue,
                         color: '#9b59b6',
                         dashStyle: 'Dash',
-                        width: 2,
+                        width: 3,
                         label: {
                             text: `Q = ${quantileValue.toFixed(precision)}`,
                             style: {
                                 color: '#9b59b6',
                                 fontWeight: 'bold',
-                                fontSize: '11px',
-                                textOutline: '1px rgba(0,0,0,0.5)'
+                                fontSize: '12px',
+                                textOutline: '2px rgba(0,0,0,0.7)'
                             },
                             align: 'center',
                             rotation: 0,
                             y: 15,
                             verticalAlign: 'top'
                         },
-                        zIndex: 5
+                        zIndex: 10
                     });
                     break;
             }
@@ -1727,10 +1790,11 @@
                     pdfChart.series[0].setData(pdfData, false);
                     if (pdfChart.series[1]) {
                         pdfChart.series[1].setData(shadedPdfData, false);
-                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.8)' : 'rgba(233, 30, 99, 0.8)';
+                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.9)' : 'rgba(233, 30, 99, 0.8)';
+                        const fillOpacity = calcType === 'quantile' ? 0.8 : 0.6;
                         pdfChart.series[1].update({
                             color: shadedColor,
-                            fillOpacity: 0.6
+                            fillOpacity: fillOpacity
                         }, false);
                     }
                     pdfChart.xAxis[0].setExtremes(minX, maxX, false);
@@ -1763,10 +1827,11 @@
                     combinedChart.series[0].setData(pdfData, false);
                     if (combinedChart.series[1]) {
                         combinedChart.series[1].setData(shadedPdfData, false);
-                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.8)' : 'rgba(233, 30, 99, 0.8)';
+                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.9)' : 'rgba(233, 30, 99, 0.8)';
+                        const fillOpacity = calcType === 'quantile' ? 0.8 : 0.6;
                         combinedChart.series[1].update({
                             color: shadedColor,
-                            fillOpacity: 0.6
+                            fillOpacity: fillOpacity
                         }, false);
                     }
                     if (combinedChart.series[2]) {
