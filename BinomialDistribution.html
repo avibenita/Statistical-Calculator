@@ -1417,9 +1417,21 @@
         // Track if this is initial load to prevent double animation
         let isInitialLoad = true;
 
+        // TEST: Add visible indicator that JavaScript is running
+        document.body.style.backgroundColor = '#f0f0f0';
+        console.log('🔥 SCRIPT LOADED - JavaScript is running!');
+        
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded');
+            console.log('🔥 DOM Content Loaded');
+            
+            // Add visual test
+            const testDiv = document.createElement('div');
+            testDiv.style.cssText = 'position:fixed;top:10px;right:10px;background:red;color:white;padding:10px;z-index:9999;';
+            testDiv.textContent = 'JS RUNNING!';
+            document.body.appendChild(testDiv);
+            setTimeout(() => testDiv.remove(), 3000);
+            
             // Wait for both Highcharts and jStat to load
             waitForLibraries();
         });
@@ -1465,6 +1477,13 @@
                     cdfChart: !!cdfChart,
                     combinedChart: !!combinedChart
                 });
+                
+                // TEST: Add visual indicators for chart status
+                const statusDiv = document.createElement('div');
+                statusDiv.style.cssText = 'position:fixed;top:50px;right:10px;background:blue;color:white;padding:10px;z-index:9999;font-size:12px;';
+                statusDiv.innerHTML = `PMF: ${!!pmfChart}<br>CDF: ${!!cdfChart}<br>Combined: ${!!combinedChart}`;
+                document.body.appendChild(statusDiv);
+                setTimeout(() => statusDiv.remove(), 5000);
                 
                 updateInputSection();
                 updateRadioSelection();
