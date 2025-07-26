@@ -1844,8 +1844,17 @@
                 setTimeout(() => field.classList.remove('updating'), 600);
             });
 
-            // Call main calculate function
-            calculate();
+            // Check if charts exist, if not reinitialize
+            if (!pmfChart || !cdfChart || !combinedChart) {
+                console.log('Charts not initialized, reinitializing...');
+                initializeCharts();
+                setTimeout(() => {
+                    calculate();
+                }, 100);
+            } else {
+                // Call main calculate function
+                calculate();
+            }
         }
 
         function calculate() {
@@ -2149,9 +2158,15 @@
             }
 
             // Generate chart data
+            console.log(`Generating data for n=${n}, p=${p}, range=${minK}-${maxK}`);
             for (let k = minK; k <= maxK; k++) {
                 const pmfValue = binomialPMF(k, n, p);
                 const cdfValue = binomialCDF(k, n, p);
+
+                if (isNaN(pmfValue) || isNaN(cdfValue)) {
+                    console.error(`Invalid values at k=${k}: PMF=${pmfValue}, CDF=${cdfValue}`);
+                    continue;
+                }
 
                 pmfData.push([k, pmfValue]);
                 cdfData.push([k, cdfValue]);
@@ -2161,6 +2176,10 @@
                     highlightedData.push([k, pmfValue]);
                 }
             }
+            
+            console.log('Generated PMF data points:', pmfData.length);
+            console.log('Generated CDF data points:', cdfData.length);
+            console.log('Generated highlighted data points:', highlightedData.length);
 
             // Store data globally for animations
             chartDataStore.pmfData = [...pmfData];
@@ -2168,6 +2187,7 @@
             chartDataStore.highlightedData = [...highlightedData];
 
             // Update PMF chart
+            console.log('Updating PMF chart with', pmfData.length, 'data points');
             if (pmfChart && pmfChart.series && pmfChart.series[0]) {
                 try {
                     pmfChart.series[0].setData(pmfData, false);
@@ -2179,35 +2199,34 @@
                     if (pmfChart.xAxis && pmfChart.xAxis[0]) {
                         pmfChart.xAxis[0].setExtremes(minK, maxK, false);
                     }
-                } catch (error) {
-                    console.warn('Error updating PMF chart data:', error);
-                }
-
-                try {
+                    
                     pmfChart.redraw();
+                    console.log('PMF chart updated successfully');
                 } catch (error) {
-                    console.warn('Error redrawing PMF chart:', error);
+                    console.error('Error updating PMF chart:', error);
                 }
+            } else {
+                console.error('PMF chart not available for update');
             }
 
             // Update CDF chart
+            console.log('Updating CDF chart with', cdfData.length, 'data points');
             if (cdfChart && cdfChart.series && cdfChart.series[0]) {
                 try {
                     cdfChart.series[0].setData(cdfData, false);
 
                     // Update X axis range
                     if (cdfChart.xAxis && cdfChart.xAxis[0]) {
-                        cdfChart.xAxis[0].setExtremes(minK, maxK, false);
+                        cdfChart.xAxis[0].setExtremes(minK, maxX, false);
                     }
-                } catch (error) {
-                    console.warn('Error updating CDF chart data:', error);
-                }
-
-                try {
+                    
                     cdfChart.redraw();
+                    console.log('CDF chart updated successfully');
                 } catch (error) {
-                    console.warn('Error redrawing CDF chart:', error);
+                    console.error('Error updating CDF chart:', error);
                 }
+            } else {
+                console.error('CDF chart not available for update');
             }
 
             // Update combined chart
