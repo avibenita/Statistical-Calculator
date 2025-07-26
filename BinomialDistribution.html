@@ -1419,19 +1419,53 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            // Wait for Highcharts to load
-            if (typeof Highcharts === 'undefined') {
-                setTimeout(() => {
-                    initializeApp();
-                }, 100);
-            } else {
-                initializeApp();
-            }
+            console.log('DOM Content Loaded');
+            // Wait for both Highcharts and jStat to load
+            waitForLibraries();
         });
+
+        function waitForLibraries() {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max wait
+            
+            function checkLibraries() {
+                attempts++;
+                console.log(`Checking libraries, attempt ${attempts}`);
+                
+                if (typeof Highcharts !== 'undefined' && typeof jStat !== 'undefined') {
+                    console.log('All libraries loaded successfully');
+                    initializeApp();
+                } else {
+                    console.log(`Libraries status: Highcharts=${typeof Highcharts}, jStat=${typeof jStat}`);
+                    if (attempts < maxAttempts) {
+                        setTimeout(checkLibraries, 100);
+                    } else {
+                        console.error('Failed to load required libraries after 5 seconds');
+                        // Try to initialize anyway
+                        initializeApp();
+                    }
+                }
+            }
+            
+            checkLibraries();
+        }
 
         function initializeApp() {
             try {
+                console.log('Starting app initialization');
+                console.log('Chart containers available:', {
+                    pmf: !!document.getElementById('pmfChart'),
+                    cdf: !!document.getElementById('cdfChart'),
+                    combined: !!document.getElementById('combinedChart')
+                });
+                
                 initializeCharts();
+                console.log('Charts initialized, status:', {
+                    pmfChart: !!pmfChart,
+                    cdfChart: !!cdfChart,
+                    combinedChart: !!combinedChart
+                });
+                
                 updateInputSection();
                 updateRadioSelection();
                 updateStatistics();
@@ -1441,6 +1475,8 @@
                 setTimeout(() => {
                     if (pmfChart && chartDataStore.pmfData.length > 0) {
                         triggerChartAnimations('pmf');
+                    } else {
+                        console.error('PMF chart or data not available for animation');
                     }
                 }, 800); // Delay to ensure all data is ready
 
@@ -1577,6 +1613,11 @@
                 }
                 
                 console.log('Initializing charts...');
+                console.log('Container dimensions:', {
+                    pmf: { width: pmfContainer.offsetWidth, height: pmfContainer.offsetHeight },
+                    cdf: { width: cdfContainer.offsetWidth, height: cdfContainer.offsetHeight },
+                    combined: { width: combinedContainer.offsetWidth, height: combinedContainer.offsetHeight }
+                });
 
                 // Set dark theme for all charts
                 Highcharts.setOptions({
@@ -1637,6 +1678,7 @@
                 });
 
                 // PMF Chart (using column chart for discrete distribution)
+                console.log('Creating PMF chart...');
                 pmfChart = Highcharts.chart('pmfChart', {
                     chart: {
                         type: 'column',
