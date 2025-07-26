@@ -1013,9 +1013,9 @@
                                         Precision
                                     </label>
                                     <select class="mini-dropdown" id="precision">
-                                        <option value="2">2</option>
+                                        <option selected value="2">2</option>
                                         <option value="3">3</option>
-                                        <option selected value="4">4</option>
+                                        <option value="4">4</option>
                                         <option value="5">5</option>
                                         <option value="6">6</option>
                                     </select>
@@ -1261,16 +1261,14 @@
                 case 'between':
                     html = `
                         <div class="input-group">
-                            <label>Lower Bound (a)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer ≤ n</small>
+                            <label style="margin-bottom: 8px; display: block;">Bounds (a ≤ X ≤ b)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integers ≤ n</small>
                             </label>
-                            <input type="number" id="lowerBound" class="input-field" value="3" step="1" min="0" placeholder="e.g., 0, 1, 3">
-                        </div>
-                        <div class="input-group">
-                            <label>Upper Bound (b)
-                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Non-negative integer ≤ n</small>
-                            </label>
-                            <input type="number" id="upperBound" class="input-field" value="7" step="1" min="0" placeholder="e.g., 5, 7, 10">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <input type="number" id="lowerBound" class="input-field" value="3" step="1" min="0" placeholder="Lower" style="flex: 1;">
+                                <span style="color: #bbb; font-weight: bold;">≤ X ≤</span>
+                                <input type="number" id="upperBound" class="input-field" value="7" step="1" min="0" placeholder="Upper" style="flex: 1;">
+                            </div>
                         </div>
                     `;
                     break;
@@ -1382,9 +1380,9 @@
                     }, {
                         name: 'Highlighted',
                         data: [],
-                        color: 'rgba(230, 126, 34, 0.8)',
+                        color: '#9b59b6',
                         borderWidth: 2,
-                        borderColor: '#ffa578'
+                        borderColor: '#8e44ad'
                     }],
                     tooltip: {
                         shared: false,
@@ -1659,14 +1657,16 @@
                 if (areaValueEl) {
                     // For probability calculations, show percentage
                     const displayValue = result * 100;
+                    const precision = parseInt(document.getElementById('precision')?.value) || 2;
 
                     // Animate the percentage with enhanced feedback
                     animateNumber(areaValueEl, parseFloat(areaValueEl.textContent) || 0, displayValue, 700, false);
 
-                    // Add suffix after animation
+                    // Add suffix and decimal equivalent after animation
                     setTimeout(() => {
                         if (areaValueEl.textContent && !areaValueEl.textContent.includes('%')) {
-                            areaValueEl.textContent += '%';
+                            const decimalEquivalent = result.toFixed(Math.max(2, precision));
+                            areaValueEl.textContent += `%   = ${decimalEquivalent}`;
                         }
                     }, 750);
                 }
