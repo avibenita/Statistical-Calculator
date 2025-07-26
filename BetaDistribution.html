@@ -16,9 +16,9 @@
             --panel-radius: 10px;
             --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
             --header-bg: #000;
-            --header-color: rgb(233,30,99);
-            --highlight-bg: rgba(233, 30, 99, 0.2);
-            --highlight-text: rgb(233, 30, 99);
+            --header-color: rgb(255,165,120);
+            --highlight-bg: rgba(255, 165, 120, 0.2);
+            --highlight-text: rgb(255, 165, 120);
             --primary-blue: #3498db;
             --primary-blue-hover: #2980b9;
             --success-green: #27ae60;
@@ -350,9 +350,9 @@
         .tab.active {
             color: var(--header-color);
             border-bottom-color: var(--header-color);
-            background: rgba(233, 30, 99, 0.1);
+            background: rgba(255, 165, 120, 0.1);
             transform: translateY(0);
-            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 165, 120, 0.3);
         }
 
         .tab-content {
@@ -456,7 +456,7 @@
             transform: translateY(10px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            border: 1px solid rgba(233, 30, 99, 0.3);
+            border: 1px solid rgba(255, 165, 120, 0.3);
             pointer-events: none;
         }
 
@@ -532,44 +532,44 @@
 
         /* Quantile Result Highlighting */
         .quantile-highlight {
-            background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.3)) !important;
-            border: 2px solid rgba(155, 89, 182, 0.6) !important;
+            background: linear-gradient(135deg, rgba(255, 165, 120, 0.2), rgba(230, 126, 34, 0.3)) !important;
+            border: 2px solid rgba(255, 165, 120, 0.6) !important;
             border-radius: 8px !important;
             padding: 12px 16px !important;
             margin: 4px 0 !important;
-            box-shadow: 0 4px 20px rgba(155, 89, 182, 0.3) !important;
+            box-shadow: 0 4px 20px rgba(255, 165, 120, 0.3) !important;
             animation: quantileGlow 2s ease-in-out infinite alternate !important;
         }
 
         .quantile-highlight #equationText {
             font-size: 1.3em !important;
             font-weight: 900 !important;
-            color: #9b59b6 !important;
-            text-shadow: 0 2px 4px rgba(155, 89, 182, 0.4) !important;
+            color: #e67e22 !important;
+            text-shadow: 0 2px 4px rgba(255, 165, 120, 0.4) !important;
             letter-spacing: 0.5px !important;
         }
 
         .quantile-highlight #percentageText {
             font-size: 1.1em !important;
-            color: #8e44ad !important;
+            color: #d35400 !important;
             font-weight: 700 !important;
         }
 
         @keyframes quantileGlow {
             0% {
-                box-shadow: 0 4px 20px rgba(155, 89, 182, 0.3);
-                border-color: rgba(155, 89, 182, 0.6);
+                box-shadow: 0 4px 20px rgba(255, 165, 120, 0.3);
+                border-color: rgba(255, 165, 120, 0.6);
             }
             100% {
-                box-shadow: 0 6px 30px rgba(155, 89, 182, 0.5);
-                border-color: rgba(155, 89, 182, 0.8);
+                box-shadow: 0 6px 30px rgba(255, 165, 120, 0.5);
+                border-color: rgba(255, 165, 120, 0.8);
             }
         }
 
         /* Quantile result badge */
         .quantile-badge {
             display: inline-block;
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            background: linear-gradient(135deg, #e67e22, #d35400);
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
@@ -577,7 +577,7 @@
             font-weight: bold;
             margin-right: 8px;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            box-shadow: 0 2px 8px rgba(155, 89, 182, 0.4);
+            box-shadow: 0 2px 8px rgba(255, 165, 120, 0.4);
         }
 
         /* Mobile Responsiveness */
@@ -1252,7 +1252,7 @@
                             fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                         }
                     },
-                    colors: ['#e91e63', '#3498db', '#e74c3c', '#f39c12', '#27ae60'],
+                    colors: ['#e67e22', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
                     title: {
                         style: {
                             color: 'white'
@@ -1336,14 +1336,14 @@
                     series: [{
                         name: 'Probability Density',
                         data: [],
-                        color: '#e91e63',
+                        color: '#e67e22',
                         lineWidth: 3,
                         shadow: true
                     }, {
                         name: 'Shaded Area',
                         data: [],
                         type: 'area',
-                        color: 'rgba(233, 30, 99, 0.8)',
+                        color: 'rgba(230, 126, 34, 0.8)',
                         lineWidth: 2,
                         fillOpacity: 0.6
                     }],
@@ -1451,13 +1451,13 @@
                         title: {
                             text: 'PDF',
                             style: {
-                                color: '#e91e63'
+                                color: '#e67e22'
                             }
                         },
                         min: 0,
                         labels: {
                             style: {
-                                color: '#e91e63'
+                                color: '#e67e22'
                             }
                         }
                     }, {
@@ -1479,7 +1479,7 @@
                     series: [{
                         name: 'PDF',
                         data: [],
-                        color: '#e91e63',
+                        color: '#e67e22',
                         lineWidth: 3,
                         shadow: true,
                         yAxis: 0
@@ -1487,7 +1487,7 @@
                         name: 'Shaded Area',
                         data: [],
                         type: 'area',
-                        color: 'rgba(233, 30, 99, 0.8)',
+                        color: 'rgba(230, 126, 34, 0.8)',
                         lineWidth: 2,
                         fillOpacity: 0.6,
                         yAxis: 0
@@ -1763,13 +1763,13 @@
                     const quantileValue = jStat.beta.inv(probability, alpha, beta);
                     plotLines.push({
                         value: quantileValue,
-                        color: '#9b59b6',
+                        color: '#e67e22',
                         dashStyle: 'Dash',
                         width: 3,
                         label: {
                             text: `Q = ${quantileValue.toFixed(precision)}`,
                             style: {
-                                color: '#9b59b6',
+                                color: '#e67e22',
                                 fontWeight: 'bold',
                                 fontSize: '12px',
                                 textOutline: '2px rgba(0,0,0,0.7)'
@@ -1790,7 +1790,7 @@
                     pdfChart.series[0].setData(pdfData, false);
                     if (pdfChart.series[1]) {
                         pdfChart.series[1].setData(shadedPdfData, false);
-                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.9)' : 'rgba(233, 30, 99, 0.8)';
+                        const shadedColor = calcType === 'quantile' ? 'rgba(255, 165, 120, 0.9)' : 'rgba(230, 126, 34, 0.8)';
                         const fillOpacity = calcType === 'quantile' ? 0.8 : 0.6;
                         pdfChart.series[1].update({
                             color: shadedColor,
@@ -1827,7 +1827,7 @@
                     combinedChart.series[0].setData(pdfData, false);
                     if (combinedChart.series[1]) {
                         combinedChart.series[1].setData(shadedPdfData, false);
-                        const shadedColor = calcType === 'quantile' ? 'rgba(155, 89, 182, 0.9)' : 'rgba(233, 30, 99, 0.8)';
+                        const shadedColor = calcType === 'quantile' ? 'rgba(255, 165, 120, 0.9)' : 'rgba(230, 126, 34, 0.8)';
                         const fillOpacity = calcType === 'quantile' ? 0.8 : 0.6;
                         combinedChart.series[1].update({
                             color: shadedColor,
