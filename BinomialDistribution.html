@@ -56,9 +56,9 @@
             --panel-radius: 10px;
             --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
             --header-bg: #000;
-            --header-color: rgb(120,165,255);
-            --highlight-bg: rgba(120, 165, 255, 0.2);
-            --highlight-text: rgb(120, 165, 255);
+            --header-color: rgb(255,165,120);
+            --highlight-bg: rgba(255, 165, 120, 0.2);
+            --highlight-text: rgb(255, 165, 120);
             --primary-blue: #3498db;
             --primary-blue-hover: #2980b9;
             --success-green: #27ae60;
@@ -318,9 +318,9 @@
         .tab.active {
             color: var(--header-color);
             border-bottom-color: var(--header-color);
-            background: rgba(120,165,255,0.1);
+            background: rgba(255,165,120,0.1);
             transform: translateY(0);
-            box-shadow: 0 4px 12px rgba(120,165,255,0.3);
+            box-shadow: 0 4px 12px rgba(255,165,120,0.3);
         }
 
         .tab.switching {
@@ -330,15 +330,15 @@
         @keyframes tabSwitchPulse {
             0% {
                 transform: translateY(0);
-                box-shadow: 0 4px 12px rgba(120,165,255,0.3);
+                box-shadow: 0 4px 12px rgba(255,165,120,0.3);
             }
             50% {
                 transform: translateY(-4px);
-                box-shadow: 0 8px 24px rgba(120,165,255,0.5);
+                box-shadow: 0 8px 24px rgba(255,165,120,0.5);
             }
             100% {
                 transform: translateY(0);
-                box-shadow: 0 4px 12px rgba(120,165,255,0.3);
+                box-shadow: 0 4px 12px rgba(255,165,120,0.3);
             }
         }
 
@@ -389,7 +389,7 @@
             align-items: center;
             margin-top: 10px;
             padding: 10px;
-            background: rgba(120,165,255,0.1);
+            background: rgba(255,165,120,0.1);
             border-radius: 6px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -589,8 +589,8 @@
         }
 
         .probability-result {
-            background: linear-gradient(135deg, rgba(120,165,255,0.2) 0%, rgba(100,140,255,0.2) 100%);
-            border: 2px solid rgba(120,165,255,0.6);
+            background: linear-gradient(135deg, rgba(255,165,120,0.2) 0%, rgba(255,140,100,0.2) 100%);
+            border: 2px solid rgba(255,165,120,0.6);
             padding: 8px 12px;
             border-radius: 6px;
             font-weight: bold;
@@ -666,14 +666,14 @@
         }
 
         .embedded-stat-item.primary-result {
-            background: rgba(120,165,255,0.15);
-            border: 1px solid rgba(120,165,255,0.3);
+            background: rgba(255,165,120,0.15);
+            border: 1px solid rgba(255,165,120,0.3);
             min-width: 65px;
         }
 
         .embedded-stat-item.primary-result:hover {
-            background: rgba(120,165,255,0.25);
-            box-shadow: 0 4px 16px rgba(120,165,255,0.3);
+            background: rgba(255,165,120,0.25);
+            box-shadow: 0 4px 16px rgba(255,165,120,0.3);
         }
 
         .embedded-stat-value {
@@ -1299,7 +1299,7 @@
                             fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                         }
                     },
-                    colors: ['#3498db', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
+                    colors: ['#e67e22', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
                     title: {
                         style: {
                             color: 'white'
@@ -1376,15 +1376,15 @@
                     series: [{
                         name: 'P(X = k)',
                         data: [],
-                        color: '#3498db',
+                        color: '#e67e22',
                         borderWidth: 1,
-                        borderColor: '#2980b9'
+                        borderColor: '#d35400'
                     }, {
                         name: 'Highlighted',
                         data: [],
-                        color: 'rgba(120, 165, 255, 0.8)',
+                        color: 'rgba(230, 126, 34, 0.8)',
                         borderWidth: 2,
-                        borderColor: '#78a5ff'
+                        borderColor: '#ffa578'
                     }],
                     tooltip: {
                         shared: false,
@@ -1499,15 +1499,15 @@
                         name: 'PMF',
                         data: [],
                         type: 'column',
-                        color: '#3498db',
+                        color: '#e67e22',
                         yAxis: 0,
                         borderWidth: 1,
-                        borderColor: '#2980b9'
+                        borderColor: '#d35400'
                     }, {
                         name: 'CDF',
                         data: [],
                         type: 'line',
-                        color: '#27ae60',
+                        color: '#3498db',
                         lineWidth: 3,
                         yAxis: 1,
                         step: 'left'
@@ -2084,14 +2084,14 @@
                     align-items: center;
                     gap: 5px;
                     padding: 12px 20px;
-                    background: linear-gradient(135deg, rgba(120,165,255,0.25) 0%, rgba(100,140,255,0.15) 100%);
-                    border: 2px solid rgba(120,165,255,0.7);
+                    background: linear-gradient(135deg, rgba(255,165,120,0.25) 0%, rgba(255,140,100,0.15) 100%);
+                    border: 2px solid rgba(255,165,120,0.7);
                     border-radius: 8px;
-                    color: rgb(120,165,255);
+                    color: rgb(255,165,120);
                     font-weight: bold;
                     text-align: center;
                     min-width: 140px;
-                    box-shadow: 0 4px 12px rgba(120,165,255,0.3);
+                    box-shadow: 0 4px 12px rgba(255,165,120,0.3);
                 `;
 
                 const mainResult = document.getElementById('mainResult').textContent;
