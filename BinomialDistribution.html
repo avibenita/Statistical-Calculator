@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <style>
-       html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;            /* no browser scrollbars */
-}
-
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
         #main-wrapper {
             width: 75vw;
             max-width: 1000px;
@@ -25,29 +26,17 @@
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
-            overflow-x: hidden; /* Prevent horizontal scrollbars only */
+            max-width: 100%;
+            overflow-x: hidden;
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
         }
-
-        /* Main container optimized for full viewport */
         .main-container {
-            width: 100vw;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
             padding: 20px;
             box-sizing: border-box;
-        }
-
-        .content-wrapper {
-            width: 100%;
-            max-width: 1400px;
-            min-height: calc(100vh - 40px);
-            display: flex;
-            flex-direction: column;
         }
     </style>
     <meta charset="utf-8"/>
@@ -67,9 +56,9 @@
             --panel-radius: 10px;
             --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
             --header-bg: #000;
-            --header-color: rgb(255,165,120);
-            --highlight-bg: rgba(255, 165, 120, 0.2);
-            --highlight-text: rgb(255, 165, 120);
+            --header-color: rgb(120,165,255);
+            --highlight-bg: rgba(120, 165, 255, 0.2);
+            --highlight-text: rgb(120, 165, 255);
             --primary-blue: #3498db;
             --primary-blue-hover: #2980b9;
             --success-green: #27ae60;
@@ -92,64 +81,54 @@
         }
 
         .container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            box-sizing: border-box;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
-            padding: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
             background: linear-gradient(135deg, var(--header-bg) 0%, #1a1a2e 100%);
             border-radius: var(--panel-radius);
             box-shadow: var(--panel-shadow);
-            flex-shrink: 0;
         }
 
         .header h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: var(--header-color);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         .header p {
             color: #bbb;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 300;
         }
 
         .main-content {
             display: grid;
             grid-template-columns: 1fr 2fr;
-            gap: 20px;
-            flex: 1;
-            min-height: 0; /* Allow flexbox to shrink */
-            overflow: hidden;
+            gap: 30px;
+            margin-bottom: 30px;
         }
 
         .control-panel {
             background: var(--panel-bg);
             border-radius: var(--panel-radius);
             box-shadow: var(--panel-shadow);
-            padding: 20px;
-            overflow-y: auto;
-            max-height: 100%;
+            padding: 25px;
+            height: fit-content;
         }
 
         .visualization-panel {
             background: var(--panel-bg);
             border-radius: var(--panel-radius);
             box-shadow: var(--panel-shadow);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            overflow: hidden;
+            padding: 25px;
+            min-height: 500px;
         }
 
         .panel-title {
@@ -339,9 +318,9 @@
         .tab.active {
             color: var(--header-color);
             border-bottom-color: var(--header-color);
-            background: rgba(255,165,120,0.1);
+            background: rgba(120,165,255,0.1);
             transform: translateY(0);
-            box-shadow: 0 4px 12px rgba(255,165,120,0.3);
+            box-shadow: 0 4px 12px rgba(120,165,255,0.3);
         }
 
         .tab.switching {
@@ -422,153 +401,19 @@
             box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
         }
 
-        .chart-container {
-            flex: 1 1 auto;
-            min-height: 200px;
-            max-height: 60vh;
-        }
-
-        .radio-option.selected.quantile-mode {
-            border-color: #3498db;
-            background: rgba(52, 152, 219, 0.2);
-        }
-
-        .shaded-area-info.quantile-mode {
-            background: rgba(52, 152, 219, 0.15);
-            border: 1px solid rgba(52, 152, 219, 0.4);
-        }
-
-        .shaded-area-info.quantile-mode #equationText,
-        .shaded-area-info.quantile-mode #percentageText {
-            color: #3498db;
-        }
-
-        .shaded-area-info.quantile-mode #percentageText {
-            font-size: 0.8em;
-            opacity: 0.9;
-        }
-
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 20px;
             }
 
             .header h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
 
             .input-row {
                 flex-direction: column;
-                gap: 8px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            html, body {
-                overflow-x: hidden;
-                overflow-y: auto;
-                height: auto;
-                min-height: 100vh;
-            }
-
-            .main-container {
-                height: auto;
-                min-height: 100vh;
-                align-items: flex-start;
-            }
-
-            .content-wrapper {
-                height: auto;
-                min-height: auto;
-            }
-
-            .container {
-                padding: 10px;
-                height: auto;
-                min-height: 100vh;
-                overflow: visible;
-            }
-
-            .main-content {
-                display: flex;
-                flex-direction: column;
-                height: auto;
-                min-height: 0;
-                gap: 15px;
-            }
-
-            .visualization-panel {
-                overflow-y: auto;
-                max-height: none;
-                height: auto;
-                min-height: 600px;
-            }
-
-            .chart-container {
-                width: 100%;
-                height: 400px !important;
-                min-height: 400px !important;
-                max-height: none;
-                overflow: visible;
-                position: relative;
-            }
-
-            .chart-container > div {
-                width: 100% !important;
-                height: 100% !important;
-            }
-
-            /* Hide plot line labels on mobile to prevent overlap */
-            .highcharts-plot-line-label {
-                display: none !important;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tabs-and-options-row {
-                flex-direction: column;
                 gap: 10px;
-                align-items: stretch;
-            }
-
-            .tabs {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .chart-options-toolbar {
-                justify-content: center;
-                gap: 10px;
-                flex-wrap: wrap;
-            }
-
-            .results-row {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .about-content {
-                margin: 15px;
-                padding: 15px;
-                max-width: calc(100% - 30px);
-                max-height: 90vh;
-            }
-
-            .about-title {
-                font-size: 1.3rem;
-            }
-
-            .applications-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tooltip {
-                max-width: 200px;
-                font-size: 0.75rem;
-                padding: 8px 10px;
             }
         }
 
@@ -763,7 +608,7 @@
         }
 
         .results-row .probability-visualization {
-            flex: 0 0 45%;
+            flex: 0 0 40%;
             margin-top: 0;
         }
 
@@ -832,7 +677,7 @@
         }
 
         .embedded-stat-value {
-            font-size: 0.85rem;
+            font-size: 0.65rem;
             font-weight: bold;
             color: var(--header-color);
             line-height: 1.1;
@@ -851,7 +696,7 @@
 
         .embedded-stat-label {
             color: #bbb;
-            font-size: 0.65rem;
+            font-size: 0.5rem;
             margin-top: 1px;
             line-height: 1;
             transition: color 0.3s ease;
@@ -1057,94 +902,11 @@
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
-
-        /* Enhanced Tooltip System & About Modal (Compact) */
-        .tooltip-container { position: relative; display: inline-block; }
-        .tooltip { position: absolute; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 12px 16px; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; max-width: 280px; width: max-content; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 8px 32px rgba(0,0,0,0.4); border: 1px solid rgba(255,165,120,0.3); pointer-events: none; }
-        .tooltip::before { content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid #2c3e50; }
-        .tooltip.bottom { top: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(10px); }
-        .tooltip.top { bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(-10px); }
-        .tooltip.top::before { top: auto; bottom: -6px; border-bottom: none; border-top: 6px solid #2c3e50; }
-        .tooltip-container:hover .tooltip, .tooltip-container:focus-within .tooltip { opacity: 1; visibility: visible; transform: translateY(0); }
-        .tooltip-container:hover .tooltip.top, .tooltip-container:focus-within .tooltip.top { transform: translateX(-50%) translateY(0); }
-        .tooltip strong { color: var(--header-color); display: block; margin-bottom: 4px; font-size: 0.9rem; }
-        .tooltip .tooltip-formula { font-family: 'Courier New', monospace; background: rgba(0,0,0,0.3); padding: 4px 6px; border-radius: 4px; margin: 6px 0; font-size: 0.8rem; color: #e8e8e8; }
-        .tooltip .tooltip-example { color: #bbb; font-style: italic; margin-top: 6px; font-size: 0.8rem; }
-        .input-group label, .option-label, .embedded-stat-label { cursor: help; transition: color 0.3s ease; }
-        .input-group label:hover, .option-label:hover { color: var(--header-color); }
-        .tooltip-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; border-radius: 50%; font-size: 8px; margin-left: 6px; vertical-align: middle; opacity: 0.7; transition: all 0.3s ease; cursor: help; box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3); }
-        .tooltip-icon:hover { opacity: 1; transform: scale(1.1); box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4); }
-        .tooltip-icon i { font-size: 7px; }
-        .tooltip-container.with-icon { display: inline-flex; align-items: center; gap: 2px; }
-        .about-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
-        .about-modal.active { opacity: 1; visibility: visible; }
-        .about-content { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); border-radius: 16px; padding: 30px; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 2px solid rgba(255,165,120,0.3); position: relative; color: white; line-height: 1.6; }
-        .about-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,165,120,0.3); }
-        .about-title { font-size: 1.8rem; color: var(--header-color); display: flex; align-items: center; gap: 12px; }
-        .close-modal { background: none; border: none; font-size: 1.5rem; color: #bbb; cursor: pointer; transition: color 0.3s ease; padding: 5px; }
-        .close-modal:hover { color: var(--header-color); }
-        .about-section { margin-bottom: 25px; }
-        .about-section h3 { color: var(--header-color); font-size: 1.3rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .about-section p { margin-bottom: 12px; color: #e8e8e8; }
-        .formula-box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; margin: 15px 0; font-family: 'Courier New', monospace; border-left: 4px solid var(--header-color); }
-        .formula-title { color: var(--header-color); font-weight: bold; margin-bottom: 8px; font-family: 'Segoe UI', sans-serif; }
-        .historical-note { background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1)); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 8px; padding: 15px; margin: 15px 0; border-left: 4px solid #3498db; }
-        .historical-note .note-title { color: #3498db; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .applications-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
-        .application-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); }
-        .application-item h4 { color: var(--header-color); margin-bottom: 8px; font-size: 1rem; }
-        .application-item p { font-size: 0.9rem; color: #ccc; }
-        .about-btn { background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3); }
-        .about-btn:hover { background: linear-gradient(135deg, #2980b9, #3498db); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4); }
-        @media (max-width: 768px) { 
-            .tooltip { max-width: 220px; font-size: 0.8rem; padding: 10px 12px; } 
-            .about-content { margin: 20px; padding: 20px; max-width: calc(100% - 40px); } 
-            .about-title { font-size: 1.4rem; } 
-            .applications-grid { grid-template-columns: 1fr; }
-
-            /* Mobile chart and container fixes */
-            body {
-                overflow-y: auto !important;
-                overflow-x: hidden !important;
-                height: auto !important;
-                min-height: 100vh !important;
-            }
-
-            #mainContentWrapper {
-                height: auto !important;
-                min-height: 100vh !important;
-                overflow: visible !important;
-            }
-
-            .container {
-                height: auto !important;
-                overflow: visible !important;
-            }
-
-            .chart-container {
-                width: 100%;
-                height: 400px !important;
-                min-height: 400px !important;
-                max-height: none;
-                overflow: visible;
-                position: relative;
-            }
-
-            .chart-container > div {
-                width: 100% !important;
-                height: 100% !important;
-            }
-
-            /* Hide plot line labels on mobile to prevent overlap */
-            .highcharts-plot-line-label {
-                display: none !important;
-            }
-        }
     </style>
 </head>
-<body>
-    <div class="main-container">
-        <div class="content-wrapper">
+<body style="margin: 0; overflow: hidden;">
+    <div style="width: 100vw; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+        <div id="mainContentWrapper" style="width: 90%; max-width: 1200px; height: auto;">
             <div class="container">
                 <div class="header">
                     <h1>
@@ -1169,41 +931,19 @@
                             </button>
                         </div>
                         <div class="input-group">
-                            <div class="tooltip-container with-icon">
-                                <label>
-                                    Number of Trials (n)
-                                    <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Positive integer (1, 2, 3, ...)</small>
-                                </label>
-                                <span class="tooltip-icon">
-                                    <i class="fas fa-info"></i>
-                                </span>
-                                <div class="tooltip bottom">
-                                    <strong>Number of Trials (n)</strong>
-                                    Fixed number of independent trials/experiments. Each trial has the same success probability p.
-                                    <div class="tooltip-formula">n ∈ {1, 2, 3, ...}, mean = np</div>
-                                    <div class="tooltip-example">n=10: 10 coin flips, n=20: 20 survey responses, n=100: 100 tests</div>
-                                </div>
-                            </div>
+                            <label>
+                                Number of Trials (n)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Positive integer (1, 2, 3, ...)</small>
+                            </label>
                             <div class="input-row">
                                 <input class="input-field" id="nTrials" min="1" step="1" type="number" value="10" placeholder="e.g., 5, 10, 20"/>
                             </div>
                         </div>
                         <div class="input-group">
-                            <div class="tooltip-container with-icon">
-                                <label>
-                                    Probability of Success (p)
-                                    <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Between 0 and 1 (e.g., 0.5 = 50%)</small>
-                                </label>
-                                <span class="tooltip-icon">
-                                    <i class="fas fa-info"></i>
-                                </span>
-                                <div class="tooltip bottom">
-                                    <strong>Success Probability (p)</strong>
-                                    Probability of success on each individual trial. Constant across all n trials.
-                                    <div class="tooltip-formula">0 ≤ p ≤ 1, variance = np(1-p)</div>
-                                    <div class="tooltip-example">p=0.5: fair coin, p=0.1: rare success, p=0.8: likely success</div>
-                                </div>
-                            </div>
+                            <label>
+                                Probability of Success (p)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Between 0 and 1 (e.g., 0.5 = 50%)</small>
+                            </label>
                             <div class="input-row">
                                 <input class="input-field" id="pSuccess" min="0" max="1" step="0.01" type="number" value="0.5" placeholder="e.g., 0.3, 0.5, 0.7"/>
                             </div>
@@ -1254,29 +994,14 @@
                         <div class="tabs-and-options-row">
                             <!-- Tabs on the Left -->
                             <div class="tabs">
-                                <div class="tab active tooltip-container" onclick="switchTab('pmf', this)">
+                                <div class="tab active" onclick="switchTab('pmf', this)">
                                     PMF View
-                                    <div class="tooltip bottom">
-                                        <strong>Probability Mass Function</strong>
-                                        Shows discrete probabilities for exact numbers of successes. Bars show P(X = k).
-                                        <div class="tooltip-example">Height = probability of exactly k successes in n trials</div>
-                                    </div>
                                 </div>
-                                <div class="tab tooltip-container" onclick="switchTab('cdf', this)">
+                                <div class="tab" onclick="switchTab('cdf', this)">
                                     CDF View
-                                    <div class="tooltip bottom">
-                                        <strong>Cumulative Distribution Function</strong>
-                                        Shows cumulative probability P(X ≤ k). Staircase pattern from 0 to 1.
-                                        <div class="tooltip-example">Each step up represents adding one more possible success</div>
-                                    </div>
                                 </div>
-                                <div class="tab tooltip-container" onclick="switchTab('both', this)">
+                                <div class="tab" onclick="switchTab('both', this)">
                                     Combined View
-                                    <div class="tooltip bottom">
-                                        <strong>PMF + CDF Together</strong>
-                                        Compare discrete probabilities (PMF) and cumulative probabilities (CDF) side by side.
-                                        <div class="tooltip-example">See how individual probabilities accumulate to total probability</div>
-                                    </div>
                                 </div>
                             </div>
                             
@@ -1288,9 +1013,9 @@
                                         Precision
                                     </label>
                                     <select class="mini-dropdown" id="precision">
-                                        <option selected value="2">2</option>
+                                        <option value="2">2</option>
                                         <option value="3">3</option>
-                                        <option value="4">4</option>
+                                        <option selected value="4">4</option>
                                         <option value="5">5</option>
                                         <option value="6">6</option>
                                     </select>
@@ -1331,10 +1056,11 @@
                                     Highlighted Value
                                 </h4>
                                 <div class="shaded-area-info">
-                                    <span id="equationText" style="font-weight: bold; color: var(--header-color);">
+                                    <span id="areaDescription">
                                         Select calculation type to see highlighted value
                                     </span>
-                                    <span id="percentageText" style="font-weight: bold; color: var(--header-color); display: none;">
+                                    <span id="areaValue" style="font-weight: bold; color: var(--header-color);">
+                                        --
                                     </span>
                                 </div>
                             </div>
@@ -1343,10 +1069,17 @@
                             <div class="embedded-results-panel">
                                 <h4 class="embedded-panel-title">
                                     <i class="fas fa-chart-bar"></i>
-                                    Distribution Statistics
+                                    Results &amp; Statistics
                                 </h4>
                                 <div class="embedded-stats-grid">
-
+                                    <div class="embedded-stat-item primary-result">
+                                        <div class="embedded-stat-value" id="mainResult">
+                                            --
+                                        </div>
+                                        <div class="embedded-stat-label">
+                                            Result
+                                        </div>
+                                    </div>
                                     <div class="embedded-stat-item">
                                         <div class="embedded-stat-value" id="nStat">
                                             10
@@ -1390,14 +1123,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- About Button at bottom of panel -->
-                        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <button class="about-btn" onclick="openAboutModal()">
-                                <i class="fas fa-info-circle"></i>
-                                About Binomial Distribution...
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1417,74 +1142,21 @@
         // Track if this is initial load to prevent double animation
         let isInitialLoad = true;
 
-        // TEST: Add visible indicator that JavaScript is running
-        document.body.style.backgroundColor = '#f0f0f0';
-        console.log('🔥 SCRIPT LOADED - JavaScript is running!');
-        
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔥 DOM Content Loaded');
-            
-            // Add visual test
-            const testDiv = document.createElement('div');
-            testDiv.style.cssText = 'position:fixed;top:10px;right:10px;background:red;color:white;padding:10px;z-index:9999;';
-            testDiv.textContent = 'JS RUNNING!';
-            document.body.appendChild(testDiv);
-            setTimeout(() => testDiv.remove(), 3000);
-            
-            // Wait for both Highcharts and jStat to load
-            waitForLibraries();
-        });
-
-        function waitForLibraries() {
-            let attempts = 0;
-            const maxAttempts = 50; // 5 seconds max wait
-            
-            function checkLibraries() {
-                attempts++;
-                console.log(`Checking libraries, attempt ${attempts}`);
-                
-                if (typeof Highcharts !== 'undefined' && typeof jStat !== 'undefined') {
-                    console.log('All libraries loaded successfully');
+            // Wait for Highcharts to load
+            if (typeof Highcharts === 'undefined') {
+                setTimeout(() => {
                     initializeApp();
-                } else {
-                    console.log(`Libraries status: Highcharts=${typeof Highcharts}, jStat=${typeof jStat}`);
-                    if (attempts < maxAttempts) {
-                        setTimeout(checkLibraries, 100);
-                    } else {
-                        console.error('Failed to load required libraries after 5 seconds');
-                        // Try to initialize anyway
-                        initializeApp();
-                    }
-                }
+                }, 100);
+            } else {
+                initializeApp();
             }
-            
-            checkLibraries();
-        }
+        });
 
         function initializeApp() {
             try {
-                console.log('Starting app initialization');
-                console.log('Chart containers available:', {
-                    pmf: !!document.getElementById('pmfChart'),
-                    cdf: !!document.getElementById('cdfChart'),
-                    combined: !!document.getElementById('combinedChart')
-                });
-                
                 initializeCharts();
-                console.log('Charts initialized, status:', {
-                    pmfChart: !!pmfChart,
-                    cdfChart: !!cdfChart,
-                    combinedChart: !!combinedChart
-                });
-                
-                // TEST: Add visual indicators for chart status
-                const statusDiv = document.createElement('div');
-                statusDiv.style.cssText = 'position:fixed;top:50px;right:10px;background:blue;color:white;padding:10px;z-index:9999;font-size:12px;';
-                statusDiv.innerHTML = `PMF: ${!!pmfChart}<br>CDF: ${!!cdfChart}<br>Combined: ${!!combinedChart}`;
-                document.body.appendChild(statusDiv);
-                setTimeout(() => statusDiv.remove(), 5000);
-                
                 updateInputSection();
                 updateRadioSelection();
                 updateStatistics();
@@ -1494,8 +1166,6 @@
                 setTimeout(() => {
                     if (pmfChart && chartDataStore.pmfData.length > 0) {
                         triggerChartAnimations('pmf');
-                    } else {
-                        console.error('PMF chart or data not available for animation');
                     }
                 }, 800); // Delay to ensure all data is ready
 
@@ -1621,23 +1291,6 @@
                     return;
                 }
 
-                // Check if chart containers exist
-                const pmfContainer = document.getElementById('pmfChart');
-                const cdfContainer = document.getElementById('cdfChart');
-                const combinedContainer = document.getElementById('combinedChart');
-                
-                if (!pmfContainer || !cdfContainer || !combinedContainer) {
-                    console.error('Chart containers not found');
-                    return;
-                }
-                
-                console.log('Initializing charts...');
-                console.log('Container dimensions:', {
-                    pmf: { width: pmfContainer.offsetWidth, height: pmfContainer.offsetHeight },
-                    cdf: { width: cdfContainer.offsetWidth, height: cdfContainer.offsetHeight },
-                    combined: { width: combinedContainer.offsetWidth, height: combinedContainer.offsetHeight }
-                });
-
                 // Set dark theme for all charts
                 Highcharts.setOptions({
                     chart: {
@@ -1646,7 +1299,7 @@
                             fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                         }
                     },
-                    colors: ['#e67e22', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
+                    colors: ['#3498db', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
                     title: {
                         style: {
                             color: 'white'
@@ -1697,7 +1350,6 @@
                 });
 
                 // PMF Chart (using column chart for discrete distribution)
-                console.log('Creating PMF chart...');
                 pmfChart = Highcharts.chart('pmfChart', {
                     chart: {
                         type: 'column',
@@ -1724,15 +1376,15 @@
                     series: [{
                         name: 'P(X = k)',
                         data: [],
-                        color: '#e67e22',
+                        color: '#3498db',
                         borderWidth: 1,
-                        borderColor: '#d35400'
+                        borderColor: '#2980b9'
                     }, {
                         name: 'Highlighted',
                         data: [],
-                        color: 'rgba(255, 165, 120, 0.8)',
+                        color: 'rgba(120, 165, 255, 0.8)',
                         borderWidth: 2,
-                        borderColor: '#ffa578'
+                        borderColor: '#78a5ff'
                     }],
                     tooltip: {
                         shared: false,
@@ -1777,7 +1429,7 @@
                     series: [{
                         name: 'Cumulative Probability',
                         data: [],
-                        color: '#3498db',
+                        color: '#27ae60',
                         lineWidth: 3,
                         shadow: true,
                         step: 'left'
@@ -1847,15 +1499,15 @@
                         name: 'PMF',
                         data: [],
                         type: 'column',
-                        color: '#e67e22',
+                        color: '#3498db',
                         yAxis: 0,
                         borderWidth: 1,
-                        borderColor: '#d35400'
+                        borderColor: '#2980b9'
                     }, {
                         name: 'CDF',
                         data: [],
                         type: 'line',
-                        color: '#3498db',
+                        color: '#27ae60',
                         lineWidth: 3,
                         yAxis: 1,
                         step: 'left'
@@ -1905,17 +1557,8 @@
                 setTimeout(() => field.classList.remove('updating'), 600);
             });
 
-            // Check if charts exist, if not reinitialize
-            if (!pmfChart || !cdfChart || !combinedChart) {
-                console.log('Charts not initialized, reinitializing...');
-                initializeCharts();
-                setTimeout(() => {
-                    calculate();
-                }, 100);
-            } else {
-                // Call main calculate function
-                calculate();
-            }
+            // Call main calculate function
+            calculate();
         }
 
         function calculate() {
@@ -2175,7 +1818,7 @@
             });
         }
 
-        function updateCharts(skipAnimation = false) {
+        function updateCharts() {
             const n = parseInt(document.getElementById('nTrials')?.value) || 10;
             const p = parseFloat(document.getElementById('pSuccess')?.value) || 0.5;
             const chartRange = document.getElementById('chartRange')?.value || 'centered';
@@ -2219,15 +1862,9 @@
             }
 
             // Generate chart data
-            console.log(`Generating data for n=${n}, p=${p}, range=${minK}-${maxK}`);
             for (let k = minK; k <= maxK; k++) {
                 const pmfValue = binomialPMF(k, n, p);
                 const cdfValue = binomialCDF(k, n, p);
-
-                if (isNaN(pmfValue) || isNaN(cdfValue)) {
-                    console.error(`Invalid values at k=${k}: PMF=${pmfValue}, CDF=${cdfValue}`);
-                    continue;
-                }
 
                 pmfData.push([k, pmfValue]);
                 cdfData.push([k, cdfValue]);
@@ -2237,10 +1874,6 @@
                     highlightedData.push([k, pmfValue]);
                 }
             }
-            
-            console.log('Generated PMF data points:', pmfData.length);
-            console.log('Generated CDF data points:', cdfData.length);
-            console.log('Generated highlighted data points:', highlightedData.length);
 
             // Store data globally for animations
             chartDataStore.pmfData = [...pmfData];
@@ -2248,7 +1881,6 @@
             chartDataStore.highlightedData = [...highlightedData];
 
             // Update PMF chart
-            console.log('Updating PMF chart with', pmfData.length, 'data points');
             if (pmfChart && pmfChart.series && pmfChart.series[0]) {
                 try {
                     pmfChart.series[0].setData(pmfData, false);
@@ -2260,34 +1892,35 @@
                     if (pmfChart.xAxis && pmfChart.xAxis[0]) {
                         pmfChart.xAxis[0].setExtremes(minK, maxK, false);
                     }
-                    
-                    pmfChart.redraw();
-                    console.log('PMF chart updated successfully');
                 } catch (error) {
-                    console.error('Error updating PMF chart:', error);
+                    console.warn('Error updating PMF chart data:', error);
                 }
-            } else {
-                console.error('PMF chart not available for update');
+
+                try {
+                    pmfChart.redraw();
+                } catch (error) {
+                    console.warn('Error redrawing PMF chart:', error);
+                }
             }
 
             // Update CDF chart
-            console.log('Updating CDF chart with', cdfData.length, 'data points');
             if (cdfChart && cdfChart.series && cdfChart.series[0]) {
                 try {
                     cdfChart.series[0].setData(cdfData, false);
 
                     // Update X axis range
                     if (cdfChart.xAxis && cdfChart.xAxis[0]) {
-                        cdfChart.xAxis[0].setExtremes(minK, maxX, false);
+                        cdfChart.xAxis[0].setExtremes(minK, maxK, false);
                     }
-                    
-                    cdfChart.redraw();
-                    console.log('CDF chart updated successfully');
                 } catch (error) {
-                    console.error('Error updating CDF chart:', error);
+                    console.warn('Error updating CDF chart data:', error);
                 }
-            } else {
-                console.error('CDF chart not available for update');
+
+                try {
+                    cdfChart.redraw();
+                } catch (error) {
+                    console.warn('Error redrawing CDF chart:', error);
+                }
             }
 
             // Update combined chart
@@ -2320,10 +1953,8 @@
         function updateChartIndicators(highlightValues, calcType) {
             // Remove existing indicators
             document.querySelectorAll('.chart-indicator').forEach(el => el.remove());
-            
-            // Chart indicators are no longer needed since information is shown in shaded area and plot lines
-            // This function is kept for compatibility but does not create new indicators
-        }
+
+            // Create visual indicators below charts
             const chartContainers = document.querySelectorAll('.chart-container');
             chartContainers.forEach(container => {
                 const indicator = document.createElement('div');
