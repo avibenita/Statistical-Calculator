@@ -4,17 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Statistical Calculators Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
     :root {
+      --surface-0: #0c1624; /* page background */
+      --surface-1: #1a1f2e; /* cards / panels - warmer dark gray-blue */
+      --surface-2: #242938; /* chart / results boxes */
+      --border: #2d3748; /* softer border color */
+      --accent-1: rgb(255,165,120); /* warm orange */
+      --accent-2: rgb(120,200,255); /* cyan blue */
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.8);
+      --text-muted: rgba(255,255,255,0.6);
+      --panel-bg: var(--surface-1);
+      --panel-radius: 10px;
+      --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+      --header-color: rgb(255,165,120);
+      --pad: 12px;
+      --highlight-bg: rgba(255, 165, 120, 0.2);
+      --highlight-text: var(--accent-1);
       --sidebar-width: 280px;
-      --sidebar-bg: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-      --main-bg: #ffffff;
-      --color-text: #333333;
-      --color-link: #ff9800;
-      --color-link-hover: #f57c00;
-      --color-primary: #3498db;
-      --border-radius: 8px;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      --sidebar-bg: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+      --main-bg: var(--surface-0);
+      --color-text: var(--text-primary);
+      --color-link: var(--accent-1);
+      --color-link-hover: var(--accent-2);
+      --color-primary: var(--accent-2);
+      --border-radius: var(--panel-radius);
+      --shadow: var(--panel-shadow);
     }
 
     * {
@@ -29,7 +46,8 @@
       min-height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       overflow: hidden;
-      background: #f8f9fa;
+      background: var(--surface-0);
+      color: var(--text-primary);
     }
 
     .hub {
@@ -69,19 +87,91 @@
         min-height: 500px;
       }
     }
-
+.headerh1 {
+    font-size: 1.3rem;
+    color: var(--header-color);
+    margin-bottom: 8px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
     /* Enhanced sidebar responsiveness */
     aside {
       width: var(--sidebar-width);
       min-width: 250px;
       background: var(--sidebar-bg);
-      color: white;
+      color: var(--text-primary);
       padding: 1.2rem;
       overflow-y: auto;
       box-shadow: var(--shadow);
       z-index: 10;
       flex-shrink: 0;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s ease;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+
+    /* Desktop: sidebar can collapse */
+    aside.collapsed {
+      transform: translateX(calc(-1 * var(--sidebar-width)));
+      position: absolute;
+      height: 100%;
+      left: 0;
+    }
+
+    /* Sidebar Collapse Toggle Button - Always Visible */
+    .sidebar-toggle-btn {
+      position: fixed;
+      top: 50%;
+      left: calc(var(--sidebar-width) - 20px);
+      transform: translateY(-50%);
+      width: 40px;
+      height: 80px;
+      background: linear-gradient(145deg, var(--accent-1), rgba(255, 165, 120, 0.8));
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1001;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background: linear-gradient(145deg, rgba(255, 165, 120, 1), var(--accent-1));
+      left: calc(var(--sidebar-width) - 18px);
+      box-shadow: 2px 0 12px rgba(255, 165, 120, 0.5);
+    }
+
+    .sidebar-toggle-btn i {
       transition: transform 0.3s ease;
+    }
+
+    /* When sidebar is collapsed, button moves to left edge */
+    aside.collapsed ~ * .sidebar-toggle-btn,
+    body:has(aside.collapsed) .sidebar-toggle-btn {
+      left: 0px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    body:has(aside.collapsed) .sidebar-toggle-btn:hover {
+      left: 2px;
+    }
+
+    body:has(aside.collapsed) .sidebar-toggle-btn i {
+      transform: rotate(180deg);
+    }
+
+    /* Pulsing animation for initial hint */
+    @keyframes pulse-hint {
+      0%, 100% { transform: translateY(-50%) scale(1); }
+      50% { transform: translateY(-50%) scale(1.1); }
+    }
+
+    .sidebar-toggle-btn.hint {
+      animation: pulse-hint 2s ease-in-out 3;
     }
 
     /* Better scrollbar styling */
@@ -115,8 +205,9 @@
     /* Navigation Groups */
     details.group {
       margin-bottom: 1.2rem;
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--surface-2);
       border-radius: var(--border-radius);
+      border: 1px solid var(--border);
       overflow: hidden;
     }
 
@@ -125,14 +216,21 @@
       font-weight: 600;
       padding: 0.8rem 1rem;
       list-style: none;
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--surface-1);
+      color: var(--text-primary);
       transition: all 0.3s ease;
       border-left: 4px solid transparent;
     }
 
+    summary i {
+      margin-right: 8px;
+      color: var(--accent-1);
+      font-size: 1rem;
+    }
+
     summary:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-left-color: var(--color-link);
+      background: var(--surface-2);
+      border-left-color: var(--accent-1);
     }
 
     summary::-webkit-details-marker {
@@ -152,7 +250,8 @@
 
     details.subgroup {
       margin: 0.5rem 0;
-      background: rgba(0, 0, 0, 0.1);
+      background: var(--surface-0);
+      border: 1px solid var(--border);
       border-radius: 6px;
     }
 
@@ -160,12 +259,46 @@
       font-size: 0.95rem;
       padding: 0.6rem 1rem;
       font-weight: 500;
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--surface-1);
+      color: var(--text-secondary);
     }
 
     details.subgroup summary:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--surface-2);
+      color: var(--text-primary);
     }
+
+/* only main group summaries get the colored left-border on hover */
+details.group > summary:hover {
+  background: var(--surface-2);
+  border-left-color: var(--accent-1);
+}
+
+/* remove left-border on hovered or active sub-items */
+details.subgroup > summary,
+details.subgroup > summary:hover {
+  /* border-left-color: var(--color-link);*/
+}
+
+a:hover {
+  color: var(--accent-1);
+  background: var(--highlight-bg);
+  transform: translateX(4px);
+}
+
+a.active {
+  color: var(--accent-1);
+  background: var(--highlight-bg);
+  font-weight: 600;
+  border-left-color: var(--accent-1);
+}
+
+
+
+
+
+
+
 
     /* Navigation Lists */
     ul {
@@ -176,7 +309,7 @@
 
     li {
       margin: 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid var(--border);
     }
 
     li:last-child {
@@ -184,7 +317,7 @@
     }
 
     a {
-      color: rgba(255, 255, 255, 0.9);
+      color: var(--text-secondary);
       text-decoration: none;
       font-size: 0.9rem;
       display: block;
@@ -195,16 +328,16 @@
     }
 
     a:hover {
-      color: var(--color-link);
-      background: rgba(255, 255, 255, 0.1);
-      border-left-color: var(--color-link);
+      color: var(--accent-1);
+      background: var(--highlight-bg);
+      border-left-color: var(--accent-1);
       transform: translateX(4px);
     }
 
     a.active {
-      color: var(--color-link);
-      background: rgba(255, 152, 0, 0.15);
-      border-left-color: var(--color-link);
+      color: var(--accent-1);
+      background: var(--highlight-bg);
+      border-left-color: var(--accent-1);
       font-weight: 600;
     }
 
@@ -256,6 +389,90 @@
       font-weight: 500;
     }
 
+    /* Awaiting Overlay - Initial Load State */
+    .awaiting-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(40, 44, 57, 0.98);
+      z-index: 500000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.4s ease-out;
+    }
+
+    .awaiting-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes ellipsis {
+      0% { content: ''; }
+      25% { content: '.'; }
+      50% { content: '..'; }
+      75% { content: '...'; }
+      100% { content: ''; }
+    }
+
+    @keyframes bounceHorizontal {
+      0%, 100% { transform: translateX(0); opacity: 0.7; }
+      50% { transform: translateX(-10px); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .loading-dots::after {
+      content: '';
+      animation: ellipsis 1.5s infinite;
+    }
+
+    .awaiting-content {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .awaiting-title {
+      text-align: center;
+      color: #e0e6ed;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+
+    .awaiting-instructions {
+      text-align: left;
+      color: #8b95a5;
+      font-size: 14px;
+      line-height: 1.8;
+      max-width: 420px;
+      padding: 0 20px;
+    }
+
+    .awaiting-instructions div {
+      margin-bottom: 8px;
+    }
+
+    .awaiting-instructions strong {
+      color: #ffa500;
+    }
+
+    .awaiting-icon {
+      margin-top: 30px;
+      text-align: center;
+      color: #ffa500;
+      font-size: 3rem;
+      animation: bounceHorizontal 2s ease-in-out infinite;
+    }
+
     /* Enhanced iframe styles - Wix optimized with dynamic sizing */
     iframe {
       width: 100%;
@@ -270,27 +487,13 @@
       opacity: 0.7;
     }
 
-    /* Improved mobile responsiveness */
+    /* Mobile toggle button - HIDDEN (using only sidebar edge button) */
     .mobile-toggle {
-      display: none;
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
-      z-index: 1000;
-      background: var(--color-primary);
-      color: white;
-      border: none;
-      padding: 0.7rem;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      font-size: 1.2rem;
-      transition: all 0.3s ease;
+      display: none !important;
     }
 
     .mobile-toggle:hover {
-      background: #2980b9;
-      transform: scale(1.05);
+      /* Not used - mobile toggle hidden */
     }
 
     /* Enhanced calculator info bar */
@@ -345,40 +548,27 @@
 
     /* Enhanced mobile responsive - Wix optimized */
     @media (max-width: 768px) {
-      .mobile-toggle {
-        display: block;
-        position: fixed;
-      }
-
-      .hub {
-        position: relative;
-        height: 100%;
-        min-height: 100%;
-      }
-
-      .hub.in-iframe {
-        height: auto;
-        min-height: 950px;
-      }
-
+      /* Mobile uses same sidebar collapse mechanism */
       aside {
         position: fixed;
         top: 0;
         left: 0;
         height: 100%;
         width: var(--sidebar-width);
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
         z-index: 100;
       }
 
-      .hub.in-iframe aside {
-        height: 950px;
-        overflow-y: auto;
+      aside.collapsed {
+        transform: translateX(calc(-1 * var(--sidebar-width)));
       }
 
-      aside.open {
-        transform: translateX(0);
+      /* Button adjusts for mobile */
+      .sidebar-toggle-btn {
+        left: calc(var(--sidebar-width) - 20px);
+      }
+
+      body:has(aside.collapsed) .sidebar-toggle-btn {
+        left: 0px;
       }
 
       main {
@@ -396,7 +586,7 @@
         top: 4rem;
       }
 
-      /* Enhanced mobile overlay */
+      /* Enhanced mobile overlay - works for all screen sizes */
       .mobile-overlay {
         position: fixed;
         top: 0;
@@ -415,8 +605,6 @@
         visibility: visible;
       }
     }
-
-    /* Enhanced small mobile devices */
     @media (max-width: 480px) {
       :root {
         --sidebar-width: 100vw;
@@ -681,7 +869,46 @@
         width: 100% !important;
       }
     }
+
+    /* 1. Always clear out any left-border on group summaries by default */
+      details.group > summary {
+        /* border-left-color: var(--color-link);*/
+      }
+
+      /* 2. Highlight only when hovered or when the group has an “active” flag */
+      details.group:hover > summary,
+      details.group.active > summary {
+        background: rgba(255, 255, 255, 0.15);
+       /* border-left-color: var(--color-link);*/
+      }
+
+      /* 3. Never show a left-border on any subgroup summaries */
+      details.subgroup > summary {
+        /* border-left-color: var(--color-link);*/
+      }
+      details.subgroup > summary:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+/* 1. Ensure every group starts without a colored border */
+details.group > summary {
+  border-left: 4px solid transparent;
+}
+
+/* 2. When a group contains an active sub-link, “light up” its summary */
+details.group:has(a.active) > summary {
+  border-left-color: var(--color-link);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 3. Keep sub-group summaries always clear */
+details.subgroup > summary {
+  border-left-color: transparent !important;
+}
+
   </style>
+
+
+
 </head>
 <body class="wix-container wix-safe">
   <button class="mobile-toggle" onclick="toggleSidebar()">
@@ -690,21 +917,29 @@
 
   <div class="mobile-overlay" onclick="closeSidebar()"></div>
 
+  <!-- Sidebar Collapse/Expand Button - Always Visible -->
+  <button class="sidebar-toggle-btn hint" onclick="toggleSidebarCollapse()" id="sidebarToggleBtn" title="Collapse sidebar">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+
   <div class="hub">
     <aside id="sidebar">
 
-      <details open class="group">
-        <summary>Continuous- Distributions</summary>
+<div  class="headerh1" >
+   <br>
+  Distribution Calculators
 
-
-
+  <br>
+</div>
+      <details class="group" data-category="continuous">
+        <summary><i class="fas fa-chart-line"></i> Continuous Distributions</summary>
           <ul>
             <li>
               <a href="https://avibenita.github.io/Statistical-Calculator/Normal.html"
                  data-src
                  data-name="Normal Distribution"
                  target="_blank">
-                📊 Normal Distribution
+                Normal Distribution
               </a>
             </li>
             <li>
@@ -712,7 +947,7 @@
                  data-src
                  data-name="Uniform Distribution"
                  target="_blank">
-                📏 Uniform Distribution
+                Uniform Distribution
               </a>
             </li>
             <li>
@@ -720,7 +955,7 @@
                  data-src
                  data-name="Exponential Distribution"
                  target="_blank">
-                ⚡ Exponential Distribution
+                Exponential Distribution
               </a>
             </li>
             <li>
@@ -728,18 +963,15 @@
                  data-src
                  data-name="Log-Normal Distribution"
                  target="_blank">
-                📈 Log-Normal Distribution
+                Log-Normal Distribution
               </a>
             </li>
-
-
-
             <li>
               <a href="https://avibenita.github.io/Statistical-Calculator/WeibullDistribution.html"
                  data-src
                  data-name="Weibull Distribution"
                  target="_blank">
-                🔧 Weibull Distribution
+                Weibull Distribution
               </a>
             </li>
             <li>
@@ -747,22 +979,21 @@
                  data-src
                  data-name="Beta Distribution"
                  target="_blank">
-                🎯 Beta Distribution
+                Beta Distribution
               </a>
             </li>
         </ul>
-        </details>
       </details>
 
-      <details class="group">
-        <summary>Discrete Distributions</summary>
+      <details class="group" data-category="discrete">
+        <summary><i class="fas fa-cubes"></i> Discrete Distributions</summary>
         <ul>
           <li>
             <a href="https://avibenita.github.io/Statistical-Calculator/BinomialDistribution.html"
                data-src
                data-name="Binomial Distribution"
                target="_blank">
-              🎯 Binomial Distribution
+              Binomial Distribution
             </a>
           </li>
           <li>
@@ -770,7 +1001,7 @@
                data-src
                data-name="Poisson Distribution"
                target="_blank">
-              ⏰ Poisson Distribution
+              Poisson Distribution
             </a>
           </li>
           <li>
@@ -778,7 +1009,7 @@
                data-src
                data-name="Geometric Distribution"
                target="_blank">
-              🔄 Geometric Distribution
+              Geometric Distribution
             </a>
           </li>
           <li>
@@ -786,21 +1017,21 @@
                data-src
                data-name="Hypergeometric Distribution"
                target="_blank">
-              🎴 Hypergeometric Distribution
+              Hypergeometric Distribution
             </a>
           </li>
         </ul>
       </details>
 
-      <details class="group">
-        <summary>H0 Testing Distributions</summary>
+      <details class="group" data-category="testing">
+        <summary><i class="fas fa-flask"></i> H0 Testing Distributions</summary>
         <ul>
           <li>
             <a href="https://avibenita.github.io/Statistical-Calculator/ChiSquare.html"
                data-src
                data-name="Chi-Square Distribution"
                target="_blank">
-              χ² Chi-Square Distribution
+              Chi-Square Distribution
             </a>
           </li>
           <li>
@@ -808,7 +1039,7 @@
                data-src
                data-name="Student's t-Distribution"
                target="_blank">
-              📊 Student's t-Distribution
+              Student's t-Distribution
             </a>
           </li>
           <li>
@@ -816,30 +1047,95 @@
                data-src
                data-name="F-Distribution"
                target="_blank">
-              📈 F-Distribution
+              F-Distribution
             </a>
           </li>
         </ul>
       </details>
 
-      <details class="group">
-        <summary>Specialized Calculators</summary>
+<div  class="headerh1" >
+   <br>
+  Specialized Calculators
+  <br>
+ </div>
+      <details class="group" data-category="erlang">
+        <summary><i class="fas fa-phone"></i> Erlang-C Calculator</summary>
         <ul>
           <li>
-            <a href="https://avibenita.github.io/Statistical-Calculator/EralngC-Calculator/SimpleErlangC_server.py"
+            <a href="https://avibenita.github.io/Statistical-Calculator/Erlang_SimpleAndSimulation.html"
                data-src
                data-name="Erlang-C Calculator"
                target="_blank">
-              ☎️ Erlang-C Calculator
+              Erlang-C Calculator
             </a>
           </li>
         </ul>
       </details>
+ <details class="group" data-category="power">
+        <summary><i class="fas fa-bolt"></i> Power & Sample Size</summary>
+        <ul>
+          <li>
+            <a href="https://github.com/avibenita/Statistical-Calculator/blob/main/SampleSizeCalculator.html"
+               data-src
+               data-name="Compute N for Target Power"
+               target="_blank">
+              Compute N for Target Power
+            </a>
+          </li>
+          <li>
+            <a href="https://avibenita.github.io/Statistical-Calculator/EralngC-Calculator/SimpleErlangC_server.py"
+               data-src
+               data-name="Compute N for Target α"
+               target="_blank">
+              Compute N for Target α
+            </a>
+          </li>
+        </ul>
+      </details>
+
+<details class="group" data-category="cpk">
+        <summary><i class="fas fa-chart-bar"></i> CPk Calculator</summary>
+        <ul>
+          <li>
+            <a href="https://github.com/avibenita/Statistical-Calculator/blob/main/CpkCalculator.html"
+               data-src
+               data-name="CPk Calculator"
+               target="_blank">
+              CPk Calculator
+            </a>
+          </li>
+        </ul>
+      </details>
+
+
     </aside>
 
+
+
+
+
+
     <main>
+      <!-- Awaiting Overlay - Shown on Initial Load (only covers main area) -->
+      <div class="awaiting-overlay" id="awaitingOverlay">
+        <div class="awaiting-content">
+          <div class="awaiting-title">
+            Awaiting Calculator Selection<span class="loading-dots" style="display: inline-block; width: 30px;"></span>
+          </div>
+          <div class="awaiting-instructions">
+            <div>📊 <strong>Browse the calculators</strong> in the left sidebar</div>
+            <div>🎯 <strong>Click any calculator</strong> to load it in the main area</div>
+            <div>⚡ <strong>Results appear instantly</strong> once you select a calculator</div>
+            <div>🔄 Use the <strong>menu</strong> to explore different statistical distributions</div>
+          </div>
+          <div class="awaiting-icon">
+            ←
+          </div>
+        </div>
+      </div>
+
       <div class="calc-info" id="calc-info">
-        Loading Normal Distribution Calculator...
+        <!-- Empty initially - will show calculator name when selected -->
       </div>
 
       <div class="loading" id="loading">
@@ -848,9 +1144,7 @@
       </div>
 
       <iframe id="calcFrame"
-              src="https://avibenita.github.io/Statistical-Calculator/Normal.html"
-              onload="hideLoading()"
-              onerror="showError()"
+              src="about:blank"
               allow="fullscreen"
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox">
       </iframe>
@@ -858,10 +1152,35 @@
   </div>
 
   <script>
-    let currentCalc = 'Normal Distribution';
+    let currentCalc = null; // No calculator selected initially
+
+    // Hide awaiting overlay when iframe loads successfully
+    function hideAwaitingOverlay() {
+      const overlay = document.getElementById('awaitingOverlay');
+      if (overlay) {
+        overlay.classList.add('hidden');
+        console.log('✅ Awaiting overlay hidden - calculator loaded');
+      }
+    }
+
+    // Show awaiting overlay
+    function showAwaitingOverlay() {
+      const overlay = document.getElementById('awaitingOverlay');
+      if (overlay) {
+        overlay.classList.remove('hidden');
+        console.log('👁️ Awaiting overlay shown');
+      }
+    }
 
     // Initialize with Normal Distribution and iframe detection
     document.addEventListener('DOMContentLoaded', function() {
+      // Setup iframe event listeners
+      const iframe = document.getElementById('calcFrame');
+      if (iframe) {
+        iframe.addEventListener('load', hideLoading);
+        iframe.addEventListener('error', showError);
+      }
+
       // Enhanced detection for Wix environment (editor vs live)
       const isInIframe = window.self !== window.top;
       
@@ -915,11 +1234,11 @@
         optimizeForIframeEmbedding(isWixEditor, isWixLive);
       }
 
-      const normalLink = document.querySelector('[data-name="Normal Distribution"]');
-      if (normalLink) {
-        normalLink.classList.add('active');
-        showCalcInfo('Normal Distribution');
-      }
+      // Don't auto-load any calculator - let user choose from sidebar
+      console.log('📊 Ready - please select a calculator from the sidebar');
+      
+      // Setup accordion behavior for categories
+      setupCategoryAccordion();
     });
 
     // Optimize interface for iframe embedding with Wix-specific handling
@@ -1020,6 +1339,9 @@
         // Add active class to clicked link
         el.classList.add('active');
 
+        // Show awaiting overlay briefly during transition
+        showAwaitingOverlay();
+
         // Show loading
         showLoading();
 
@@ -1032,10 +1354,13 @@
         currentCalc = calcName;
         showCalcInfo(calcName);
 
-        // Close sidebar on mobile
-        if (window.innerWidth <= 768) {
-          closeSidebar();
-        }
+        // Collapse sidebar after selecting a calculator (smooth animation)
+        setTimeout(() => {
+          const sidebar = document.getElementById('sidebar');
+          if (!sidebar.classList.contains('collapsed')) {
+            toggleSidebarCollapse();
+          }
+        }, 300);
       });
     });
 
@@ -1053,6 +1378,11 @@
         const iframe = document.getElementById('calcFrame');
         loading.classList.remove('show');
         iframe.classList.remove('loading');
+        
+        // Only hide the awaiting overlay if an actual calculator is loaded (not blank)
+        if (iframe.src && iframe.src !== 'about:blank' && !iframe.src.includes('about:blank')) {
+          hideAwaitingOverlay();
+        }
       }, 500); // Small delay for smooth transition
     }
 
@@ -1083,44 +1413,71 @@
       }, 3000);
     }
 
-    // Mobile sidebar functions
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.querySelector('.mobile-overlay');
-      const icon = document.getElementById('toggle-icon');
+    // Accordion behavior - only one category open at a time
+    function setupCategoryAccordion() {
+      const allCategories = document.querySelectorAll('details.group');
+      
+      allCategories.forEach(category => {
+        category.addEventListener('toggle', function() {
+          if (this.open) {
+            // Close all other categories
+            allCategories.forEach(otherCategory => {
+              if (otherCategory !== this && otherCategory.open) {
+                otherCategory.open = false;
+              }
+            });
+            console.log('📂 Category opened:', this.getAttribute('data-category'));
+          }
+        });
+      });
+      
+      console.log('✅ Accordion behavior initialized for', allCategories.length, 'categories');
+    }
 
-      if (sidebar.classList.contains('open')) {
-        closeSidebar();
+    // Sidebar collapse/expand - single unified mechanism
+    function toggleSidebarCollapse() {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.getElementById('sidebarToggleBtn');
+      const overlay = document.querySelector('.mobile-overlay');
+      
+      if (sidebar.classList.contains('collapsed')) {
+        // Expand sidebar
+        sidebar.classList.remove('collapsed');
+        overlay.classList.add('show');
+        toggleBtn.setAttribute('title', 'Collapse sidebar');
+        toggleBtn.classList.remove('hint');
+        console.log('📂 Sidebar expanded');
       } else {
-        openSidebar();
+        // Collapse sidebar
+        sidebar.classList.add('collapsed');
+        overlay.classList.remove('show');
+        toggleBtn.setAttribute('title', 'Expand sidebar');
+        console.log('📁 Sidebar collapsed');
       }
+    }
+
+    // Legacy functions for compatibility (now just call main function)
+    function toggleSidebar() {
+      toggleSidebarCollapse();
     }
 
     function openSidebar() {
       const sidebar = document.getElementById('sidebar');
-      const overlay = document.querySelector('.mobile-overlay');
-      const icon = document.getElementById('toggle-icon');
-
-      sidebar.classList.add('open');
-      overlay.classList.add('show');
-      icon.textContent = '✕';
+      if (sidebar.classList.contains('collapsed')) {
+        toggleSidebarCollapse();
+      }
     }
 
     function closeSidebar() {
       const sidebar = document.getElementById('sidebar');
-      const overlay = document.querySelector('.mobile-overlay');
-      const icon = document.getElementById('toggle-icon');
-
-      sidebar.classList.remove('open');
-      overlay.classList.remove('show');
-      icon.textContent = '☰';
+      if (!sidebar.classList.contains('collapsed')) {
+        toggleSidebarCollapse();
+      }
     }
 
     // Handle window resize
     window.addEventListener('resize', function() {
-      if (window.innerWidth > 768) {
-        closeSidebar();
-      }
+      // No auto-opening on resize - user controls sidebar with toggle button
     });
 
     // Handle iframe errors and retries
