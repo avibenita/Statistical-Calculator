@@ -2,24 +2,23 @@
 setlocal
 
 REM ============================
-REM Configuration
+REM CONFIG
 REM ============================
-set REPO_BRANCH=main
+set BRANCH=main
 set COMMIT_MSG=Update calculators
 
 REM ============================
-REM Go to script directory
+REM GO TO SCRIPT FOLDER
 REM ============================
 cd /d "%~dp0"
 
-echo.
-echo ============================
+echo ===============================
 echo Statistico Git Push Script
-echo ============================
+echo ===============================
 echo.
 
 REM ============================
-REM Check git availability
+REM CHECK GIT
 REM ============================
 git --version >nul 2>&1
 if errorlevel 1 (
@@ -29,41 +28,53 @@ if errorlevel 1 (
 )
 
 REM ============================
-REM Show status
+REM SHOW STATUS
 REM ============================
-echo Current git status:
 git status
 echo.
 
 REM ============================
-REM Stage changes
+REM STAGE FILES
 REM ============================
-echo Adding files...
-git add *.html
-git add *.bat
+git add .
 
 REM ============================
-REM Commit (only if needed)
+REM COMMIT IF NEEDED
 REM ============================
 git diff --cached --quiet
 if %errorlevel%==0 (
     echo No changes to commit.
 ) else (
-    echo Committing changes...
     git commit -m "%COMMIT_MSG%"
 )
 
 REM ============================
-REM Push to GitHub
+REM SYNC WITH GITHUB (IMPORTANT)
+REM ============================
+echo.
+echo Pulling latest changes from GitHub...
+git pull --rebase origin %BRANCH%
+if errorlevel 1 (
+    echo.
+    echo ERROR: Pull failed. Resolve conflicts, then rerun.
+    pause
+    exit /b 1
+)
+
+REM ============================
+REM PUSH
 REM ============================
 echo.
 echo Pushing to GitHub...
-git push origin %REPO_BRANCH%
+git push origin %BRANCH%
+if errorlevel 1 (
+    echo.
+    echo ERROR: Push failed.
+    pause
+    exit /b 1
+)
 
-REM ============================
-REM Done
-REM ============================
 echo.
-echo Push completed.
+echo Push completed successfully.
 pause
 endlocal
