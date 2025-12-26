@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Sample Size Calculation Formulas</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --panel-bg: #484b57;
+            --panel-radius: 10px;
+            --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+            --header-bg: #000;
+            --header-color: rgb(255,192,192);
+            --highlight-bg: rgba(255, 192, 192, 0.2);
+            --highlight-text: rgb(255, 192, 192);
+            --primary-blue: #3498db;
+            --primary-blue-hover: #2980b9;
+            --success-green: #27ae60;
+            --warning-orange: #f39c12;
+            --danger-red: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+           white
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--header-bg) 0%, #1a1a2e 100%);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            color: var(--header-color);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            margin-bottom: 10px;
+        }
+
+        .formula-section {
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--header-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid rgba(255,192,192,0.3);
+            padding-bottom: 15px;
+        }
+
+        .subsection {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .subsection-title {
+            font-size: 1.3rem;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .formula-block {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .formula-title {
+            font-size: 1.1rem;
+            color: var(--warning-orange);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .variable-def {
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .variable-def h4 {
+            color: var(--success-green);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .variable-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .variable-item {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .note-box {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .note-box h4 {
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .note-box p {
+            font-size: 0.95rem;
+            color: #e0e0e0;
+        }
+
+        .toc {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .toc h3 {
+            color: var(--header-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .toc a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: var(--primary-blue-hover);
+        }
+
+        .effect-size-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .effect-size-table th,
+        .effect-size-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .effect-size-table th {
+            background: rgba(255,192,192,0.2);
+            color: var(--header-color);
+            font-weight: 600;
+        }
+
+        .effect-size-table td {
+            color: #e8e8e8;
+        }
+
+        .mjx-chtml {
+            color: white !important;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .variable-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-calculator"></i> Sample Size Calculation Formulas</h1>
+            <p>Comprehensive mathematical reference for statistical sample size determination</p>
+            <p>Including power analysis, effect sizes, and test-specific formulas</p>
+        </div>
+
+        <div class="toc">
+            <h3><i class="fas fa-list"></i> Table of Contents</h3>
+            <ul>
+                <li><a href="#general">General Concepts & Power Analysis</a></li>
+                <li><a href="#one-sample-mean">One-Sample t-test (Mean)</a></li>
+                <li><a href="#two-sample-mean">Two-Sample t-test (Means)</a></li>
+                <li><a href="#one-sample-prop">One-Sample Proportion Test</a></li>
+                <li><a href="#two-sample-prop">Two-Sample Proportion Test</a></li>
+                <li><a href="#correlation">Correlation Analysis</a></li>
+                <li><a href="#anova">One-Way ANOVA</a></li>
+                <li><a href="#regression">Linear Regression</a></li>
+                <li><a href="#effect-sizes">Effect Size Guidelines</a></li>
+            </ul>
+        </div>
+
+        <div id="general" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-cog"></i>
+                General Concepts & Power Analysis
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Statistical Power Components</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Statistical Power</div>
+                    $$\text{Power} = 1 - \beta = P(\text{Reject } H_0 | H_1 \text{ is true})$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Key Parameters:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$\alpha$ = Significance level (Type I error rate)</div>
+                        <div class="variable-item">$\beta$ = Type II error rate</div>
+                        <div class="variable-item">$1-\beta$ = Statistical power</div>
+                        <div class="variable-item">$n$ = Sample size</div>
+                        <div class="variable-item">$\delta$ = Effect size</div>
+                        <div class="variable-item">$\sigma$ = Population standard deviation</div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <h4><i class="fas fa-info-circle"></i> Standard Values</h4>
+                    <p>Commonly used values: $\alpha = 0.05$ (5% significance), Power = 0.80 (80% power), which corresponds to $\beta = 0.20$</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Critical Values</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Two-sided Test</div>
+                    $$z_{\alpha/2} = \Phi^{-1}\left(1 - \frac{\alpha}{2}\right)$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">One-sided Test</div>
+                    $$z_{\alpha} = \Phi^{-1}(1 - \alpha)$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Power Critical Value</div>
+                    $$z_{\beta} = \Phi^{-1}(\beta) = \Phi^{-1}(1 - \text{Power})$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Where:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$\Phi^{-1}$ = Inverse standard normal CDF</div>
+                        <div class="variable-item">$z_{\alpha/2} \approx 1.96$ for $\alpha = 0.05$ (two-sided)</div>
+                        <div class="variable-item">$z_{\beta} \approx -0.84$ for Power = 0.80</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="one-sample-mean" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                One-Sample t-test (Mean)
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Sample Size Formula</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Sample Size Calculation</div>
+                    $$n = \left(\frac{z_{\alpha/2} + z_{\beta}}{d}\right)^2$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Effect Size (Cohen's d)</div>
+                    $$d = \frac{|\mu - \mu_0|}{\sigma}$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Parameters:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$\mu$ = Expected population mean</div>
+                        <div class="variable-item">$\mu_0$ = Null hypothesis mean</div>
+                        <div class="variable-item">$\sigma$ = Population standard deviation</div>
+                        <div class="variable-item">$d$ = Cohen's d (standardized effect size)</div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <h4><i class="fas fa-lightbulb"></i> Interpretation</h4>
+                    <p>This formula determines the sample size needed to detect a specific difference between a sample mean and a hypothesized population mean.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="two-sample-mean" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-balance-scale"></i>
+                Two-Sample t-test (Means)
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Equal Sample Sizes</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Sample Size per Group</div>
+                    $$n = 2\left(\frac{z_{\alpha/2} + z_{\beta}}{d}\right)^2$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Effect Size</div>
+                    $$d = \frac{|\mu_1 - \mu_2|}{\sigma_{pooled}}$$
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Unequal Sample Sizes</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Sample Size for Group 1</div>
+                    $$n_1 = \left(\frac{z_{\alpha/2} + z_{\beta}}{d}\right)^2 \cdot \frac{(1 + k)}{k}$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Sample Size for Group 2</div>
+                    $$n_2 = k \cdot n_1$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Parameters:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$\mu_1, \mu_2$ = Group means</div>
+                        <div class="variable-item">$\sigma_{pooled}$ = Pooled standard deviation</div>
+                        <div class="variable-item">$k = n_2/n_1$ = Allocation ratio</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="one-sample-prop" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-percentage"></i>
+                One-Sample Proportion Test
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Sample Size Formula</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Sample Size Calculation</div>
+                    $$n = \frac{\left(z_{\alpha/2}\sqrt{p_0(1-p_0)} + z_{\beta}\sqrt{p(1-p)}\right)^2}{(p - p_0)^2}$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Simplified Form (Large Sample)</div>
+                    $$n \approx \frac{(z_{\alpha/2} + z_{\beta})^2 \cdot p(1-p)}{(p - p_0)^2}$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Parameters:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$p$ = Expected proportion</div>
+                        <div class="variable-item">$p_0$ = Null hypothesis proportion</div>
+                        <div class="variable-item">$\sqrt{p(1-p)}$ = Standard error of proportion</div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Assumptions</h4>
+                    <p>Normal approximation is valid when $np \geq 5$ and $n(1-p) \geq 5$ for both $p$ and $p_0$.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="two-sample-prop" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-pie"></i>
+                Two-Sample Proportion Test
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Sample Size Formula</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Sample Size per Group</div>
+                    $$n = \frac{\left(z_{\alpha/2}\sqrt{2\bar{p}(1-\bar{p})} + z_{\beta}\sqrt{p_1(1-p_1) + p_2(1-p_2)}\right)^2}{(p_1 - p_2)^2}$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Pooled Proportion</div>
+                    $$\bar{p} = \frac{p_1 + p_2}{2}$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Parameters:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$p_1, p_2$ = Group proportions</div>
+                        <div class="variable-item">$\bar{p}$ = Pooled proportion estimate</div>
+                        <div class="variable-item">Total sample size = $2n$</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="correlation" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-project-diagram"></i>
+                Correlation Analysis
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Sample Size Formula</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Fisher's Z Transformation</div>
+                    $$Z_r = \frac{1}{2}\ln\left(\frac{1+r}{1-r}\right)$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Sample Size Calculation</div>
+                    $$n = \left(\frac{z_{\alpha/2} + z_{\beta}}{Z_1 - Z_0}\right)^2 + 3$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">For Testing r = 0</div>
+                    $$n = \left(\frac{z_{\alpha/2} + z_{\beta}}{0.5 \ln\left(\frac{1+r}{1-r}\right)}\right)^2 + 3$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Parameters:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$r$ = Expected correlation coefficient</div>
+                        <div class="variable-item">$r_0$ = Null hypothesis correlation (often 0)</div>
+                        <div class="variable-item">$Z_1, Z_0$ = Fisher's Z transforms of $r$ and $r_0$</div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <h4><i class="fas fa-info-circle"></i> Fisher's Transformation</h4>
+                    <p>The Fisher's Z transformation normalizes the correlation coefficient, making it approximately normally distributed for easier statistical inference.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="anova" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-layer-group"></i>
+                One-Way ANOVA
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Sample Size Formula</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Sample Size per Group</div>
+                    $$n = \frac{(z_{\alpha} + z_{\beta})^2}{f^2} + 1$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Effect Size (Cohen's f)</div>
+                    $$f = \frac{\sigma_m}{\sigma} = \sqrt{\frac{\eta^2}{1-\eta^2}}$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Eta-squared (η²)</div>
+                    $$\eta^2 = \frac{SS_{between}}{SS_{total}} = \frac{\sum_{i=1}^k n_i(\mu_i - \mu)^2}{\sigma^2_{total}}$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Parameters:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$k$ = Number of groups</div>
+                        <div class="variable-item">$f$ = Cohen's f (effect size)</div>
+                        <div class="variable-item">$\sigma_m$ = Standard deviation of group means</div>
+                        <div class="variable-item">$\sigma$ = Within-group standard deviation</div>
+                        <div class="variable-item">$\eta^2$ = Eta-squared (proportion of variance explained)</div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <h4><i class="fas fa-calculator"></i> Total Sample Size</h4>
+                    <p>Total sample size = $n \times k$ where $k$ is the number of groups.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="regression" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-line"></i>
+                Linear Regression
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Sample Size Formula</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Multiple Regression</div>
+                    $$n = \frac{(z_{\alpha} + z_{\beta})^2}{f^2} + p + 1$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">Effect Size (Cohen's f²)</div>
+                    $$f^2 = \frac{R^2}{1 - R^2}$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">For Testing Single Predictor</div>
+                    $$n = \frac{(z_{\alpha/2} + z_{\beta})^2 \cdot (1 - R^2)}{R^2_{new}} + p + 1$$
+                </div>
+
+                <div class="variable-def">
+                    <h4>Parameters:</h4>
+                    <div class="variable-list">
+                        <div class="variable-item">$p$ = Number of predictors</div>
+                        <div class="variable-item">$R^2$ = Expected coefficient of determination</div>
+                        <div class="variable-item">$f^2$ = Cohen's f² (effect size)</div>
+                        <div class="variable-item">$R^2_{new}$ = Additional variance explained by new predictor</div>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <h4><i class="fas fa-lightbulb"></i> Model Testing</h4>
+                    <p>This formula tests the overall significance of the regression model. For testing individual predictors, use the single predictor formula.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="effect-sizes" class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-ruler"></i>
+                Effect Size Guidelines
+            </h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Cohen's Conventions</h3>
+                
+                <table class="effect-size-table">
+                    <thead>
+                        <tr>
+                            <th>Test Type</th>
+                            <th>Small Effect</th>
+                            <th>Medium Effect</th>
+                            <th>Large Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Cohen's d (t-tests)</td>
+                            <td>0.2</td>
+                            <td>0.5</td>
+                            <td>0.8</td>
+                        </tr>
+                        <tr>
+                            <td>Cohen's f (ANOVA)</td>
+                            <td>0.1</td>
+                            <td>0.25</td>
+                            <td>0.4</td>
+                        </tr>
+                        <tr>
+                            <td>Cohen's f² (Regression)</td>
+                            <td>0.02</td>
+                            <td>0.15</td>
+                            <td>0.35</td>
+                        </tr>
+                        <tr>
+                            <td>R² (Regression)</td>
+                            <td>0.02</td>
+                            <td>0.13</td>
+                            <td>0.26</td>
+                        </tr>
+                        <tr>
+                            <td>Correlation (r)</td>
+                            <td>0.1</td>
+                            <td>0.3</td>
+                            <td>0.5</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="note-box">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Important Note</h4>
+                    <p>These are general guidelines. Effect sizes should be based on practical significance and domain knowledge rather than these arbitrary conventions when possible.</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Relationship Between Effect Sizes</h3>
+                
+                <div class="formula-block">
+                    <div class="formula-title">Cohen's d to Cohen's f</div>
+                    $$f = \frac{d}{2}$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">η² to Cohen's f</div>
+                    $$f = \sqrt{\frac{\eta^2}{1-\eta^2}}$$
+                </div>
+
+                <div class="formula-block">
+                    <div class="formula-title">R² to Cohen's f²</div>
+                    $$f^2 = \frac{R^2}{1-R^2}$$
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-book"></i>
+                References & Notes
+            </h2>
+
+            <div class="subsection">
+                <div class="note-box">
+                    <h4><i class="fas fa-info-circle"></i> Key References</h4>
+                    <p>
+                        • Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences (2nd ed.)<br>
+                        • Faul, F., Erdfelder, E., Lang, A. G., & Buchner, A. (2007). G*Power 3<br>
+                        • Lakens, D. (2013). Calculating and reporting effect sizes<br>
+                        • Murphy, K. R., Myors, B., & Wolach, A. (2014). Statistical Power Analysis
+                    </p>
+                </div>
+
+                <div class="note-box">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Assumptions</h4>
+                    <p>
+                        • Normality of distributions (where applicable)<br>
+                        • Independence of observations<br>
+                        • Homogeneity of variance (where applicable)<br>
+                        • Random sampling from population of interest<br>
+                        • Effect size estimates based on prior research or pilot studies
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
