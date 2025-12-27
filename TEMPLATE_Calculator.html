@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Distribution Calculator Template</title>
+    
+    <!-- Required Libraries -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/annotations.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+    
+    <!-- IMPORTANT: Link to Common Styles -->
+    <link href="calculator-common.css" rel="stylesheet"/>
+    
+    <style>
+        /* Add ONLY calculator-specific styles here */
+        /* For example, if your stats grid needs different columns: */
+        /* 
+        .embedded-stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        */
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <div style="width: 100vw; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+        <div id="mainContentWrapper" style="width: 90%; max-width: 1200px; height: auto;">
+            <div class="container">
+                <!-- HEADER -->
+                <div class="header">
+                    <h1>
+                        <i class="fas fa-chart-line"></i>
+                        [Your Distribution] Calculator
+                    </h1>
+                </div>
+                
+                <!-- MAIN CONTENT GRID -->
+                <div class="main-content">
+                    
+                    <!-- RESULT HERO (Top Right) -->
+                    <div class="result-hero">
+                        <!-- Header with Precision -->
+                        <div style="width: 100%; margin: 0 0 8px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between;">
+                            <h3 style="margin: 0; color: var(--header-color); font-size: 1.1rem; font-weight: 600;">
+                                <i class="fas fa-chart-line"></i> Results
+                            </h3>
+                            <div class="chart-option" style="margin: 0;">
+                                <label for="precision" class="option-label" style="margin-right: 6px; font-size: 0.85rem;">
+                                    <i class="fas fa-decimal"></i> Precision
+                                </label>
+                                <select class="mini-dropdown" id="precision" style="font-size: 0.85rem;">
+                                    <option value="2">2</option>
+                                    <option value="3" selected>3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Main Result Display -->
+                        <div class="result-hero-left" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,165,120,0.3); border-radius: 12px; padding: 12px; text-align: center; align-items: center;">
+                            <div class="result-hero-label" style="justify-content: center; font-size: 0.85rem;">
+                                <i class="fas fa-bullseye"></i>
+                                <span id="heroExpression">Result</span>
+                                <small>(updates instantly)</small>
+                            </div>
+                            <div class="result-hero-value" id="mainResult" style="text-align: center;">--</div>
+                            <div class="shaded-area-info" style="margin: 0; text-align: center; font-size: 0.9rem;">
+                                <span id="areaValue" style="font-weight: 800; color: rgb(120,165,255); text-shadow: 0 6px 22px rgba(120,165,255,0.25);">--</span>
+                            </div>
+                            <div style="margin-top: 8px; text-align: center;">
+                                <span id="explanationLine" style="font-size: 0.8rem; color: rgba(255,255,255,0.6); font-style: italic;">Select parameters to calculate</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Summary Statistics -->
+                        <div class="result-hero-right">
+                            <div class="result-hero-card">
+                                <h4><i class="fas fa-chart-bar"></i> Summary Statistics</h4>
+                                <div class="embedded-results-panel">
+                                    <div class="embedded-stats-grid">
+                                        <!-- Add your stats here -->
+                                        <div class="embedded-stat-item">
+                                            <div class="embedded-stat-value" id="stat1">0</div>
+                                            <div class="embedded-stat-label">Stat 1</div>
+                                        </div>
+                                        <!-- ... more stats -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CONTROL PANEL (Left Side) -->
+                    <div class="control-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h3 class="panel-title" style="margin-bottom: 0;">
+                                <i class="fas fa-edit"></i> Inputs
+                            </h3>
+                            <button class="btn btn-success" onclick="reloadCalculator()" style="padding: 6px 10px; font-size: 0.8rem;">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+                        </div>
+                        
+                        <!-- Input Fields -->
+                        <div class="input-group">
+                            <label>
+                                Parameter 1
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Description</small>
+                            </label>
+                            <div class="input-row">
+                                <input class="input-field" id="param1" type="number" value="0" placeholder="e.g., 0"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Calculation Type -->
+                        <div class="calculation-type">
+                            <h4 style="margin-bottom: 10px; color: var(--header-color); font-size: 0.95rem;">
+                                Calculation Type
+                            </h4>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input checked="" name="calcType" type="radio" value="option1"/>
+                                    <div>
+                                        <strong>Option 1</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">Description</small>
+                                    </div>
+                                </label>
+                                <!-- Add more options -->
+                            </div>
+                        </div>
+                        
+                        <div id="inputSection">
+                            <!-- Dynamic inputs go here -->
+                        </div>
+                        
+                        <!-- About Button -->
+                        <div style="margin: 15px -18px -18px -18px; padding: 12px 18px 18px 18px; border-top: 1px solid rgba(120,165,255,0.2); text-align: center;">
+                            <button onclick="toggleAboutSection()" style="width: 80%; background: linear-gradient(135deg, rgba(120,165,255,0.2), rgba(120,200,255,0.15)); border: 1px solid rgba(120,165,255,0.4); color: rgb(120,200,255); padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                                <i class="fas fa-info-circle"></i> About This Distribution...
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- VISUALIZATION PANEL (Bottom Right) -->
+                    <div class="visualization-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-chart-area"></i> Visualizations
+                        </h3>
+                        
+                        <!-- Tabs and Options -->
+                        <div class="tabs-and-options-row">
+                            <div class="tabs">
+                                <div class="tab active" onclick="switchTab('tab1', this)">Tab 1</div>
+                                <div class="tab" onclick="switchTab('tab2', this)">Tab 2</div>
+                            </div>
+                            <div class="chart-options-toolbar">
+                                <!-- Add chart options here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Tab Contents -->
+                        <div class="tab-content active" id="tab1">
+                            <div class="chart-container">
+                                <div id="chart1"></div>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="tab2">
+                            <div class="chart-container">
+                                <div id="chart2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add your JavaScript here -->
+    <script>
+        // Your calculation functions
+        // Your chart initialization
+        // Your event handlers
+    </script>
+</body>
+</html>
+
