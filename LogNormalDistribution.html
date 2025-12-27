@@ -99,6 +99,9 @@
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+    
+    <!-- Common Calculator Styles -->
+    <link href="calculator-common.css" rel="stylesheet"/>
     <style>
         :root {
             --surface-0: #0c1624; /* page background */
@@ -2649,6 +2652,42 @@
                 }, 300);
             }
         }
+
+        // About Modal Functions
+        function openAboutModal() {
+            const modal = document.getElementById('aboutModal');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeAboutModal() {
+            const modal = document.getElementById('aboutModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Close modal when clicking outside the content
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('aboutModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeAboutModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && modal.classList.contains('active')) {
+                        closeAboutModal();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html> 
