@@ -179,7 +179,7 @@
             grid-area: vizPanel;
 }
 
-
+        
 /* ------------------------------
    RESULT-FIRST HERO
 -------------------------------- */
@@ -236,7 +236,7 @@
     font-weight: 800;
     line-height: 1.05;
     color: rgb(120,165,255);
-    text-shadow:
+    text-shadow: 
         0 0 20px rgba(120,165,255,0.8),
         0 0 40px rgba(120,165,255,0.6),
         0 0 60px rgba(120,165,255,0.4),
@@ -1294,7 +1294,7 @@
                                     Combined View
                                 </div>
                             </div>
-
+                            
                             <!-- Chart Options on the Right -->
                             <div class="chart-options-toolbar">
                                 <div class="chart-option">
@@ -1325,7 +1325,7 @@
                                 <div id="combinedChart"></div>
                             </div>
                         </div>
-
+                        
 <!-- Result/Stats moved to Result Hero -->
 
                         <!-- About Section Toggle Button -->
@@ -1347,9 +1347,9 @@
                         </div>
 
 </div>
-
+                            
                             <!-- Embedded Results & Statistics Panel -->
-
+                            
 <!-- Results & Statistics moved to Result Hero -->
 
                         </div>
@@ -1364,19 +1364,19 @@
                             <button onclick="toggleAboutSection()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='rotate(0deg)'">
                                 <i class="fas fa-times"></i>
                             </button>
-
+                            
                             <h2 style="color: var(--header-color); margin-bottom: 25px; font-size: 1.8rem; text-align: center; padding-right: 40px;">
                                 <i class="fas fa-chart-bar"></i> About the Binomial Distribution
                             </h2>
-
+                    
                     <div style="color: rgba(255,255,255,0.85); line-height: 1.9; font-size: 1rem;">
                         <!-- Definition -->
                         <h3 style="color: rgb(120,200,255); margin-top: 30px; margin-bottom: 15px; font-size: 1.3rem;">
                             <i class="fas fa-book"></i> Definition
                         </h3>
                         <p style="margin-bottom: 20px;">
-                            The <strong>binomial distribution</strong> is a discrete probability distribution that models the number of successes
-                            in a fixed number of independent Bernoulli trials, where each trial has only two possible outcomes (success or failure)
+                            The <strong>binomial distribution</strong> is a discrete probability distribution that models the number of successes 
+                            in a fixed number of independent Bernoulli trials, where each trial has only two possible outcomes (success or failure) 
                             and the same probability of success. It is one of the most widely used probability distributions in statistics.
                         </p>
 
@@ -1413,7 +1413,7 @@
                                 P(X = k) = C(n, k) × p<sup>k</sup> × (1-p)<sup>n-k</sup>
                             </p>
                             <p style="margin-bottom: 10px;">where C(n, k) = n! / (k! × (n-k)!) is the binomial coefficient</p>
-
+                            
                             <p style="margin-bottom: 15px; margin-top: 25px;"><strong>Cumulative Distribution Function (CDF):</strong></p>
                             <p style="font-family: 'Courier New', monospace; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; font-size: 1.05rem; margin-bottom: 20px;">
                                 P(X ≤ k) = Σ<sub>i=0</sub><sup>k</sup> C(n, i) × p<sup>i</sup> × (1-p)<sup>n-i</sup>
@@ -1472,17 +1472,17 @@
                         </h3>
                         <div style="background: rgba(255,165,120,0.1); padding: 20px; border-radius: 10px; border-left: 4px solid rgb(255,165,120); margin-bottom: 15px;">
                             <p style="margin-bottom: 10px;"><strong>Example 1: Coin Flips</strong></p>
-                            <p>If you flip a fair coin 10 times (n=10, p=0.5), what's the probability of getting exactly 5 heads?
+                            <p>If you flip a fair coin 10 times (n=10, p=0.5), what's the probability of getting exactly 5 heads? 
                             This is P(X = 5) ≈ 0.246 or 24.6%.</p>
                         </div>
                         <div style="background: rgba(255,165,120,0.1); padding: 20px; border-radius: 10px; border-left: 4px solid rgb(255,165,120); margin-bottom: 15px;">
                             <p style="margin-bottom: 10px;"><strong>Example 2: Free Throws</strong></p>
-                            <p>A basketball player makes 70% of free throws (p=0.7). In 20 attempts (n=20), what's the probability they make
+                            <p>A basketball player makes 70% of free throws (p=0.7). In 20 attempts (n=20), what's the probability they make 
                             at least 15? Calculate P(X ≥ 15) = 1 - P(X ≤ 14).</p>
                         </div>
                         <div style="background: rgba(255,165,120,0.1); padding: 20px; border-radius: 10px; border-left: 4px solid rgb(255,165,120); margin-bottom: 20px;">
                             <p style="margin-bottom: 10px;"><strong>Example 3: Quality Control</strong></p>
-                            <p>A factory produces items with a 5% defect rate (p=0.05). In a batch of 100 items (n=100), what's the probability
+                            <p>A factory produces items with a 5% defect rate (p=0.05). In a batch of 100 items (n=100), what's the probability 
                             of finding between 3 and 7 defective items? Calculate P(3 ≤ X ≤ 7).</p>
                         </div>
 
@@ -1498,7 +1498,7 @@
                             <li>✅ The probability of success is <strong>constant</strong> across trials</li>
                             <li>✅ You're counting the <strong>number of successes</strong></li>
                         </ul>
-
+                        
                         <p style="margin-bottom: 15px; margin-top: 25px;"><strong>Don't use binomial distribution when:</strong></p>
                         <ul style="margin-left: 25px; margin-bottom: 20px; line-height: 2;">
                             <li>❌ The number of trials is not fixed or is very large (use Poisson or normal approximation)</li>
@@ -2230,7 +2230,7 @@
                 const easedProgress = 1 - Math.pow(1 - progress, 4);
 
                 const currentValue = startNum + (endNum - startNum) * easedProgress;
-
+                
                 if (isInteger) {
                     element.textContent = Math.round(currentValue).toString();
                 } else {
@@ -2395,14 +2395,14 @@
                         cdfChart.xAxis[0].removePlotLine('between-lower');
                         cdfChart.xAxis[0].removePlotLine('between-upper');
                         cdfChart.xAxis[0].removePlotLine('between-result');
-
+                        
                         const precision = parseInt(document.getElementById('precision')?.value) || 4;
-
+                        
                         if (calcType === 'cumulative') {
                             const kValueCum = parseInt(document.getElementById('kValue')?.value) || 5;
                             if (kValueCum >= minK && kValueCum <= maxK) {
                                 const cumulativeResult = binomialCDF(kValueCum, n, p);
-
+                                
                                 cdfChart.xAxis[0].addPlotLine({
                                     id: 'cumulative-result',
                                     value: kValueCum,
@@ -2427,7 +2427,7 @@
                             const kValue = parseInt(document.getElementById('kValue')?.value) || 5;
                             if (kValue >= minK && kValue <= maxK) {
                                 const probabilityResult = binomialPMF(kValue, n, p);
-
+                                
                                 cdfChart.xAxis[0].addPlotLine({
                                     id: 'cumulative-result',
                                     value: kValue,
@@ -2451,12 +2451,12 @@
                         } else if (calcType === 'between') {
                             const lowerBound = parseInt(document.getElementById('lowerBound')?.value) || 3;
                             const upperBound = parseInt(document.getElementById('upperBound')?.value) || 7;
-
+                            
                             if (lowerBound >= minK && upperBound <= maxK && lowerBound <= upperBound) {
                                 const lowerProb = lowerBound > 0 ? binomialCDF(lowerBound - 1, n, p) : 0;
                                 const upperProb = binomialCDF(upperBound, n, p);
                                 const betweenResult = upperProb - lowerProb;
-
+                                
                                 // Lower bound line
                                 cdfChart.xAxis[0].addPlotLine({
                                     id: 'between-lower',
@@ -2474,7 +2474,7 @@
                                         y: 20
                                     }
                                 });
-
+                                
                                 // Upper bound line
                                 cdfChart.xAxis[0].addPlotLine({
                                     id: 'between-upper',
@@ -2492,7 +2492,7 @@
                                         y: 20
                                     }
                                 });
-
+                                
                                 // Result label at midpoint
                                 const midpoint = (lowerBound + upperBound) / 2;
                                 cdfChart.xAxis[0].addPlotLine({
@@ -2551,14 +2551,14 @@
                         combinedChart.xAxis[0].removePlotLine('between-lower');
                         combinedChart.xAxis[0].removePlotLine('between-upper');
                         combinedChart.xAxis[0].removePlotLine('between-result');
-
+                        
                         const precision = parseInt(document.getElementById('precision')?.value) || 4;
-
+                        
                         if (calcType === 'cumulative') {
                             const kValueCum = parseInt(document.getElementById('kValue')?.value) || 5;
                             if (kValueCum >= minK && kValueCum <= maxK) {
                                 const cumulativeResult = binomialCDF(kValueCum, n, p);
-
+                                
                                 combinedChart.xAxis[0].addPlotLine({
                                     id: 'cumulative-result',
                                     value: kValueCum,
@@ -2583,7 +2583,7 @@
                             const kValue = parseInt(document.getElementById('kValue')?.value) || 5;
                             if (kValue >= minK && kValue <= maxK) {
                                 const probabilityResult = binomialPMF(kValue, n, p);
-
+                                
                                 combinedChart.xAxis[0].addPlotLine({
                                     id: 'cumulative-result',
                                     value: kValue,
@@ -2607,12 +2607,12 @@
                         } else if (calcType === 'between') {
                             const lowerBound = parseInt(document.getElementById('lowerBound')?.value) || 3;
                             const upperBound = parseInt(document.getElementById('upperBound')?.value) || 7;
-
+                            
                             if (lowerBound >= minK && upperBound <= maxK && lowerBound <= upperBound) {
                                 const lowerProb = lowerBound > 0 ? binomialCDF(lowerBound - 1, n, p) : 0;
                                 const upperProb = binomialCDF(upperBound, n, p);
                                 const betweenResult = upperProb - lowerProb;
-
+                                
                                 // Lower bound line
                                 combinedChart.xAxis[0].addPlotLine({
                                     id: 'between-lower',
@@ -2630,7 +2630,7 @@
                                         y: 20
                                     }
                                 });
-
+                                
                                 // Upper bound line
                                 combinedChart.xAxis[0].addPlotLine({
                                     id: 'between-upper',
@@ -2648,7 +2648,7 @@
                                         y: 20
                                     }
                                 });
-
+                                
                                 // Result label at midpoint
                                 const midpoint = (lowerBound + upperBound) / 2;
                                 combinedChart.xAxis[0].addPlotLine({
@@ -2954,7 +2954,7 @@
                 if (chartContainer) {
                     chartContainer.style.opacity = '0.3';
                     chartContainer.style.transition = 'opacity 0.6s ease';
-
+                    
                     setTimeout(() => {
                         chartContainer.style.opacity = '1';
                     }, 200);
@@ -3072,7 +3072,7 @@
                 }, 300);
             }
         }
-
+    
 
 /* ------------------------------
    RESULT ACTIONS
@@ -3138,7 +3138,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 </body>
-</html>
+</html> 
 
 
 
