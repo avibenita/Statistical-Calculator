@@ -13,39 +13,773 @@
     
     <!-- Common Calculator Styles -->
     <link href="calculator-common.css" rel="stylesheet"/>
-    <style>
-        :root {
-            --surface-0: #0c1624; /* page background */
-            --surface-1: #1a1f2e; /* cards / panels - warmer dark gray-blue */
-            --surface-2: #242938; /* chart / results boxes */
-            --border: #2d3748; /* softer border color */
-            --accent-1: rgb(255,165,120); /* warm orange */
-            --accent-2: rgb(120,200,255); /* cyan blue */
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255,255,255,0.8);
-            --text-muted: rgba(255,255,255,0.6);
-            --panel-bg: var(--surface-1);
-            --panel-radius: 10px;
-            --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
-            --header-bg: var(--surface-0);
-            --header-color: var(--accent-1);
-            --highlight-bg: rgba(255, 165, 120, 0.2);
-            --highlight-text: var(--accent-1);
-            --primary-blue: var(--accent-1);
-            --primary-blue-hover: rgb(230,140,90);
-            --success-green: #27ae60;
-            --warning-orange: #f39c12;
-            --danger-red: #e74c3c;
-            --pad: 12px;
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <div style="width: 100vw; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+        <div id="mainContentWrapper" style="width: 90%; max-width: 1200px; height: auto;">
+            <div class="container">
+                <div class="header">
+                    <h1>
+                        <i class="fas fa-chart-area"></i>
+                        Beta Distribution Calculator
+                    </h1>
+                </div>
+                <div class="main-content">
+                    <!-- RESULT-FIRST HERO -->
+                    <div class="result-hero">
+                        <div class="result-hero-left">
+                            <div class="result-hero-title">
+                                <span id="heroExpression">Result</span>
+                                <small>(updates instantly)</small>
+                            </div>
+
+                            <div class="result-hero-value" id="mainResult" style="text-align: center;">--</div>
+
+                            <div class="shaded-area-info" style="margin: 0; text-align: center; font-size: 0.9rem;">
+                                <div style="text-align: center;">
+                                    <span id="areaValue" style="font-weight: 800; color: rgb(120,165,255); text-shadow: 0 6px 22px rgba(120,165,255,0.25); display: inline-block;">--</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 8px; text-align: center;">
+                                <span id="explanationLine" style="font-size: 0.8rem; color: rgba(255,255,255,0.6); font-style: italic;">Select parameters to calculate</span>
+                            </div>
+
+                            <div class="result-hero-actions" style="justify-content: center;">
+                            </div>
+                        </div>
+
+                        <div class="result-hero-right">
+                            <div class="result-hero-card">
+                                <h4><i class="fas fa-chart-bar"></i> Summary Statistics</h4>
+                                <div class="embedded-results-panel">
+                                    <div class="embedded-stats-grid">
+                                        <div class="embedded-stat-item">
+                                            <div class="embedded-stat-value" id="meanStat">0.4</div>
+                                            <div class="embedded-stat-label">Mean</div>
+                                        </div>
+                                        <div class="embedded-stat-item">
+                                            <div class="embedded-stat-value" id="varianceStat">0.03</div>
+                                            <div class="embedded-stat-label">Variance</div>
+                                        </div>
+                                        <div class="embedded-stat-item">
+                                            <div class="embedded-stat-value" id="modeStat">0.33</div>
+                                            <div class="embedded-stat-label">Mode</div>
+                                        </div>
+                                        <div class="embedded-stat-item">
+                                            <div class="embedded-stat-value" id="skewnessStat">0.28</div>
+                                            <div class="embedded-stat-label">Skewness</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h3 class="panel-title" style="margin-bottom: 0;">
+                                <i class="fas fa-edit"></i>
+                                Inputs
+                            </h3>
+                            <button class="btn btn-success" onclick="reloadCalculator()" style="padding: 6px 10px; font-size: 0.8rem;">
+                                <i class="fas fa-redo"></i>
+                                Reset
+                            </button>
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                Alpha (α) Parameter
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Shape parameter (must be > 0)</small>
+                            </label>
+                            <input type="number" id="alpha" class="input-field" value="2" step="0.1" min="0.1" placeholder="e.g., 1, 2, 5">
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                Beta (β) Parameter
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Shape parameter (must be > 0)</small>
+                            </label>
+                            <input type="number" id="beta" class="input-field" value="3" step="0.1" min="0.1" placeholder="e.g., 1, 2, 5">
+                        </div>
+
+                        <div id="inputSection">
+                            <div class="input-group">
+                                <label>
+                                    X Value (0 to 1)
+                                </label>
+                                <input type="number" id="xValue" class="input-field" value="0.5" step="0.01" min="0" max="1" placeholder="e.g., 0.25, 0.5, 0.75">
+                            </div>
+                        </div>
+
+                        <div class="calculation-type">
+                            <h4 style="margin-bottom: 10px; color: var(--header-color); font-size: 0.95rem;">
+                                Calculation Type
+                            </h4>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="calcType" value="probability" checked>
+                                    <div>
+                                        <strong>Find P(X ≤ x)</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">Cumulative probability</small>
+                                    </div>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="calcType" value="between">
+                                    <div>
+                                        <strong>Find P(a ≤ X ≤ b)</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">Probability between two values</small>
+                                    </div>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="calcType" value="quantile">
+                                    <div>
+                                        <strong>Find x given P(X ≤ x)</strong>
+                                        <small style="color: #bbb; display: block; margin-top: 2px;">Inverse cumulative probability</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- About Section Toggle Button -->
+                        <div style="margin: 15px -18px -18px -18px; padding: 12px 18px 18px 18px; border-top: 1px solid rgba(120,165,255,0.2); text-align: center;">
+                            <button onclick="openAboutModal()" style="
+                                width: 80%;
+                                background: linear-gradient(135deg, rgba(120,165,255,0.2), rgba(120,200,255,0.15));
+                                border: 1px solid rgba(120,165,255,0.4);
+                                color: rgb(120,200,255);
+                                padding: 8px 16px;
+                                border-radius: 8px;
+                                font-size: 0.9rem;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                font-weight: 600;
+                                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                            " onmouseover="this.style.background='linear-gradient(135deg, rgba(120,165,255,0.3), rgba(120,200,255,0.25))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(120,165,255,0.3)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(120,165,255,0.2), rgba(120,200,255,0.15))'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)'">
+                                <i class="fas fa-info-circle"></i> About Beta Distribution...
+                            </button>
+                        </div>
+                    </div>
+                    <div class="visualization-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-chart-area"></i>
+                            Visualizations
+                        </h3>
+                        <!-- Combined Tabs and Chart Options Row -->
+                        <div class="tabs-and-options-row">
+                            <!-- Tabs on the Left -->
+                            <div class="tabs">
+                                <div class="tab active" onclick="switchTab('pdf', this)">
+                                    PDF View
+                                </div>
+                                <div class="tab" onclick="switchTab('cdf', this)">
+                                    CDF View
+                                </div>
+                                <div class="tab" onclick="switchTab('both', this)">
+                                    Combined View
+                                </div>
+                            </div>
+
+                            <!-- Chart Options on the Right -->
+                            <div class="chart-options-toolbar">
+                                <div class="chart-option">
+                                    <label for="precision" class="option-label">
+                                        <i class="fas fa-crosshairs"></i>
+                                        Precision
+                                    </label>
+                                    <select id="precision" class="mini-dropdown">
+                                        <option value="2">2</option>
+                                        <option value="3" selected>3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-content active" id="pdfTab">
+                            <div class="chart-container">
+                                <div id="pdfChart"></div>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="cdfTab">
+                            <div class="chart-container">
+                                <div id="cdfChart"></div>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="bothTab">
+                            <div class="chart-container">
+                                <div id="combinedChart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Beta Distribution Modal -->
+    <div id="aboutModal" class="about-modal">
+        <div class="about-modal-content">
+            <div class="about-header">
+                <div class="about-title">
+                    <i class="fas fa-chart-area"></i>
+                    About the Beta Distribution
+                </div>
+                <button class="close-modal" onclick="closeAboutModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="about-body">
+                <section class="about-section">
+                    <h3><i class="fas fa-book"></i> Definition</h3>
+                    <p>The Beta distribution is a continuous probability distribution defined on the interval [0, 1]. It's characterized by two positive shape parameters, α (alpha) and β (beta), which control the shape of the distribution.</p>
+                </section>
+
+                <section class="about-section">
+                    <h3><i class="fas fa-calculator"></i> Parameters</h3>
+                    <ul>
+                        <li><strong>α (alpha):</strong> First shape parameter (α > 0)</li>
+                        <li><strong>β (beta):</strong> Second shape parameter (β > 0)</li>
+                    </ul>
+                </section>
+
+                <section class="about-section">
+                    <h3><i class="fas fa-chart-line"></i> Key Statistics</h3>
+                    <ul>
+                        <li><strong>Mean:</strong> α / (α + β)</li>
+                        <li><strong>Variance:</strong> (α × β) / ((α + β)² × (α + β + 1))</li>
+                        <li><strong>Mode:</strong> (α - 1) / (α + β - 2) when α, β > 1</li>
+                    </ul>
+                </section>
+
+                <section class="about-section">
+                    <h3><i class="fas fa-lightbulb"></i> Common Applications</h3>
+                    <ul>
+                        <li>Bayesian statistics (prior and posterior distributions)</li>
+                        <li>Modeling proportions and percentages</li>
+                        <li>Order statistics and random sampling</li>
+                        <li>Project management (PERT analysis)</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script>
+        let chart;
+        let currentCalcType = 'probability';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Highcharts === 'undefined') {
+                setTimeout(() => {
+                    initializeApp();
+                }, 100);
+            } else {
+                initializeApp();
+            }
+        });
+
+        function initializeApp() {
+            try {
+                initializeCharts();
+                updateInputSection();
+                setupEventListeners();
+                calculate();
+            } catch (error) {
+                console.error('Initialization error:', error);
+            }
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        function setupEventListeners() {
+            // Add listeners to alpha and beta inputs
+            document.getElementById('alpha').addEventListener('input', debounce(calculate, 250));
+            document.getElementById('beta').addEventListener('input', debounce(calculate, 250));
+            
+            // Add listeners to radio buttons
+            document.querySelectorAll('input[name="calcType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    currentCalcType = this.value;
+                    updateInputSection();
+                    calculate();
+                });
+            });
+            
+            // Add listener to precision dropdown
+            const precisionEl = document.getElementById('precision');
+            if (precisionEl) {
+                precisionEl.addEventListener('change', calculate);
+            }
         }
 
-        html, body {
+        function updateRadioSelection() {
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.classList.remove('selected', 'quantile-mode');
+            });
+            const selectedOption = document.querySelector(`input[value="${currentCalcType}"]`).closest('.radio-option');
+            selectedOption.classList.add('selected');
+            if (currentCalcType === 'quantile') {
+                selectedOption.classList.add('quantile-mode');
+            }
+
+            // Update shaded area info styling
+            const shadedAreaInfo = document.querySelector('.shaded-area-info');
+            if (shadedAreaInfo) {
+                shadedAreaInfo.classList.toggle('quantile-mode', currentCalcType === 'quantile');
+            }
+        }
+
+        function updateInputSection() {
+            const inputSection = document.getElementById('inputSection');
+            const calcType = document.querySelector('input[name="calcType"]:checked').value;
+
+            let html = '';
+
+            switch(calcType) {
+                case 'probability':
+                    html = `
+                        <div class="input-group">
+                            <label>X Value (0 to 1)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Value to find probability for (between 0 and 1)</small>
+                            </label>
+                            <input type="number" id="xValue" class="input-field" value="0.5" step="0.01" min="0" max="1" placeholder="e.g., 0.25, 0.5, 0.75">
+                        </div>
+                    `;
+                    break;
+                case 'between':
+                    html = `
+                        <div class="input-group">
+                            <label>Bounds (0 to 1)</label>
+                            <div class="input-row">
+                                <input type="number" id="lowerBound" class="input-field" value="0.2" step="0.01" min="0" max="1" placeholder="Lower bound">
+                                <span style="color: #bbb;">to</span>
+                                <input type="number" id="upperBound" class="input-field" value="0.8" step="0.01" min="0" max="1" placeholder="Upper bound">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'quantile':
+                    html = `
+                        <div class="input-group">
+                            <label>Probability (0 to 1)
+                                <small style="color: #bbb; font-weight: normal; display: block; margin-top: 2px;">Decimal between 0 and 1</small>
+                            </label>
+                            <input type="number" id="probability" class="input-field" value="0.5" step="0.01" min="0" max="1" placeholder="e.g., 0.25, 0.5, 0.95">
+                        </div>
+                    `;
+                    break;
+            }
+
+            inputSection.innerHTML = html;
+
+            // Add event listeners to new inputs
+            inputSection.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', debounce(calculate, 250));
+            });
+        }
+
+        function calculate() {
+            const alpha = parseFloat(document.getElementById('alpha').value);
+            const beta = parseFloat(document.getElementById('beta').value);
+            const calcType = document.querySelector('input[name="calcType"]:checked').value;
+
+            if (alpha <= 0 || beta <= 0) {
+                return;
+            }
+
+            updateStatistics();
+            
+            let result, areaDescription, explanationText;
+            const precision = parseInt(document.getElementById('precision')?.value) || 3;
+
+            switch(calcType) {
+                case 'probability':
+                    const xValue = parseFloat(document.getElementById('xValue').value);
+                    if (xValue >= 0 && xValue <= 1) {
+                        result = jStat.beta.cdf(xValue, alpha, beta);
+                        areaDescription = `P(X ≤ ${xValue})`;
+                        explanationText = `Probability that X is less than or equal to ${xValue}`;
+                    }
+                    break;
+                case 'between':
+                    const lowerBound = parseFloat(document.getElementById('lowerBound').value);
+                    const upperBound = parseFloat(document.getElementById('upperBound').value);
+                    if (lowerBound >= 0 && upperBound <= 1 && lowerBound < upperBound) {
+                        const pLower = jStat.beta.cdf(lowerBound, alpha, beta);
+                        const pUpper = jStat.beta.cdf(upperBound, alpha, beta);
+                        result = pUpper - pLower;
+                        areaDescription = `P(${lowerBound} ≤ X ≤ ${upperBound})`;
+                        explanationText = `Probability that X is between ${lowerBound} and ${upperBound}`;
+                    }
+                    break;
+                case 'quantile':
+                    const probability = parseFloat(document.getElementById('probability').value);
+                    if (probability >= 0 && probability <= 1) {
+                        result = jStat.beta.inv(probability, alpha, beta);
+                        areaDescription = `x where P(X ≤ x) = ${probability}`;
+                        explanationText = `Value x such that ${(probability * 100).toFixed(1)}% of the distribution is below it`;
+                    }
+                    break;
+            }
+
+            // Update result display
+            const mainResultEl = document.getElementById('mainResult');
+            if (mainResultEl && result !== undefined) {
+                mainResultEl.textContent = result.toFixed(precision);
+            }
+
+            const heroExpressionEl = document.getElementById('heroExpression');
+            if (heroExpressionEl && areaDescription) {
+                heroExpressionEl.textContent = areaDescription;
+            }
+
+            const areaValueEl = document.getElementById('areaValue');
+            if (areaValueEl && calcType !== 'quantile' && result !== undefined) {
+                const percentage = (result * 100).toFixed(1);
+                areaValueEl.textContent = `(${percentage}%)`;
+            } else if (areaValueEl && calcType === 'quantile') {
+                areaValueEl.textContent = '';
+            }
+
+            const explanationLineEl = document.getElementById('explanationLine');
+            if (explanationLineEl && explanationText) {
+                explanationLineEl.textContent = explanationText;
+            }
+
+            // Update charts AFTER all values are calculated
+            updateChart(alpha, beta, calcType);
+        }
+
+        function updateStatistics() {
+            const alpha = parseFloat(document.getElementById('alpha').value);
+            const beta = parseFloat(document.getElementById('beta').value);
+
+            if (alpha <= 0 || beta <= 0) return;
+
+            const mean = alpha / (alpha + beta);
+            const variance = (alpha * beta) / (Math.pow(alpha + beta, 2) * (alpha + beta + 1));
+            const mode = (alpha > 1 && beta > 1) ? (alpha - 1) / (alpha + beta - 2) : 0;
+            const skewness = (2 * (beta - alpha) * Math.sqrt(alpha + beta + 1)) / ((alpha + beta + 2) * Math.sqrt(alpha * beta));
+
+            document.getElementById('meanStat').textContent = mean.toFixed(3);
+            document.getElementById('varianceStat').textContent = variance.toFixed(3);
+            document.getElementById('modeStat').textContent = mode.toFixed(3);
+            document.getElementById('skewnessStat').textContent = skewness.toFixed(3);
+        }
+
+        function updateChart(alpha, beta, calcType) {
+            // Chart update logic will use existing chart instances
+            // For now, just trigger chart initialization
+            if (typeof initializeCharts === 'function') {
+                initializeCharts();
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function reloadCalculator() {
+            location.reload();
+        }
+
+        function openAboutModal() {
+            document.getElementById('aboutModal').style.display = 'flex';
+        }
+
+        function closeAboutModal() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
+
+        function switchTab(tabName, tabElement) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            tabElement.classList.add('active');
+        }
+
+        let pdfChart, cdfChart, combinedChart;
+
+        function initializeCharts() {
+            try {
+                if (typeof Highcharts === 'undefined') {
+                    console.error('Highcharts not loaded');
+                    return;
+                }
+
+                // Set dark theme for all charts
+                Highcharts.setOptions({
+                    chart: {
+                        backgroundColor: 'transparent',
+                        style: {
+                            fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+                        }
+                    },
+                    colors: ['#e67e22', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'],
+                    title: {
+                        style: {
+                            color: 'white'
+                        }
+                    },
+                    xAxis: {
+                        gridLineColor: 'rgba(255,255,255,0.1)',
+                        lineColor: 'rgba(255,255,255,0.3)',
+                        tickColor: 'rgba(255,255,255,0.3)',
+                        labels: {
+                            style: {
+                                color: 'white'
+                            }
+                        },
+                        title: {
+                            style: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    yAxis: {
+                        gridLineColor: 'rgba(255,255,255,0.1)',
+                        lineColor: 'rgba(255,255,255,0.3)',
+                        tickColor: 'rgba(255,255,255,0.3)',
+                        labels: {
+                            style: {
+                                color: 'white'
+                            }
+                        },
+                        title: {
+                            style: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    legend: {
+                        itemStyle: {
+                            color: 'white'
+                        }
+                    },
+                    plotOptions: {
+                        line: {
+                            marker: {
+                                enabled: false
+                            }
+                        },
+                        area: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    }
+                });
+
+                // PDF Chart
+                pdfChart = Highcharts.chart('pdfChart', {
+                    chart: {
+                        type: 'line'
+                    },
+                    title: {
+                        text: null
+                    },
+                    xAxis: {
+                        title: {
+                            text: 'X'
+                        },
+                        min: 0,
+                        max: 1
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Probability Density'
+                        }
+                    },
+                    series: [{
+                        name: 'PDF',
+                        data: [],
+                        color: 'rgb(255,165,120)',
+                        lineWidth: 3
+                    }, {
+                        name: 'Shaded Area',
+                        data: [],
+                        type: 'area',
+                        color: 'rgba(255, 165, 120, 0.3)',
+                        lineWidth: 0
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+
+                // CDF Chart
+                cdfChart = Highcharts.chart('cdfChart', {
+                    chart: {
+                        type: 'line'
+                    },
+                    title: {
+                        text: null
+                    },
+                    xAxis: {
+                        title: {
+                            text: 'X'
+                        },
+                        min: 0,
+                        max: 1
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Cumulative Probability'
+                        },
+                        min: 0,
+                        max: 1
+                    },
+                    series: [{
+                        name: 'CDF',
+                        data: [],
+                        color: 'rgb(120,200,255)',
+                        lineWidth: 3
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+
+                // Combined view - both PDF and CDF on same chart with dual Y-axes
+                combinedChart = Highcharts.chart('combinedChart', {
+                    chart: {
+                        type: 'line'
+                    },
+                    title: {
+                        text: null
+                    },
+                    xAxis: {
+                        title: {
+                            text: 'X'
+                        },
+                        min: 0,
+                        max: 1
+                    },
+                    yAxis: [{
+                        title: {
+                            text: 'Probability Density'
+                        },
+                        labels: {
+                            format: '{value}'
+                        }
+                    }, {
+                        title: {
+                            text: 'Cumulative Probability'
+                        },
+                        labels: {
+                            format: '{value}'
+                        },
+                        min: 0,
+                        max: 1,
+                        opposite: true
+                    }],
+                    series: [{
+                        name: 'PDF',
+                        data: [],
+                        color: 'rgb(255,165,120)',
+                        lineWidth: 3,
+                        yAxis: 0
+                    }, {
+                        name: 'Shaded Area',
+                        data: [],
+                        type: 'area',
+                        color: 'rgba(255, 165, 120, 0.3)',
+                        lineWidth: 0,
+                        yAxis: 0
+                    }, {
+                        name: 'CDF',
+                        data: [],
+                        color: 'rgb(120,200,255)',
+                        lineWidth: 3,
+                        yAxis: 1
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+
+                calculate();
+            } catch (error) {
+                console.error('Chart initialization error:', error);
+            }
+        }
+
+        function updateChart(alpha, beta, calcType) {
+            try {
+                const points = 200;
+                const pdfData = [];
+                const cdfData = [];
+                const shadedData = [];
+
+                for (let i = 0; i <= points; i++) {
+                    const x = i / points;
+                    const pdfValue = jStat.beta.pdf(x, alpha, beta);
+                    const cdfValue = jStat.beta.cdf(x, alpha, beta);
+                    
+                    pdfData.push([x, pdfValue]);
+                    cdfData.push([x, cdfValue]);
+                }
+
+                // Calculate shaded area based on calculation type
+                if (calcType === 'probability') {
+                    const xValue = parseFloat(document.getElementById('xValue')?.value || 0.5);
+                    for (let i = 0; i <= points; i++) {
+                        const x = i / points;
+                        if (x <= xValue) {
+                            shadedData.push([x, jStat.beta.pdf(x, alpha, beta)]);
+                        }
+                    }
+                } else if (calcType === 'between') {
+                    const lowerBound = parseFloat(document.getElementById('lowerBound')?.value || 0.2);
+                    const upperBound = parseFloat(document.getElementById('upperBound')?.value || 0.8);
+                    for (let i = 0; i <= points; i++) {
+                        const x = i / points;
+                        if (x >= lowerBound && x <= upperBound) {
+                            shadedData.push([x, jStat.beta.pdf(x, alpha, beta)]);
+                        }
+                    }
+                }
+
+                // Update all charts
+                if (pdfChart && pdfChart.series) {
+                    pdfChart.series[0].setData(pdfData, false);
+                    pdfChart.series[1].setData(shadedData, false);
+                    pdfChart.redraw();
+                }
+
+                if (cdfChart && cdfChart.series) {
+                    cdfChart.series[0].setData(cdfData, true);
+                }
+
+                if (combinedChart && combinedChart.series) {
+                    combinedChart.series[0].setData(pdfData, false);  // PDF
+                    combinedChart.series[1].setData(shadedData, false);  // Shaded Area
+                    combinedChart.series[2].setData(cdfData, false);  // CDF
+                    combinedChart.redraw();
+                }
+            } catch (error) {
+                console.error('Chart update error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+
             margin: 0;
             padding: 0;
             width: 100%;

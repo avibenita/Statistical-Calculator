@@ -1,0 +1,11 @@
+.git/
+node_modules/
+.cache/
+.vscode/
+__pycache__/
+*.log
+*.zip
+*.bak
+*.tmp
+*.min.js
+*.bundle.js

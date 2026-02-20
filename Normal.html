@@ -50,7 +50,6 @@
     </div>
     <div class="result-hero-left" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,165,120,0.3); border-radius: 12px; padding: 12px; text-align: center; align-items: center;">
         <div class="result-hero-label" style="justify-content: center; font-size: 0.85rem;">
-            <i class="fas fa-bullseye"></i>
             <span id="heroExpression">Result</span>
             <small>(updates instantly)</small>
         </div>
@@ -58,7 +57,9 @@
         <div class="result-hero-value" id="mainResult" style="text-align: center;">--</div>
 
         <div class="shaded-area-info" style="margin: 0; text-align: center; font-size: 0.9rem;">
-            <span id="areaValue" style="font-weight: 800; color: rgb(120,165,255); text-shadow: 0 6px 22px rgba(120,165,255,0.25);">--</span>
+            <div style="text-align: center;">
+                <span id="areaValue" style="font-weight: 800; color: rgb(120,165,255); text-shadow: 0 6px 22px rgba(120,165,255,0.25); display: inline-block;">--</span>
+            </div>
         </div>
 
         <div style="margin-top: 8px; text-align: center;">
@@ -133,6 +134,14 @@
                                 <input class="input-field" id="stddev" min="0.01" step="0.1" type="number" value="1" placeholder="e.g., 1, 2, 0.5"/>
                             </div>
                         </div>
+                        <div id="inputSection">
+                            <div class="input-group">
+                                <label>
+                                    X Value
+                                </label>
+                                <input class="input-field" id="xValue" step="0.1" type="number" value="0"/>
+                            </div>
+                        </div>
                         <div class="calculation-type">
                             <h4 style="margin-bottom: 10px; color: var(--header-color); font-size: 0.95rem;">
                                 Calculation Type
@@ -159,14 +168,6 @@
                                         <small style="color: #bbb; display: block; margin-top: 2px;">What value has this probability below it?</small>
                                     </div>
                                 </label>
-                            </div>
-                        </div>
-                        <div id="inputSection">
-                            <div class="input-group">
-                                <label>
-                                    X Value
-                                </label>
-                                <input class="input-field" id="xValue" step="0.1" type="number" value="0"/>
                             </div>
                         </div>
                           <!-- About Section Toggle Button -->

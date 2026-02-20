@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Cpk Process Capability Calculator</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+    <script src="https://code.highcharts.com/modules/annotations.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --panel-bg: #484b57;
+            --panel-radius: 10px;
+            --panel-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+            --header-bg: #000;
+            --header-color: rgb(255,192,192);
+            --highlight-bg: rgba(255, 192, 192, 0.2);
+            --highlight-text: rgb(255, 192, 192);
+            --primary-blue: #3498db;
+            --primary-blue-hover: #2980b9;
+            --success-green: #27ae60;
+            --warning-orange: #f39c12;
+            --danger-red: #e74c3c;
+            --excellent-green: #2ecc71;
+            --good-blue: #3498db;
+            --adequate-yellow: #f1c40f;
+            --poor-orange: #e67e22;
+            --inadequate-red: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+           white
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--header-bg) 0%, #1a1a2e 100%);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--header-color);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 5px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .control-panel-wrapper,
+        .visualization-panel-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-panel {
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+            padding: 25px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .visualization-panel {
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            box-shadow: var(--panel-shadow);
+            padding: 25px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            color: var(--header-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px 20px;
+            border-radius: var(--panel-radius);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e8e8e8;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-green) 0%, #16a085 100%);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2ecc71 0%, #17a2b8 100%);
+            transform: translateY(-2px);
+        }
+
+        .parameters-section {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            color: var(--highlight-text);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .gauge-section {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-container {
+            width: 100%;
+            height: 250px;
+            max-width: 300px;
+        }
+
+        .results-section {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: var(--highlight-text);
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .capability-rating {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .rating-excellent { background: var(--excellent-green); color: white; }
+        .rating-good { background: var(--good-blue); color: white; }
+        .rating-adequate { background: var(--adequate-yellow); color: black; }
+        .rating-poor { background: var(--poor-orange); color: white; }
+        .rating-inadequate { background: var(--inadequate-red); color: white; }
+
+        .info-box {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #e0e0e0;
+        }
+
+        .chart-container {
+            flex: 1;
+            margin-top: 20px;
+            min-height: 400px;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .row .input-group {
+            flex: 1;
+        }
+
+        .interpretation-section {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .interpretation-section h4 {
+            color: var(--highlight-text);
+            margin-bottom: 10px;
+        }
+
+        .interpretation-section ul {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+        .interpretation-section li {
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+
+        .control-sliders {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .slider-group {
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e8e8e8;
+        }
+
+        .slider-value {
+            color: var(--header-color);
+            font-weight: bold;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .slider-input {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.2);
+            outline: none;
+            -webkit-appearance: none;
+            transition: all 0.3s ease;
+        }
+
+        .slider-input::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .slider-input::-webkit-slider-thumb:hover {
+            background: var(--primary-blue-hover);
+            transform: scale(1.1);
+        }
+
+        .slider-input::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .slider-input::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+        }
+
+        .slider-input:focus {
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+
+        .slider-input:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+        }
+
+        .parameter-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .parameter-icon {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .parameter-content {
+            flex: 1;
+        }
+
+        .parameter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .parameter-label {
+            font-weight: 600;
+            color: #e8e8e8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tooltip-icon {
+            cursor: help;
+            color: var(--warning-orange);
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: normal;
+            max-width: 400px;
+            min-width: 250px;
+            z-index: 1000;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            transform: translateY(-12px);
+            font-weight: 400;
+        }
+
+        .tooltip-icon:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.95);
+        }
+
+        .tooltip-icon:hover {
+            color: var(--primary-blue);
+            transform: scale(1.1);
+        }
+
+        .parameter-value {
+            color: var(--header-color);
+            font-weight: bold;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .parameter-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .manual-input {
+            width: 80px;
+            padding: 6px 8px;
+            border: 2px solid #555;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .manual-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .slider-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .visual-indicator {
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .visual-indicator.active {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.2);
+            color: var(--primary-blue);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .section-icon {
+            font-size: 1.3rem;
+            color: var(--primary-blue);
+        }
+
+        .section-title-enhanced {
+            font-size: 1.1rem;
+            color: var(--header-color);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .row {
+                flex-direction: column;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .gauge-container {
+                height: 200px;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Cpk Process Capability Calculator</h1>
+            <p>Analyze your manufacturing process capability within specification limits</p>
+            <p>Calculate Cp, Cpk, Cpu, and Cpl indices to assess process performance</p>
+            <p><strong>🎯 Industry Standard Process Capability Analysis</strong></p>
+        </div>
+
+        <div class="main-content">
+            <div class="control-panel-wrapper">
+                <div class="control-panel">
+                    <h2 class="panel-title">
+                        <i class="fas fa-cogs"></i>
+                        Process Parameters
+                    </h2>
+
+                    <div class="control-sliders">
+                        <div class="section-header">
+                            <i class="fas fa-ruler-combined section-icon"></i>
+                            <div class="section-title-enhanced">Specification Limits</div>
+                        </div>
+                        
+                        <div class="parameter-row">
+                            <i class="fas fa-arrow-down parameter-icon" style="color: #e74c3c;"></i>
+                            <div class="parameter-content">
+                                <div class="parameter-header">
+                                    <div class="parameter-label">
+                                        Lower Specification Limit (LSL)
+                                        <i class="fas fa-question-circle tooltip-icon">
+                                            <div class="tooltip">The minimum acceptable value for your process output. Values below this limit are considered defective. This defines the lower boundary of your specification range.</div>
+                                        </i>
+                                    </div>
+                                    <span class="parameter-value" id="lslValue">10.0</span>
+                                </div>
+                                <div class="parameter-controls">
+                                    <input type="number" class="manual-input" id="lslManual" min="0" max="25" step="0.1" value="10"/>
+                                    <div class="slider-container">
+                                        <input type="range" class="slider-input" id="lsl" min="0" max="25" step="0.1" value="10"/>
+                                        <i class="fas fa-chart-area visual-indicator" id="lslIndicator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-row">
+                            <i class="fas fa-arrow-up parameter-icon" style="color: #27ae60;"></i>
+                            <div class="parameter-content">
+                                <div class="parameter-header">
+                                    <div class="parameter-label">
+                                        Upper Specification Limit (USL)
+                                        <i class="fas fa-question-circle tooltip-icon">
+                                            <div class="tooltip">The maximum acceptable value for your process output. Values above this limit are considered defective. This defines the upper boundary of your specification range.</div>
+                                        </i>
+                                    </div>
+                                    <span class="parameter-value" id="uslValue">20.0</span>
+                                </div>
+                                <div class="parameter-controls">
+                                    <input type="number" class="manual-input" id="uslManual" min="5" max="30" step="0.1" value="20"/>
+                                    <div class="slider-container">
+                                        <input type="range" class="slider-input" id="usl" min="5" max="30" step="0.1" value="20"/>
+                                        <i class="fas fa-chart-area visual-indicator" id="uslIndicator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-row">
+                            <i class="fas fa-bullseye parameter-icon" style="color: #f39c12;"></i>
+                            <div class="parameter-content">
+                                <div class="parameter-header">
+                                    <div class="parameter-label">
+                                        Target Value
+                                        <i class="fas fa-question-circle tooltip-icon">
+                                            <div class="tooltip">The ideal or nominal value for your process output. This is the value you aim for. When the process mean equals the target, capability is optimized.</div>
+                                        </i>
+                                    </div>
+                                    <span class="parameter-value" id="targetValue">15.0</span>
+                                </div>
+                                <div class="parameter-controls">
+                                    <input type="number" class="manual-input" id="targetManual" min="0" max="30" step="0.1" value="15"/>
+                                    <div class="slider-container">
+                                        <input type="range" class="slider-input" id="target" min="0" max="30" step="0.1" value="15"/>
+                                        <i class="fas fa-crosshairs visual-indicator" id="targetIndicator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-sliders">
+                        <div class="section-header">
+                            <i class="fas fa-chart-line section-icon"></i>
+                            <div class="section-title-enhanced">Process Data</div>
+                        </div>
+                        
+                        <div class="parameter-row">
+                            <i class="fas fa-balance-scale parameter-icon" style="color: #3498db;"></i>
+                            <div class="parameter-content">
+                                <div class="parameter-header">
+                                    <div class="parameter-label">
+                                        Process Mean (μ)
+                                        <i class="fas fa-question-circle tooltip-icon">
+                                            <div class="tooltip">The average value of your process output. This represents the center of your process distribution. Compare this to your target value to assess process centering.</div>
+                                        </i>
+                                    </div>
+                                    <span class="parameter-value" id="meanValue">15.2</span>
+                                </div>
+                                <div class="parameter-controls">
+                                    <input type="number" class="manual-input" id="meanManual" min="5" max="25" step="0.1" value="15.2"/>
+                                    <div class="slider-container">
+                                        <input type="range" class="slider-input" id="mean" min="5" max="25" step="0.1" value="15.2"/>
+                                        <i class="fas fa-chart-bar visual-indicator" id="meanIndicator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-row">
+                            <i class="fas fa-expand-arrows-alt parameter-icon" style="color: #9b59b6;"></i>
+                            <div class="parameter-content">
+                                <div class="parameter-header">
+                                    <div class="parameter-label">
+                                        Standard Deviation (σ)
+                                        <i class="fas fa-question-circle tooltip-icon">
+                                            <div class="tooltip">A measure of process variation. Lower standard deviation means more consistent output and better capability. This determines how spread out your process values are around the mean.</div>
+                                        </i>
+                                    </div>
+                                    <span class="parameter-value" id="stddevValue">1.5</span>
+                                </div>
+                                <div class="parameter-controls">
+                                    <input type="number" class="manual-input" id="stddevManual" min="0.1" max="5.0" step="0.1" value="1.5"/>
+                                    <div class="slider-container">
+                                        <input type="range" class="slider-input" id="stddev" min="0.1" max="5.0" step="0.1" value="1.5"/>
+                                        <i class="fas fa-wave-square visual-indicator" id="stddevIndicator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success" onclick="calculateCpk()">
+                        <i class="fas fa-calculator"></i>
+                        Calculate Process Capability
+                    </button>
+
+                    <div class="interpretation-section">
+                        <h4><i class="fas fa-info-circle"></i> Capability Index Interpretation</h4>
+                        <ul>
+                            <li><strong>Cpk ≥ 2.0:</strong> Excellent capability</li>
+                            <li><strong>Cpk ≥ 1.67:</strong> Good capability</li>
+                            <li><strong>Cpk ≥ 1.33:</strong> Adequate capability</li>
+                            <li><strong>Cpk ≥ 1.0:</strong> Poor capability</li>
+                            <li><strong>Cpk < 1.0:</strong> Inadequate capability</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization-panel-wrapper">
+                <div class="visualization-panel">
+                    <h2 class="panel-title">
+                        <i class="fas fa-chart-area"></i>
+                        Capability Analysis Results
+                    </h2>
+
+                    <div class="results-grid">
+                        <div class="gauge-section">
+                            <div class="gauge-container">
+                                <div id="cpkGauge"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="results" class="results-section">
+                            <div class="result-item">
+                                <div class="result-label">Process Capability (Cp)</div>
+                                <div class="result-value" id="cpResult">-</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Process Capability Index (Cpk)</div>
+                                <div class="result-value" id="cpkResult">-</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Upper Capability (Cpu)</div>
+                                <div class="result-value" id="cpuResult">-</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Lower Capability (Cpl)</div>
+                                <div class="result-value" id="cplResult">-</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Expected PPM Defects</div>
+                                <div class="result-value" id="ppmResult">-</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Process Yield</div>
+                                <div class="result-value" id="yieldResult">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div id="distributionChart"></div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4><i class="fas fa-lightbulb"></i> Process Assessment</h4>
+                        <p id="assessmentText">Enter your process parameters and click "Calculate Process Capability" to see detailed analysis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mathematical functions
+        function normalPDF(x, mean, stddev) {
+            const coefficient = 1 / (stddev * Math.sqrt(2 * Math.PI));
+            const exponent = -0.5 * Math.pow((x - mean) / stddev, 2);
+            return coefficient * Math.exp(exponent);
+        }
+
+        function normalCDF(x, mean, stddev) {
+            return 0.5 * (1 + erf((x - mean) / (stddev * Math.sqrt(2))));
+        }
+
+        function erf(x) {
+            // Abramowitz and Stegun approximation
+            const a1 = 0.254829592;
+            const a2 = -0.284496736;
+            const a3 = 1.421413741;
+            const a4 = -1.453152027;
+            const a5 = 1.061405429;
+            const p = 0.3275911;
+
+            const sign = x >= 0 ? 1 : -1;
+            x = Math.abs(x);
+
+            const t = 1.0 / (1.0 + p * x);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+            return sign * y;
+        }
+
+        function getCapabilityRating(cpk) {
+            if (cpk >= 2.0) {
+                return { text: 'Excellent', class: 'rating-excellent' };
+            } else if (cpk >= 1.67) {
+                return { text: 'Good', class: 'rating-good' };
+            } else if (cpk >= 1.33) {
+                return { text: 'Adequate', class: 'rating-adequate' };
+            } else if (cpk >= 1.0) {
+                return { text: 'Poor', class: 'rating-poor' };
+            } else {
+                return { text: 'Inadequate', class: 'rating-inadequate' };
+            }
+        }
+
+        function calculateCpk() {
+            // Get input values
+            const lsl = parseFloat(document.getElementById('lsl').value);
+            const usl = parseFloat(document.getElementById('usl').value);
+            const mean = parseFloat(document.getElementById('mean').value);
+            const stddev = parseFloat(document.getElementById('stddev').value);
+            const target = parseFloat(document.getElementById('target').value);
+
+            // Validate inputs
+            if (isNaN(lsl) || isNaN(usl) || isNaN(mean) || isNaN(stddev)) {
+                alert('Please enter valid numeric values for all required fields.');
+                return;
+            }
+
+            if (stddev <= 0) {
+                alert('Standard deviation must be greater than 0.');
+                return;
+            }
+
+            if (usl <= lsl) {
+                alert('Upper specification limit must be greater than lower specification limit.');
+                return;
+            }
+
+            // Calculate capability indices
+            const specWidth = usl - lsl;
+            const processWidth = 6 * stddev;
+            
+            const cp = specWidth / processWidth;
+            const cpu = (usl - mean) / (3 * stddev);
+            const cpl = (mean - lsl) / (3 * stddev);
+            const cpk = Math.min(cpu, cpl);
+
+            // Calculate PPM defects and yield
+            const ppmLower = (1 - normalCDF(lsl, mean, stddev)) * 1000000;
+            const ppmUpper = normalCDF(usl, mean, stddev) * 1000000;
+            const totalPPM = ppmLower + (1000000 - ppmUpper);
+            const yield = ((1000000 - totalPPM) / 1000000) * 100;
+
+            // Display results
+            displayResults(cp, cpk, cpu, cpl, totalPPM, yield);
+            
+            // Create visualizations
+            createCpkGauge(cpk);
+            createDistributionChart(lsl, usl, mean, stddev, target);
+            
+            // Update assessment
+            updateAssessment(cpk, cp, mean, target, lsl, usl);
+        }
+
+        function displayResults(cp, cpk, cpu, cpl, ppm, yield) {
+            const cpkRating = getCapabilityRating(cpk);
+            
+            document.getElementById('cpResult').textContent = cp.toFixed(3);
+            document.getElementById('cpkResult').innerHTML = 
+                cpk.toFixed(3) + `<span class="capability-rating ${cpkRating.class}">${cpkRating.text}</span>`;
+            document.getElementById('cpuResult').textContent = cpu.toFixed(3);
+            document.getElementById('cplResult').textContent = cpl.toFixed(3);
+            document.getElementById('ppmResult').textContent = Math.round(ppm).toLocaleString();
+            document.getElementById('yieldResult').textContent = yield.toFixed(2) + '%';
+        }
+
+        function createCpkGauge(cpk) {
+            // Limit the gauge to a reasonable maximum
+            const maxCpk = Math.max(3.0, cpk + 0.5);
+            
+            Highcharts.chart('cpkGauge', {
+                chart: {
+                    type: 'solidgauge',
+                    backgroundColor: 'transparent',
+                    margin: [0, 0, 0, 0]
+                },
+                title: {
+                    text: 'Process Capability Index (Cpk)',
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        color: '#ffc0c0'
+                    },
+                    y: 40
+                },
+                pane: {
+                    center: ['50%', '70%'],
+                    size: '140%',
+                    startAngle: -90,
+                    endAngle: 90,
+                    background: {
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        innerRadius: '60%',
+                        outerRadius: '100%',
+                        shape: 'arc'
+                    }
+                },
+                exporting: {
+                    enabled: false
+                },
+                tooltip: {
+                    enabled: false
+                },
+                yAxis: {
+                    min: 0,
+                    max: maxCpk,
+                    stops: [
+                        [1.0 / maxCpk, '#e74c3c'],        // 0.0 to 1.0 - Inadequate (Red)
+                        [1.33 / maxCpk, '#e67e22'],       // 1.0 to 1.33 - Poor (Orange)
+                        [1.67 / maxCpk, '#f1c40f'],       // 1.33 to 1.67 - Adequate (Yellow)
+                        [2.0 / maxCpk, '#3498db'],        // 1.67 to 2.0 - Good (Blue)
+                        [1.0, '#2ecc71']                  // 2.0+ - Excellent (Green)
+                    ],
+                    lineWidth: 0,
+                    tickWidth: 1,
+                    tickColor: '#ffffff',
+                    minorTickInterval: null,
+                    tickPositions: [0, 1.0, 1.33, 1.67, 2.0, maxCpk],
+                    title: {
+                        y: -50,
+                        text: 'Cpk Value',
+                        style: {
+                            color: '#e8e8e8',
+                            fontSize: '12px'
+                        }
+                    },
+                    labels: {
+                        y: 16,
+                        style: {
+                            color: '#e8e8e8',
+                            fontSize: '10px'
+                        }
+                    }
+                },
+                plotOptions: {
+                    solidgauge: {
+                        dataLabels: {
+                            y: 5,
+                            borderWidth: 0,
+                            useHTML: true,
+                            style: {
+                                fontSize: '20px',
+                                fontWeight: 'bold',
+                                color: '#ffffff',
+                                textOutline: 'none'
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Cpk',
+                    data: [{
+                        y: cpk,
+                        color: getCpkColor(cpk)
+                    }],
+                    dataLabels: {
+                        format: '<div style="text-align:center">' +
+                                '<span style="font-size:24px;color:#ffffff">{y:.2f}</span><br/>' +
+                                '<span style="font-size:12px;color:#e8e8e8">' + getCapabilityRating(cpk).text + '</span>' +
+                                '</div>'
+                    },
+                    tooltip: {
+                        valueSuffix: ' Cpk'
+                    }
+                }]
+            });
+        }
+
+        function getCpkColor(cpk) {
+            if (cpk >= 2.0) return '#2ecc71';      // Excellent - Green
+            if (cpk >= 1.67) return '#3498db';     // Good - Blue
+            if (cpk >= 1.33) return '#f1c40f';     // Adequate - Yellow
+            if (cpk >= 1.0) return '#e67e22';      // Poor - Orange
+            return '#e74c3c';                      // Inadequate - Red
+        }
+
+        function createDistributionChart(lsl, usl, mean, stddev, target) {
+            // Generate normal distribution curve
+            const xMin = Math.min(lsl, mean - 4 * stddev);
+            const xMax = Math.max(usl, mean + 4 * stddev);
+            const step = (xMax - xMin) / 200;
+            
+            const distributionData = [];
+            for (let x = xMin; x <= xMax; x += step) {
+                distributionData.push([x, normalPDF(x, mean, stddev)]);
+            }
+
+            // Create specification limit lines
+            const maxY = normalPDF(mean, mean, stddev) * 1.1;
+            
+            const series = [{
+                name: 'Process Distribution',
+                data: distributionData,
+                type: 'area',
+                color: '#3498db',
+                fillOpacity: 0.3,
+                lineWidth: 2
+            }, {
+                name: 'Lower Spec Limit (LSL)',
+                data: [[lsl, 0], [lsl, maxY]],
+                type: 'line',
+                color: '#e74c3c',
+                dashStyle: 'dash',
+                lineWidth: 2,
+                marker: { enabled: false }
+            }, {
+                name: 'Upper Spec Limit (USL)',
+                data: [[usl, 0], [usl, maxY]],
+                type: 'line',
+                color: '#e74c3c',
+                dashStyle: 'dash',
+                lineWidth: 2,
+                marker: { enabled: false }
+            }, {
+                name: 'Process Mean',
+                data: [[mean, 0], [mean, maxY]],
+                type: 'line',
+                color: '#27ae60',
+                lineWidth: 2,
+                marker: { enabled: false }
+            }];
+
+            // Add target line if specified
+            if (!isNaN(target)) {
+                series.push({
+                    name: 'Target',
+                    data: [[target, 0], [target, maxY]],
+                    type: 'line',
+                    color: '#f39c12',
+                    dashStyle: 'dot',
+                    lineWidth: 2,
+                    marker: { enabled: false }
+                });
+            }
+
+            Highcharts.chart('distributionChart', {
+                title: {
+                    text: 'Process Distribution vs Specification Limits',
+                    style: { color: '#ffc0c0' }
+                },
+                xAxis: {
+                    title: { text: 'Process Output', style: { color: '#e8e8e8' } },
+                    labels: { style: { color: '#e8e8e8' } },
+                    gridLineColor: '#555'
+                },
+                yAxis: {
+                    title: { text: 'Probability Density', style: { color: '#e8e8e8' } },
+                    labels: { style: { color: '#e8e8e8' } },
+                    gridLineColor: '#555'
+                },
+                chart: {
+                    backgroundColor: 'transparent',
+                    style: { fontFamily: 'Segoe UI' }
+                },
+                legend: { 
+                    itemStyle: { color: '#e8e8e8' },
+                    backgroundColor: 'rgba(72, 75, 87, 0.8)',
+                    borderColor: '#555',
+                    borderRadius: 5
+                },
+                series: series,
+                plotOptions: {
+                    series: {
+                        marker: { enabled: false }
+                    }
+                },
+                tooltip: {
+                    formatter: function() {
+                        if (this.series.name === 'Process Distribution') {
+                            return '<b>Process Distribution</b><br/>' +
+                                   'Value: ' + this.x.toFixed(3) + '<br/>' +
+                                   'Density: ' + this.y.toFixed(6);
+                        } else {
+                            return '<b>' + this.series.name + '</b><br/>' +
+                                   'Value: ' + this.x.toFixed(3);
+                        }
+                    },
+                    style: { color: '#e8e8e8' },
+                    backgroundColor: 'rgba(72, 75, 87, 0.9)',
+                    borderColor: '#555'
+                }
+            });
+        }
+
+        function updateAssessment(cpk, cp, mean, target, lsl, usl) {
+            const cpkRating = getCapabilityRating(cpk);
+            const centeringOffset = !isNaN(target) ? Math.abs(mean - target) : Math.abs(mean - (lsl + usl) / 2);
+            const specWidth = usl - lsl;
+            const centeringRatio = (centeringOffset / (specWidth / 2)) * 100;
+            
+            let assessment = `Your process shows <strong>${cpkRating.text.toLowerCase()}</strong> capability with Cpk = ${cpk.toFixed(3)}. `;
+            
+            if (cpk >= 2.0) {
+                assessment += 'This is world-class performance with virtually no defects expected.';
+            } else if (cpk >= 1.67) {
+                assessment += 'This represents good process control with very low defect rates.';
+            } else if (cpk >= 1.33) {
+                assessment += 'This is adequate for most applications but has room for improvement.';
+            } else if (cpk >= 1.0) {
+                assessment += 'This process is marginally capable and requires attention to reduce defects.';
+            } else {
+                assessment += 'This process is not capable and will produce significant defects. Immediate corrective action is needed.';
+            }
+            
+            assessment += `<br/><br/>Process centering is ${centeringRatio.toFixed(1)}% off from optimal. `;
+            
+            if (centeringRatio < 5) {
+                assessment += 'The process is well-centered.';
+            } else if (centeringRatio < 15) {
+                assessment += 'Minor centering adjustment may improve capability.';
+            } else {
+                assessment += 'Significant centering adjustment is recommended.';
+            }
+            
+            const cpRatio = cp / cpk;
+            if (cpRatio > 1.2) {
+                assessment += '<br/><br/>The difference between Cp and Cpk suggests that centering the process could significantly improve capability.';
+            }
+            
+            document.getElementById('assessmentText').innerHTML = assessment;
+        }
+
+        // Initialize slider values and add event listeners
+        function initializeSliders() {
+            const parameters = [
+                { id: 'lsl', suffix: '', decimals: 1 },
+                { id: 'usl', suffix: '', decimals: 1 },
+                { id: 'target', suffix: '', decimals: 1 },
+                { id: 'mean', suffix: '', decimals: 1 },
+                { id: 'stddev', suffix: '', decimals: 1 }
+            ];
+            
+            parameters.forEach(param => {
+                const slider = document.getElementById(param.id);
+                const manualInput = document.getElementById(param.id + 'Manual');
+                const valueDisplay = document.getElementById(param.id + 'Value');
+                const indicator = document.getElementById(param.id + 'Indicator');
+                
+                // Update display value
+                updateParameterValue(param.id, param.suffix, param.decimals);
+                
+                // Add event listeners for sliders
+                slider.addEventListener('input', function() {
+                    // Sync manual input with slider
+                    manualInput.value = slider.value;
+                    updateParameterValue(param.id, param.suffix, param.decimals);
+                    animateIndicator(indicator);
+                    calculateCpk(); // Real-time calculation
+                });
+                
+                // Add event listeners for manual inputs
+                manualInput.addEventListener('input', function() {
+                    const value = parseFloat(manualInput.value);
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+                    
+                    if (!isNaN(value) && value >= min && value <= max) {
+                        slider.value = value;
+                        updateParameterValue(param.id, param.suffix, param.decimals);
+                        animateIndicator(indicator);
+                        calculateCpk(); // Real-time calculation
+                    }
+                });
+                
+                // Add blur event to validate manual input
+                manualInput.addEventListener('blur', function() {
+                    const value = parseFloat(manualInput.value);
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+                    
+                    if (isNaN(value) || value < min || value > max) {
+                        manualInput.value = slider.value; // Reset to slider value
+                    }
+                });
+            });
+        }
+
+        function updateParameterValue(parameterId, suffix, decimals) {
+            const slider = document.getElementById(parameterId);
+            const valueDisplay = document.getElementById(parameterId + 'Value');
+            
+            if (slider && valueDisplay) {
+                const value = parseFloat(slider.value);
+                valueDisplay.textContent = value.toFixed(decimals) + suffix;
+            }
+        }
+
+        function animateIndicator(indicator) {
+            if (indicator) {
+                indicator.classList.add('active');
+                setTimeout(() => {
+                    indicator.classList.remove('active');
+                }, 300);
+            }
+        }
+
+        // Initialize with default calculation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSliders();
+            calculateCpk();
+        });
+    </script>
+</body>
+</html> 
